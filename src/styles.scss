@@ -1,1 +1,54 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
+
+/* Em src/styles.scss ou src/styles.css */
+
+// Primeiro, garantimos que o corpo da página ocupe toda a tela e não tenha margens.
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif; // Opcional, mas uma boa prática.
+}
+
+// 1. Transforma o container principal em um layout flexível.
+.layout-principal {
+  display: flex;
+  height: 100vh;
+}
+
+// 2. Define um tamanho fixo para a sidebar.
+// O seletor 'app-side-bar' seleciona seu componente diretamente.
+app-side-bar {
+  // flex: [grow] [shrink] [basis];
+  // 0 -> não deve crescer
+  // 0 -> não deve encolher
+  // 250px -> terá uma base de largura fixa de 250px
+  flex: 0 0 200px;
+  background-color: #f4f4f4; // Cor de fundo para visualização.
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1); // Sombra sutil para separar.
+
+  // Se a sidebar tiver muitos itens, ela terá sua própria barra de rolagem.
+  overflow-y: auto;
+}
+
+// 3. Faz o conteúdo principal ocupar todo o espaço restante e ser rolável.
+.conteudo-principal {
+  // flex: 1; é um atalho para flex-grow: 1;
+  // Isso diz ao item para "crescer" e ocupar todo o espaço disponível.
+  flex: 1;
+
+  // Apenas a área de conteúdo principal terá uma barra de rolagem, não a página inteira.
+  overflow-y: auto;
+
+  // Um espaçamento interno para o conteúdo não ficar colado nas bordas.
+
+}
+
+// 4. Ajuste na Navbar (Opcional, mas recomendado)
+// Como a navbar está fora do main, precisamos ajustar sua posição.
+// Uma forma é colocar a navbar DENTRO do main no seu HTML.
+// Se você fizer isso, o código acima já funciona perfeitamente.
