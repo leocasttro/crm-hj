@@ -1,31 +1,60 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Paciente } from '../../shared/models/paciente';
 import { PacienteForm } from '../../shared/component/paciente-form/paciente-form';
+import { UiActionService } from '../../shared/services/ui-action.service';
 
 @Component({
   standalone: true,
   selector: 'app-pacientes',
   templateUrl: './pacientes.html',
-  imports: [CommonModule, PacienteForm], // ✅ IMPORTANTE
+  imports: [CommonModule],
 })
-export class Pacientes {
+export class Pacientes implements OnInit, OnDestroy {
 
   pacientes: Paciente[] = [];
-  mostrarFormulario = false;
-  pacienteSelecionado?: Paciente;
+  private sub!: Subscription;
 
-  novo(): void {
-    this.pacienteSelecionado = undefined;
-    this.mostrarFormulario = true;
+  constructor(
+    private uiAction: UiActionService,
+    private modalService: NgbModal // 👈 ESSENCIAL
+  ) {}
+
+  ngOnInit(): void {
+    this.sub = this.uiAction.action$.subscribe(action => {
+      if (action === 'novo-paciente') {
+        this.abrirModal();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  abrirModal(paciente?: Paciente): void {
+    const modalRef = this.modalService.open(PacienteForm, {
+      size: 'lg',
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.paciente = paciente;
+
+    modalRef.result.then((dados) => {
+      if (dados) {
+        this.salvarPaciente(dados);
+      }
+    });
   }
 
   editar(paciente: Paciente): void {
-    this.pacienteSelecionado = paciente;
-    this.mostrarFormulario = true;
+    this.abrirModal(paciente);
   }
 
-  fecharFormulario(): void {
-    this.mostrarFormulario = false;
+  salvarPaciente(dados: Paciente): void {
+    console.log('Salvar paciente:', dados);
+    // TODO: chamar API + atualizar lista
   }
 }

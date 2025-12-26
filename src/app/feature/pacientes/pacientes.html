@@ -22,12 +22,4 @@
 
   </div>
 
-  <!-- FORMULÁRIO -->
-  <div class="formulario" *ngIf="mostrarFormulario">
-    <app-paciente-form
-      [paciente]="pacienteSelecionado"
-      (salvo)="fecharFormulario()">
-    </app-paciente-form>
-  </div>
-
 </div>

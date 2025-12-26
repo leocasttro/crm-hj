@@ -8,6 +8,7 @@ import {
   faMagnifyingGlass,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
+import { UiActionService } from '../services/ui-action.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -17,7 +18,6 @@ import {
   styleUrl: './nav-bar.scss',
 })
 export class NavBar {
-
   faSearch = faMagnifyingGlass;
   faNotification = faBell;
   faPlus = faPlus;
@@ -29,14 +29,15 @@ export class NavBar {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private uiAction: UiActionService
   ) {
     this.listenToRouteChanges();
   }
 
   private listenToRouteChanges(): void {
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
+      .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe(() => {
         const route = this.getDeepestChild(this.route);
 
@@ -62,13 +63,8 @@ export class NavBar {
   }
 
   emitAction(): void {
-    if (this.currentAction === 'novo-paciente') {
-      console.log('Ação: novo paciente');
-      // próximo passo: service compartilhado
-    }
-
-    if (this.currentAction === 'nova-cirurgia') {
-      console.log('Ação: nova cirurgia');
+    if (this.currentAction) {
+      this.uiAction.emit(this.currentAction as any);
     }
   }
 }
