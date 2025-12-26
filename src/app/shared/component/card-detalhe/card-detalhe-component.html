@@ -1,0 +1,61 @@
+<div class="modal-header border-0">
+  <h4 class="modal-title" id="modal-basic-title">
+    <i class="bi bi-clock-history"></i> Histórico do Pedido
+  </h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="activeModal.dismiss('Cross click')"
+  ></button>
+</div>
+
+<div class="modal-body border-0">
+  <div class="horizontal-timeline-container d-flex justify-content-between">
+    <div class="timeline-line"></div>
+
+    <div
+      *ngFor="let fase of fases; let i = index"
+      class="timeline-item-h text-center"
+      [style.width.%]="100 / fases.length"
+    >
+      <div
+        class="timeline-point-h mx-auto"
+        [ngClass]="{
+          'bg-success': fase.concluido,
+          'bg-primary': !fase.concluido && i === getProximaFaseIndex(),
+          'bg-secondary': !fase.concluido && i !== getProximaFaseIndex()
+        }"
+      >
+        <i
+          *ngIf="fase.concluido"
+          class="fas fa-check text-white small"
+        ></i>
+        <i
+          *ngIf="!fase.concluido && i === getProximaFaseIndex()"
+          class="fas fa-arrow-right text-white small"
+        ></i>
+      </div>
+
+      <div class="timeline-content-h mt-3">
+        <h6
+          class="small"
+          [ngClass]="{
+            'fw-bold': fase.concluido || i === getProximaFaseIndex()
+          }"
+        >
+          {{ fase.nome }}
+        </h6>
+        <p *ngIf="fase.data" class="text-muted small timeline-date">
+          {{ fase.data | date : 'shortDate' }}
+        </p>
+        <span
+          *ngIf="!fase.concluido && i === getProximaFaseIndex()"
+          class="badge bg-primary mt-1"
+          >Atual</span
+        >
+      </div>
+    </div>
+  </div>
+</div>
+

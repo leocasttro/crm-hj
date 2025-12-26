@@ -1,0 +1,11 @@
+<h3>{{ paciente ? 'Editar Paciente' : 'Novo Paciente' }}</h3>
+
+<form [formGroup]="pacienteForm" (ngSubmit)="salvar()">
+  <input formControlName="nomeCompleto" placeholder="Nome completo" />
+  <input formControlName="cpf" placeholder="CPF" />
+  <input formControlName="telefone1" placeholder="Telefone" />
+
+  <button type="submit" class="btn btn-primary">
+    Salvar
+  </button>
+</form>

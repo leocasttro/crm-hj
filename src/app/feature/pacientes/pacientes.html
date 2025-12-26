@@ -1,0 +1,33 @@
+<div class="pacientes-container d-flex">
+
+  <!-- LISTA -->
+  <div class="lista flex-fill">
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Telefone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let paciente of pacientes" (click)="editar(paciente)">
+          <td>{{ paciente.nomeCompleto }}</td>
+          <td>{{ paciente.cpf }}</td>
+          <td>{{ paciente.telefone1 }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- FORMULÁRIO -->
+  <div class="formulario" *ngIf="mostrarFormulario">
+    <app-paciente-form
+      [paciente]="pacienteSelecionado"
+      (salvo)="fecharFormulario()">
+    </app-paciente-form>
+  </div>
+
+</div>

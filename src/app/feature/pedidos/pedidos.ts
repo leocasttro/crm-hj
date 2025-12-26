@@ -5,7 +5,7 @@ import {
   CardData,
   ChecklistItem,
 } from '../../shared/component/card-component/card-component';
-// 1. Importar os módulos necessários do Angular CDK
+
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -18,7 +18,6 @@ import {
 @Component({
   selector: 'app-pedidos',
   standalone: true,
-  // 2. Adicionar os módulos do CDK aos imports do componente
   imports: [
     CommonModule,
     CardComponent,
@@ -32,7 +31,7 @@ import {
 export class Pedidos {
   @ViewChild('fileInput') fileInput!: ElementRef;
   private itemSelecionadoParaUpload: ChecklistItem | null = null;
-  // As listas de tarefas que você já tinha
+
   tarefasPendentes: CardData[] = [
     {
       titulo: 'Preparar sala de cirurgia 3',

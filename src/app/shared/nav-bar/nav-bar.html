@@ -2,14 +2,26 @@
   <div class="container-fluid">
     <div class="wrapper d-flex justify-content-between w-100 m-3">
       <div class="titulo">
-        <h4 class="fw-bolder">Pedidos de cirurgia</h4>
-        <span class="text-body-tertiary fs-6">Gerencie seus pedidos de cirurgia em formato Kanban</span>
+        <h4 class="fw-bolder">{{ pageTitle }}</h4>
+        <span class="text-body-tertiary fs-6">{{ pageSubtitle }}</span>
       </div>
+
       <div class="perfil-btn">
-        <button class="btn btn-primary fw-bolder p-2 m-2"><fa-icon [icon]="faPlus"/> Nova Cirurgia </button>
+        <button
+          *ngIf="actionLabel"
+          class="btn btn-primary fw-bolder p-2 m-2"
+          (click)="emitAction()"
+        >
+          <fa-icon [icon]="faPlus"></fa-icon>
+          {{ actionLabel }}
+        </button>
+
         <div class="icons d-inline-flex">
-          <fa-icon class="mx-2 text-secondary" [icon]="faNotification" />
-          <fa-icon class="text-secondary" [icon]="faSearch" />
+          <fa-icon
+            class="mx-2 text-secondary"
+            [icon]="faNotification"
+          ></fa-icon>
+          <fa-icon class="text-secondary" [icon]="faSearch"></fa-icon>
         </div>
       </div>
     </div>

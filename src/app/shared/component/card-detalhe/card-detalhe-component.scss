@@ -1,0 +1,54 @@
+/* Estilos para a Timeline Horizontal */
+
+.horizontal-timeline-container {
+  position: relative;
+  padding-top: 20px; /* Espaço para o ponto ficar acima da linha */
+  margin-bottom: 20px;
+}
+
+/* A Linha Central (Progresso) */
+.timeline-line {
+  position: absolute;
+  top: 30px; /* Alinha a linha com o centro dos pontos */
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #e9ecef; /* Linha cinza de fundo (Bootstrap secondary light) */
+  z-index: 1;
+}
+
+/* O Item (Coluna) individual da Fase */
+.timeline-item-h {
+  position: relative;
+  z-index: 2; /* Garante que os pontos fiquem sobre a linha */
+  flex-grow: 1; /* Distribuição uniforme */
+  max-width: 25%; /* Ajuste a ser feito se tiveres muitas fases */
+}
+
+/* O Círculo/Ponto da Timeline Horizontal */
+.timeline-point-h {
+  display: flex; /* Para centrar o ícone, se houver */
+  justify-content: center;
+  align-items: center;
+  width: 25px; /* Tamanho ligeiramente maior */
+  height: 25px;
+  border-radius: 50%;
+  border: 3px solid #ffffff; /* Borda branca para destacar o ponto na linha */
+  transition: background-color 0.3s ease;
+  position: relative; /* Para garantir que o mx-auto funcione no container flex */
+
+  /* Deslocamento dos pontos para o topo da linha */
+  margin-top: -12px; /* metade da altura do ponto - metade da altura da linha */
+}
+
+/* O conteúdo (nome e data) */
+.timeline-content-h {
+  margin-top: 5px;
+  line-height: 1.2;
+}
+
+/* Estilo para as datas mais subtis */
+.timeline-date {
+    margin-top: 0;
+    line-height: 1;
+}

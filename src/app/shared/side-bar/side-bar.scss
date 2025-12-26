@@ -6,25 +6,33 @@
   font-size: small;
 }
 
-
 .nav-link {
-  // --- As propriedades que você já tinha ---
   transition: all 0.2s ease-in-out;
   border: 2px solid transparent;
   height: 80px;
 
-  // --- NOVAS PROPRIEDADES PARA O ALINHAMENTO ---
-  display: flex;          // Transforma o link em um container flex
-  align-items: center;    // Alinha os itens (ícone e texto) VERTICALMENTE ao centro
+  display: flex;
+  align-items: center;
+  gap: 12px;
 
-  // Opcional, mas recomendado: um padding para o conteúdo não ficar colado na borda
   padding-left: 20px;
+  color: #6c757d;
+}
+
+.nav-link:hover {
+  background-color: rgba(13, 110, 253, 0.08);
+  color: #0d6efd;
 }
 
 .nav-link.active {
   background-color: #0d6efd;
-  color: #ffff;
+  color: #fff;
   font-weight: 500;
   border-color: #0d6efd;
   border-radius: 8px;
+}
+
+.nav-link.active:hover {
+  background-color: #0d6efd;
+  color: #fff;
 }

@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'; // ✨ 1. Importe o módulo aqui
+import { NgbCollapseModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faMinus } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faMinus, faTimeline } from '@fortawesome/free-solid-svg-icons';
+import { CardDetalheComponent } from '../card-detalhe/card-detalhe-component';
 
 export interface CardData {
   titulo: string;
@@ -12,6 +13,7 @@ export interface CardData {
   urlImagem: string;
   dataCriacao: string;
   checklist: ChecklistItem[];
+  timelineFases?: any[];
 }
 
 export interface ChecklistItem {
@@ -32,22 +34,44 @@ export class CardComponent {
   @Input() data!: CardData;
   @Output() checklistItemSelected = new EventEmitter<ChecklistItem>();
   public isCollapsed = true;
-  faMinus = faMinus;
 
-  /**
-   * Função chamada quando um item do dropdown é clicado.
-   * Em vez de conter a lógica, ela apenas emite o item para o pai.
-   * @param item O item do checklist que foi clicado.
-   */
+  faMinus = faMinus;
+  faTimeLine = faTimeline;
+
+  constructor(private modalService: NgbModal) {}
+
   onItemClick(item: ChecklistItem): void {
     if (item.status === 'Pendente') {
-      // Correto, com o "S" maiúsculo
       this.checklistItemSelected.emit(item);
     }
   }
 
+  private getTimelineFases(): any[] {
+    return (
+      this.data?.timelineFases || [
+        { nome: 'Criado', data: '2024-10-25', concluido: true },
+        { nome: 'Em Análise', data: '2024-10-26', concluido: true },
+        { nome: 'Retorno do Pedido', data: undefined, concluido: false },
+        { nome: 'Marcação da Cirurgia', data: undefined, concluido: false },
+        { nome: 'Consulta Pré-Operatória', data: undefined, concluido: false },
+        { nome: 'Faturamento', data: undefined, concluido: false },
+        { nome: 'Pós-Operatório', data: undefined, concluido: false },
+        { nome: 'Finalizado', data: undefined, concluido: false },
+      ]
+    );
+  }
+
+  abrirModalTimeline() {
+    const modalRef = this.modalService.open(CardDetalheComponent, {
+      centered: true,
+      scrollable: true,
+      size: 'xl'
+    });
+
+    modalRef.componentInstance.fases = this.getTimelineFases();
+  }
+
   public gerarIdUnico(titulo: string): string {
-    // Concatena 'ID' com o título após remover todos os espaços em branco
     return 'cardID-' + titulo.replace(/\s+/g, '');
   }
 }
