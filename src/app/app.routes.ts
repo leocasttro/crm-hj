@@ -10,9 +10,10 @@ export const routes: Routes = [
     title: 'Pedidos de cirurgia|Gerencie seus pedidos',
     data: {
       actionLabel: 'Nova Cirurgia',
-      action: 'nova-cirurgia',
+      action: 'novo-pedido',
     },
   },
+
   {
     path: 'pacientes',
     component: Pacientes,

@@ -1,5 +1,13 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+
 import {
   CardComponent,
   CardData,
@@ -15,6 +23,10 @@ import {
   CdkDropListGroup,
 } from '@angular/cdk/drag-drop';
 
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UiActionService } from '../../shared/services/ui-action.service';
+import { PedidosForm } from '../../shared/component/pedidos-form/pedidos-form';
+
 @Component({
   selector: 'app-pedidos',
   standalone: true,
@@ -28,9 +40,15 @@ import {
   templateUrl: './pedidos.html',
   styleUrl: './pedidos.scss',
 })
-export class Pedidos {
+export class Pedidos implements OnInit, OnDestroy {
+  /* ================== UPLOAD CHECKLIST ================== */
   @ViewChild('fileInput') fileInput!: ElementRef;
   private itemSelecionadoParaUpload: ChecklistItem | null = null;
+
+  /* ================== SUBSCRIPTION ================== */
+  private sub!: Subscription;
+
+  /* ================== KANBAN ================== */
 
   tarefasPendentes: CardData[] = [
     {
@@ -125,17 +143,74 @@ export class Pedidos {
     },
   ];
 
-  // 3. Método que será chamado quando um card for solto
-  drop(event: CdkDragDrop<CardData[]>) {
+  /* ================== CONSTRUCTOR ================== */
+
+  constructor(
+    private uiAction: UiActionService,
+    private modalService: NgbModal
+  ) {}
+
+  /* ================== LIFECYCLE ================== */
+
+  ngOnInit(): void {
+    this.sub = this.uiAction.action$.subscribe((action) => {
+      if (action === 'novo-pedido') {
+        this.abrirModalPedido();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  /* ================== MODAL ================== */
+
+  abrirModalPedido(): void {
+    const modalRef = this.modalService.open(PedidosForm, {
+      size: 'xl', // modal grande
+      scrollable: true, // 🔴 ESSENCIAL
+      backdrop: 'static',
+      centered: false,
+    });
+
+    modalRef.result.then((dados) => {
+      if (dados) {
+        this.adicionarPedidoAoKanban(dados);
+      }
+    });
+  }
+
+  adicionarPedidoAoKanban(dados: any): void {
+    const novoCard: CardData = {
+      titulo: dados.titulo,
+      descricao: dados.descricao,
+      badgeTexto: dados.prioridade === 'URGENCIA' ? 'Urgente' : 'Novo',
+      badgeClasseCor:
+        dados.prioridade === 'URGENCIA' ? 'bg-danger' : 'bg-secondary',
+      urlImagem: 'https://placehold.co/24x24/6c757d/FFFFFF?text=N',
+      dataCriacao: new Date().toLocaleDateString('pt-BR'),
+      checklist: [
+        { id: 1, titulo: 'Pedido médico', status: 'Pendente' },
+        { id: 2, titulo: 'Exames', status: 'Pendente' },
+        { id: 3, titulo: 'Documento de identidade', status: 'Pendente' },
+        { id: 4, titulo: 'Carteirinha do convênio', status: 'Pendente' },
+      ],
+    };
+
+    this.tarefasPendentes.unshift(novoCard);
+  }
+
+  /* ================== DRAG & DROP ================== */
+
+  drop(event: CdkDragDrop<CardData[]>): void {
     if (event.previousContainer === event.container) {
-      // Se o card foi solto na mesma coluna, apenas muda a ordem
       moveItemInArray(
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
     } else {
-      // Se o card foi movido para uma coluna diferente, transfere o item de uma lista para outra
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -145,13 +220,16 @@ export class Pedidos {
     }
   }
 
-  handleChecklistItemClick(item: any): void {
+  /* ================== CHECKLIST UPLOAD ================== */
+
+  handleChecklistItemClick(item: ChecklistItem): void {
     this.itemSelecionadoParaUpload = item;
     this.fileInput.nativeElement.click();
   }
 
   onArquivoSelecionado(event: Event): void {
     const input = event.target as HTMLInputElement;
+
     if (
       input.files &&
       input.files.length > 0 &&
@@ -162,11 +240,12 @@ export class Pedidos {
       this.itemSelecionadoParaUpload.status = 'Concluído';
 
       console.log(
-        `Upload do arquivo ${arquivo.name} para o item ${this.itemSelecionadoParaUpload.titulo}`
+        `Upload do arquivo ${arquivo.name} para ${this.itemSelecionadoParaUpload.titulo}`
       );
 
       this.itemSelecionadoParaUpload = null;
     }
+
     input.value = '';
   }
 }

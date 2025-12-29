@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 
 export type UiAction =
   | 'novo-paciente'
-  | 'nova-cirurgia';
+  | 'novo-pedido';
 
 @Injectable({
   providedIn: 'root',
