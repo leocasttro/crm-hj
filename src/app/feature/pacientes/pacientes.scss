@@ -1,14 +1,58 @@
-form {
-  max-width: 900px;
+/* Área da página (cria respiro geral) */
+.page-container {
+  padding: 32px;                 // topo + laterais
+  margin-left: 24px;             // afasta do sidebar
+  background-color: #f3f4f6;
+  min-height: calc(100vh - 64px);
 }
 
-fieldset {
-  border: 1px solid #ddd;
-  margin-bottom: 16px;
+.page-card {
+  background-color: #fff;
+  border-radius: 16px;
+  overflow: hidden; // 🔥 ESSENCIAL para arredondar a tabela
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+
+/* Tabela clean */
+.table {
+  margin: 0;
+}
+
+.table thead th {
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table td {
   padding: 16px;
 }
 
-input, select, textarea {
-  width: 100%;
-  margin-bottom: 12px;
+.table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+:host {
+  display: block;
+  padding: 32px;
+  background-color: #f3f4f6;
+  min-height: calc(100vh - 64px);
+}
+
+
+table {
+  background-color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+table {
+  margin-top: 16px;
 }

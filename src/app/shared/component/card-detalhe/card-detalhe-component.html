@@ -27,10 +27,7 @@
           'bg-secondary': !fase.concluido && i !== getProximaFaseIndex()
         }"
       >
-        <i
-          *ngIf="fase.concluido"
-          class="fas fa-check text-white small"
-        ></i>
+        <i *ngIf="fase.concluido" class="fas fa-check text-white small"></i>
         <i
           *ngIf="!fase.concluido && i === getProximaFaseIndex()"
           class="fas fa-arrow-right text-white small"
@@ -57,5 +54,48 @@
       </div>
     </div>
   </div>
-</div>
+  <!-- ================= CONTEÚDO DA FASE ================= -->
+  <hr class="my-4" />
 
+  <!-- 🔹 FASE: CRIADO -->
+  <div *ngIf="faseAtual === 'CRIADO'">
+    <h5 class="fw-bold">Pedido criado</h5>
+    <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+    <!-- aqui depois entra o resumo dos dados -->
+    <button class="btn btn-primary">Enviar para análise</button>
+  </div>
+
+  <!-- 🔹 FASE: EM ANÁLISE -->
+  <div *ngIf="faseAtual === 'EM_ANALISE'">
+    <h5 class="fw-bold">Pedido em análise</h5>
+    <p class="text-muted">O pedido está aguardando avaliação do gestor.</p>
+
+    <!-- botões só aparecem se tiver permissão (depois) -->
+    <div class="d-flex gap-2">
+      <button class="btn btn-success">Aprovar</button>
+
+      <button class="btn btn-warning">Solicitar correção</button>
+    </div>
+  </div>
+
+  <!-- 🔹 FASE: RETORNO -->
+  <div *ngIf="faseAtual === 'RETORNO_PEDIDO'">
+    <h5 class="fw-bold text-warning">Correções solicitadas</h5>
+    <p>Ajuste os dados solicitados e reenvie para análise.</p>
+
+    <button class="btn btn-primary">Editar pedido</button>
+  </div>
+
+  <!-- 🔹 FASE: MARCAÇÃO -->
+  <div *ngIf="faseAtual === 'MARCACAO_CIRURGIA'">
+    <h5 class="fw-bold">Marcação da cirurgia</h5>
+    <p class="text-muted">Pedido aprovado. Aguardando marcação.</p>
+  </div>
+
+  <!-- 🔹 FASE: FINALIZADO -->
+  <div *ngIf="faseAtual === 'FINALIZADO'">
+    <h5 class="fw-bold text-success">Pedido finalizado</h5>
+  </div>
+</div>
+<!-- fecha modal-body -->

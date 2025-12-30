@@ -8,11 +8,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 
-import {
-  CardComponent,
-  CardData,
-  ChecklistItem,
-} from '../../shared/component/card-component/card-component';
 
 import {
   CdkDragDrop,
@@ -26,16 +21,21 @@ import {
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UiActionService } from '../../shared/services/ui-action.service';
 import { PedidosForm } from '../../shared/component/pedidos-form/pedidos-form';
+import { PEDIDO_MOCK } from '../../shared/mocks/pedido.mock';
+import { FASES_PEDIDO_MOCK } from '../../shared/mocks/fases-pedido.mock';
+import { ChecklistItem } from '../../shared/component/card-detalhe/card-detalhe-component';
+import { CardData } from '../../shared/models/cardData';
+import { CardComponent } from '../../shared/component/card-component/card-component';
 
 @Component({
   selector: 'app-pedidos',
   standalone: true,
   imports: [
     CommonModule,
-    CardComponent,
     CdkDropListGroup,
     CdkDropList,
     CdkDrag,
+    CardComponent
   ],
   templateUrl: './pedidos.html',
   styleUrl: './pedidos.scss',
@@ -52,17 +52,25 @@ export class Pedidos implements OnInit, OnDestroy {
 
   tarefasPendentes: CardData[] = [
     {
-      titulo: 'Preparar sala de cirurgia 3',
-      descricao: 'Verificar equipamentos e esterilização.',
-      badgeTexto: 'Urgente',
-      badgeClasseCor: 'bg-danger',
-      urlImagem: 'https://placehold.co/24x24/FF0000/FFFFFF?text=S',
-      dataCriacao: '01/10/2025',
+      titulo: PEDIDO_MOCK.titulo,
+      descricao: PEDIDO_MOCK.descricao,
+      badgeTexto: 'Criado',
+      badgeClasseCor: 'bg-secondary',
+      urlImagem: 'https://placehold.co/24x24/0d6efd/FFFFFF?text=C',
+      dataCriacao: PEDIDO_MOCK.dataPedido,
+
       checklist: [
-        { id: 1, titulo: 'Verificar cilindro de O2', status: 'Pendente' },
-        { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
-        { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
+        { id: 1, titulo: 'Pedido médico anexado', status: 'Concluído' },
+        { id: 2, titulo: 'Exames anexados', status: 'Concluído' },
+        { id: 3, titulo: 'Documento de identidade', status: 'Pendente' },
+        { id: 4, titulo: 'Carteirinha do convênio', status: 'Pendente' },
       ],
+
+      // 🔥 ESSENCIAL PARA O DETALHE
+      pedido: PEDIDO_MOCK,
+
+      // 🔥 ESSENCIAL PARA A TIMELINE
+      timelineFases: structuredClone(FASES_PEDIDO_MOCK),
     },
     {
       titulo: 'Confirmar jejum do paciente M. Silva',
@@ -76,6 +84,11 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
+            // 🔥 ESSENCIAL PARA O DETALHE
+      pedido: PEDIDO_MOCK,
+
+      // 🔥 ESSENCIAL PARA A TIMELINE
+      timelineFases: structuredClone(FASES_PEDIDO_MOCK),
     },
   ];
 
@@ -92,6 +105,11 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
+            // 🔥 ESSENCIAL PARA O DETALHE
+      pedido: PEDIDO_MOCK,
+
+      // 🔥 ESSENCIAL PARA A TIMELINE
+      timelineFases: structuredClone(FASES_PEDIDO_MOCK),
     },
   ];
 
@@ -108,6 +126,11 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
+            // 🔥 ESSENCIAL PARA O DETALHE
+      pedido: PEDIDO_MOCK,
+
+      // 🔥 ESSENCIAL PARA A TIMELINE
+      timelineFases: structuredClone(FASES_PEDIDO_MOCK),
     },
   ];
 
@@ -124,6 +147,11 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
+            // 🔥 ESSENCIAL PARA O DETALHE
+      pedido: PEDIDO_MOCK,
+
+      // 🔥 ESSENCIAL PARA A TIMELINE
+      timelineFases: structuredClone(FASES_PEDIDO_MOCK),
     },
   ];
 
@@ -140,6 +168,11 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
+            // 🔥 ESSENCIAL PARA O DETALHE
+      pedido: PEDIDO_MOCK,
+
+      // 🔥 ESSENCIAL PARA A TIMELINE
+      timelineFases: structuredClone(FASES_PEDIDO_MOCK),
     },
   ];
 
@@ -196,6 +229,11 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 3, titulo: 'Documento de identidade', status: 'Pendente' },
         { id: 4, titulo: 'Carteirinha do convênio', status: 'Pendente' },
       ],
+            // 🔥 ESSENCIAL PARA O DETALHE
+      pedido: PEDIDO_MOCK,
+
+      // 🔥 ESSENCIAL PARA A TIMELINE
+      timelineFases: structuredClone(FASES_PEDIDO_MOCK),
     };
 
     this.tarefasPendentes.unshift(novoCard);

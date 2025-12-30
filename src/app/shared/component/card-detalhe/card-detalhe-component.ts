@@ -2,7 +2,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { NgbActiveModal, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'; // ✨ 1. Importe o módulo aqui
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowRight, faCheck, faMinus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowDown,
+  faArrowRight,
+  faCheck,
+  faMinus,
+} from '@fortawesome/free-solid-svg-icons';
+import { PedidosResumo } from '../pedidos-resumo/pedidos-resumo';
+import { Pedido } from '../../models/pedido';
 
 export interface CardData {
   titulo: string;
@@ -21,29 +28,63 @@ export interface ChecklistItem {
   arquivo?: File;
 }
 
+export type CodigoFase =
+  | 'CRIADO'
+  | 'EM_ANALISE'
+  | 'RETORNO_PEDIDO'
+  | 'MARCACAO_CIRURGIA'
+  | 'CONSULTA_PRE_OPERATORIA'
+  | 'FATURAMENTO'
+  | 'POS_OPERATORIO'
+  | 'FINALIZADO';
+
+export interface FasePedido {
+  codigo: CodigoFase;
+  nome: string;
+  data?: string;
+  concluido: boolean;
+}
+
 @Component({
   selector: 'app-card-component',
   standalone: true,
-  imports: [CommonModule, NgClass, NgbCollapseModule, FontAwesomeModule],
+  imports: [
+    CommonModule,
+    NgClass,
+    NgbCollapseModule,
+    FontAwesomeModule,
+    PedidosResumo,
+  ],
   templateUrl: './card-detalhe-component.html',
   styleUrls: ['./card-detalhe-component.scss'],
 })
 export class CardDetalheComponent implements OnInit {
-  @Input() fases: any[] = [];
+  @Input() fases: FasePedido[] = [];
+  @Input() pedido!: any; // 👈 DADOS DO PEDIDO (mock ou API)
 
-  faCheck = faCheck;
-  faArrowRight = faArrowRight;
-  // Injetar o NgbActiveModal para controlar o modal (fechar, dispensar)
+  faseAtual!: CodigoFase;
+
   constructor(public activeModal: NgbActiveModal) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.definirFaseAtual();
+  }
 
-  /**
-   * Encontra o índice da primeira fase que *não* está concluída.
-   * Esta será considerada a fase 'Atual'.
-   * @returns O índice da fase atual, ou -1 se todas estiverem concluídas.
-   */
+  definirFaseAtual(): void {
+    const faseAtualObj = this.fases.find((f) => !f.concluido);
+    this.faseAtual = faseAtualObj ? faseAtualObj.codigo : 'FINALIZADO';
+  }
+
   getProximaFaseIndex(): number {
     return this.fases.findIndex((fase) => !fase.concluido);
+  }
+
+  avancarFase(): void {
+    const index = this.getProximaFaseIndex();
+    if (index >= 0) {
+      this.fases[index].concluido = true;
+      this.fases[index].data = new Date().toISOString();
+      this.definirFaseAtual();
+    }
   }
 }

@@ -2,9 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { Paciente } from '../../shared/models/paciente';
 import { PacienteForm } from '../../shared/component/paciente-form/paciente-form';
 import { UiActionService } from '../../shared/services/ui-action.service';
+import { PACIENTES_MOCK } from '../../shared/mocks/pacientes.mock'; // 👈 AQUI
 
 @Component({
   standalone: true,
@@ -19,10 +21,13 @@ export class Pacientes implements OnInit, OnDestroy {
 
   constructor(
     private uiAction: UiActionService,
-    private modalService: NgbModal // 👈 ESSENCIAL
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
+    // ✅ MOCK PARA LISTAGEM
+    this.pacientes = structuredClone(PACIENTES_MOCK);
+
     this.sub = this.uiAction.action$.subscribe(action => {
       if (action === 'novo-paciente') {
         this.abrirModal();
@@ -55,6 +60,11 @@ export class Pacientes implements OnInit, OnDestroy {
 
   salvarPaciente(dados: Paciente): void {
     console.log('Salvar paciente:', dados);
-    // TODO: chamar API + atualizar lista
+
+    // 🧪 MOCK: adiciona na lista
+    this.pacientes.unshift({
+      ...dados,
+      id: Date.now(),
+    });
   }
 }

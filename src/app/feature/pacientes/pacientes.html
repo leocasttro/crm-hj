@@ -1,9 +1,7 @@
-<div class="pacientes-container d-flex">
+<div class="page-container m-4">
+  <div class="page-card">
 
-  <!-- LISTA -->
-  <div class="lista flex-fill">
-
-    <table class="table">
+    <table class="table table-hover align-middle mb-0">
       <thead>
         <tr>
           <th>Nome</th>
@@ -11,6 +9,7 @@
           <th>Telefone</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let paciente of pacientes" (click)="editar(paciente)">
           <td>{{ paciente.nomeCompleto }}</td>
@@ -21,5 +20,4 @@
     </table>
 
   </div>
-
 </div>
