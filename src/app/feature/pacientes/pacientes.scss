@@ -1,34 +1,40 @@
-/* Área da página (cria respiro geral) */
+/* Área da página */
 .page-container {
-  padding: 32px;                 // topo + laterais
-  margin-left: 24px;             // afasta do sidebar
+  padding: 32px;
+  margin-left: 24px; // afasta do sidebar
   background-color: #f3f4f6;
   min-height: calc(100vh - 64px);
 }
 
+/* Card branco com bordas arredondadas */
 .page-card {
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 16px;
-  overflow: hidden; // 🔥 ESSENCIAL para arredondar a tabela
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden; // 🔥 ESSENCIAL
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-
-/* Tabela clean */
+/* Tabela */
 .table {
   margin: 0;
 }
 
+/* Cabeçalho */
 .table thead th {
   font-weight: 600;
+  font-size: 13px;
   color: #6b7280;
   border-bottom: 1px solid #e5e7eb;
-}
-
-.table td {
   padding: 16px;
 }
 
+/* Linhas */
+.table td {
+  padding: 16px;
+  font-size: 14px;
+}
+
+/* Hover moderno */
 .table tbody tr {
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -36,23 +42,4 @@
 
 .table tbody tr:hover {
   background-color: #f9fafb;
-}
-
-:host {
-  display: block;
-  padding: 32px;
-  background-color: #f3f4f6;
-  min-height: calc(100vh - 64px);
-}
-
-
-table {
-  background-color: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-
-table {
-  margin-top: 16px;
 }

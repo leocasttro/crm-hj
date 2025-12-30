@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Pedidos } from './feature/pedidos/pedidos';
 import { Pacientes } from './feature/pacientes/pacientes';
+import { Agenda } from './feature/agenda/agenda';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cirurgias', pathMatch: 'full' },
@@ -23,4 +24,9 @@ export const routes: Routes = [
       action: 'novo-paciente',
     },
   },
+  {
+    path: 'agenda',
+    component: Agenda,
+    title: 'Agenda de cirurgias | Gerencie sua agenda',
+  }
 ];
