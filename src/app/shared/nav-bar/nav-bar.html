@@ -17,11 +17,10 @@
         </button>
 
         <div class="icons d-inline-flex">
-          <fa-icon
-            class="mx-2 text-secondary"
-            [icon]="faNotification"
-          ></fa-icon>
-          <fa-icon class="text-secondary" [icon]="faSearch"></fa-icon>
+          <div class="icons d-inline-flex align-items-center gap-3">
+            <app-notifications-component></app-notifications-component>
+            <fa-icon class="text-secondary" [icon]="faSearch"></fa-icon>
+          </div>
         </div>
       </div>
     </div>

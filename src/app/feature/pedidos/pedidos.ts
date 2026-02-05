@@ -4,10 +4,10 @@ import {
   ViewChild,
   OnInit,
   OnDestroy,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-
 
 import {
   CdkDragDrop,
@@ -26,6 +26,7 @@ import { FASES_PEDIDO_MOCK } from '../../shared/mocks/fases-pedido.mock';
 import { ChecklistItem } from '../../shared/component/card-detalhe/card-detalhe-component';
 import { CardData } from '../../shared/models/cardData';
 import { CardComponent } from '../../shared/component/card-component/card-component';
+import { NotificationStore } from '../../shared/services/notification.store';
 
 @Component({
   selector: 'app-pedidos',
@@ -35,7 +36,7 @@ import { CardComponent } from '../../shared/component/card-component/card-compon
     CdkDropListGroup,
     CdkDropList,
     CdkDrag,
-    CardComponent
+    CardComponent,
   ],
   templateUrl: './pedidos.html',
   styleUrl: './pedidos.scss',
@@ -44,6 +45,7 @@ export class Pedidos implements OnInit, OnDestroy {
   /* ================== UPLOAD CHECKLIST ================== */
   @ViewChild('fileInput') fileInput!: ElementRef;
   private itemSelecionadoParaUpload: ChecklistItem | null = null;
+  private notificationStore = inject(NotificationStore);
 
   /* ================== SUBSCRIPTION ================== */
   private sub!: Subscription;
@@ -84,7 +86,7 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
-            // 🔥 ESSENCIAL PARA O DETALHE
+      // 🔥 ESSENCIAL PARA O DETALHE
       pedido: PEDIDO_MOCK,
 
       // 🔥 ESSENCIAL PARA A TIMELINE
@@ -105,7 +107,7 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
-            // 🔥 ESSENCIAL PARA O DETALHE
+      // 🔥 ESSENCIAL PARA O DETALHE
       pedido: PEDIDO_MOCK,
 
       // 🔥 ESSENCIAL PARA A TIMELINE
@@ -126,7 +128,7 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
-            // 🔥 ESSENCIAL PARA O DETALHE
+      // 🔥 ESSENCIAL PARA O DETALHE
       pedido: PEDIDO_MOCK,
 
       // 🔥 ESSENCIAL PARA A TIMELINE
@@ -147,7 +149,7 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
-            // 🔥 ESSENCIAL PARA O DETALHE
+      // 🔥 ESSENCIAL PARA O DETALHE
       pedido: PEDIDO_MOCK,
 
       // 🔥 ESSENCIAL PARA A TIMELINE
@@ -168,7 +170,7 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 2, titulo: 'Esterilizar instrumentos', status: 'Pendente' },
         { id: 3, titulo: 'Ligar monitor cardíaco', status: 'Pendente' },
       ],
-            // 🔥 ESSENCIAL PARA O DETALHE
+      // 🔥 ESSENCIAL PARA O DETALHE
       pedido: PEDIDO_MOCK,
 
       // 🔥 ESSENCIAL PARA A TIMELINE
@@ -180,7 +182,7 @@ export class Pedidos implements OnInit, OnDestroy {
 
   constructor(
     private uiAction: UiActionService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
   ) {}
 
   /* ================== LIFECYCLE ================== */
@@ -229,7 +231,7 @@ export class Pedidos implements OnInit, OnDestroy {
         { id: 3, titulo: 'Documento de identidade', status: 'Pendente' },
         { id: 4, titulo: 'Carteirinha do convênio', status: 'Pendente' },
       ],
-            // 🔥 ESSENCIAL PARA O DETALHE
+      // 🔥 ESSENCIAL PARA O DETALHE
       pedido: PEDIDO_MOCK,
 
       // 🔥 ESSENCIAL PARA A TIMELINE
@@ -242,20 +244,49 @@ export class Pedidos implements OnInit, OnDestroy {
   /* ================== DRAG & DROP ================== */
 
   drop(event: CdkDragDrop<CardData[]>): void {
-    if (event.previousContainer === event.container) {
+    const sameColumn = event.previousContainer === event.container;
+
+    if (sameColumn) {
       moveItemInArray(
         event.container.data,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
-    } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+
+      // opcional: notificar reordenação dentro da mesma coluna
+      // const card = event.container.data[event.currentIndex];
+      // this.notificationStore.push({ type: 'INFO', title: 'Ordem alterada', message: card.titulo });
+
+      return;
     }
+
+    // ✅ capture o card ANTES de transferir (porque depois ele some do array de origem)
+    const movedCard = event.previousContainer.data[event.previousIndex];
+
+    // move de fato
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex,
+    );
+
+    const de = event.previousContainer.id;
+    const para = event.container.id;
+
+    this.applyColumnVisual(movedCard, para);
+
+    this.notificationStore.push({
+      type: 'INFO',
+      title: 'Pedido movimentado',
+      message: `${movedCard.titulo} (${this.labelColuna(de)} → ${this.labelColuna(para)})`,
+      link: '/pedidos',
+      meta: {
+        pedidoId: movedCard?.pedido?.id,
+        de,
+        para,
+      },
+    });
   }
 
   /* ================== CHECKLIST UPLOAD ================== */
@@ -278,12 +309,35 @@ export class Pedidos implements OnInit, OnDestroy {
       this.itemSelecionadoParaUpload.status = 'Concluído';
 
       console.log(
-        `Upload do arquivo ${arquivo.name} para ${this.itemSelecionadoParaUpload.titulo}`
+        `Upload do arquivo ${arquivo.name} para ${this.itemSelecionadoParaUpload.titulo}`,
       );
 
       this.itemSelecionadoParaUpload = null;
     }
 
     input.value = '';
+  }
+
+  private labelColuna(id: string) {
+    const map: Record<string, string> = {
+      PENDENTES: 'Pendentes',
+      EM_ANDAMENTO: 'Em andamento',
+      CONCLUIDAS: 'Concluídas',
+    };
+    return map[id] ?? id;
+  }
+
+  private applyColumnVisual(card: CardData, colunaId: string) {
+    // ajuste visual do card conforme a coluna
+    if (colunaId === 'PENDENTES') {
+      card.badgeTexto = 'Criado';
+      card.badgeClasseCor = 'bg-secondary';
+    } else if (colunaId === 'EM_ANDAMENTO') {
+      card.badgeTexto = 'Em Progresso';
+      card.badgeClasseCor = 'bg-primary';
+    } else if (colunaId === 'CONCLUIDAS') {
+      card.badgeTexto = 'Finalizado';
+      card.badgeClasseCor = 'bg-success';
+    }
   }
 }

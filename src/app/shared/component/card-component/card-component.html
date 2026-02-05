@@ -1,7 +1,7 @@
 @if (data) {
-<div class="card mb-3" style="min-height: 210px">
+<div class="card mb-3" style="min-height: 210px" (click)="abrirModalTimeline()">
   <div class="card-body d-flex flex-column">
-    <div class="mt-3" (click)="abrirModalTimeline()">
+    <div class="mt-3">
       <div class="d-flex justify-content-between align-items-start">
         <h6 class="card-title fw-bold mb-0">{{ data.titulo }}</h6>
 
@@ -23,14 +23,6 @@
       />
       <small class="text-muted">{{ data.dataCriacao }}</small>
     </div>
-    <!-- <div
-      class="w-100 d-flex justify-content-center align-items-center"
-      style="cursor: pointer"
-      (click)="isCollapsed = !isCollapsed"
-    >
-      <fa-icon class="text-muted" [icon]="faMinus" />
-    </div> -->
-
     <div [ngbCollapse]="isCollapsed" [id]="gerarIdUnico(data.titulo)">
       <div class="form-check mt-4">
         <input

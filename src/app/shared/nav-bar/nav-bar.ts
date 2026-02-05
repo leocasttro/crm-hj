@@ -9,11 +9,12 @@ import {
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { UiActionService } from '../services/ui-action.service';
+import { NotificationsComponent } from "../component/notifications/notifications-component";
 
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule], // ✅ IMPORTANTE
+  imports: [CommonModule, FontAwesomeModule, NotificationsComponent], // ✅ IMPORTANTE
   templateUrl: './nav-bar.html',
   styleUrl: './nav-bar.scss',
 })

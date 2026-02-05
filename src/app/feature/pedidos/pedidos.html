@@ -12,6 +12,7 @@
         cdkDropList
         [cdkDropListData]="tarefasPendentes"
         (cdkDropListDropped)="drop($event)"
+        id="PENDENTES"
       >
         @for (tarefa of tarefasPendentes; track tarefa.titulo) {
         <app-card-component
@@ -35,6 +36,7 @@
         cdkDropList
         [cdkDropListData]="tarefasEmAndamento"
         (cdkDropListDropped)="drop($event)"
+        id="EM_ANDAMENTO"
       >
         @for (tarefa of tarefasEmAndamento; track tarefa.titulo) {
         <app-card-component
@@ -81,6 +83,7 @@
         cdkDropList
         [cdkDropListData]="tarefasTeste"
         (cdkDropListDropped)="drop($event)"
+        id="CONCLUIDAS"
       >
         @for (tarefa of tarefasTeste; track tarefa.titulo) {
         <app-card-component
