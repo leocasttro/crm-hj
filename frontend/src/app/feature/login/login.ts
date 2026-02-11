@@ -3,10 +3,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faKey } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
   selector: 'app-login',
   templateUrl: './login.html',
   styleUrl: './login.scss',
@@ -15,6 +17,8 @@ export class LoginComponent {
   loading = false;
   error: string | null = null;
   form: FormGroup;
+
+  faKey = faKey;
 
   constructor(
     private fb: FormBuilder,

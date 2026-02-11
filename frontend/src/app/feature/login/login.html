@@ -1,15 +1,69 @@
-<form (ngSubmit)="submit()" [formGroup]="form">
-  <h1>Login</h1>
+<div class="login-page">
+  <!-- Lado esquerdo (branding) -->
+  <section class="login-left">
+    <div class="brand">
+      <div class="brand-logo">H&amp;M</div>
+      <div class="brand-subtitle">Serviços médicos</div>
+      <p class="brand-text">
+        Gerencie seus pacientes, cirurgias e agenda em um só lugar.
+      </p>
+    </div>
 
-  <label>Email</label>
-  <input formControlName="email" type="email" />
+    <!-- “curva”/faixa clara como na imagem -->
+    <div class="left-wave"></div>
+  </section>
 
-  <label>Senha</label>
-  <input formControlName="senha" type="password" />
+  <!-- Lado direito (form) -->
+  <section class="login-right">
+    <div class="login-card">
+      <form (ngSubmit)="submit()" [formGroup]="form" class="form">
+        <div class="field">
+          <label class="sr-only" for="email">Email</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">▾</span>
+            <input
+              id="email"
+              class="input"
+              formControlName="email"
+              type="email"
+              placeholder="Email"
+              autocomplete="email"
+            />
+          </div>
+        </div>
 
-  <button type="submit" [disabled]="loading">
-    {{ loading ? 'Entrando...' : 'Entrar' }}
-  </button>
+        <div class="field">
+          <label class="sr-only" for="senha">Senha</label>
+          <div class="input-wrap">
+            <span class="icon lock" aria-hidden="true"><fa-icon [icon]="faKey"></fa-icon></span>
+            <input
+              id="senha"
+              class="input"
+              formControlName="senha"
+              type="password"
+              placeholder="Senha"
+              autocomplete="current-password"
+            />
+          </div>
+        </div>
 
-  <p *ngIf="error" style="color:red">{{ error }}</p>
-</form>
+        <div class="row">
+          <label class="checkbox">
+            <input type="checkbox" />
+            <span>Lembrar e-mail</span>
+          </label>
+
+          <a class="forgot" href="#" (click)="$event.preventDefault()">
+            Esqueci a senha
+          </a>
+        </div>
+
+        <button class="btn" type="submit" [disabled]="loading || form.invalid">
+          {{ loading ? 'Entrando...' : 'Entrar' }}
+        </button>
+
+        <p class="error" *ngIf="error">{{ error }}</p>
+      </form>
+    </div>
+  </section>
+</div>
