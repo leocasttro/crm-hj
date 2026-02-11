@@ -1,0 +1,15 @@
+<form (ngSubmit)="submit()" [formGroup]="form">
+  <h1>Login</h1>
+
+  <label>Email</label>
+  <input formControlName="email" type="email" />
+
+  <label>Senha</label>
+  <input formControlName="senha" type="password" />
+
+  <button type="submit" [disabled]="loading">
+    {{ loading ? 'Entrando...' : 'Entrar' }}
+  </button>
+
+  <p *ngIf="error" style="color:red">{{ error }}</p>
+</form>
