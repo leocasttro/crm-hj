@@ -1,0 +1,13 @@
+.card {
+  min-height: 120px;
+  border: 2px solid rgb(233, 227, 227);
+}
+
+.collapse-content {
+  overflow: hidden;
+  min-height: 50px; // Garante altura mínima para animação visível
+}
+
+.form-check-input-rounded {
+  border-radius: 50%;
+}

@@ -1,0 +1,98 @@
+<div class="container-fluid">
+  <div class="kanban-board mt-4 ms-1" cdkDropListGroup>
+    <div class="kanban-column shadow-sm">
+      <div class="kanban-column-header d-flex justify-content-between">
+        <h6 class="fw-bold">
+          <i class="fas fa-clipboard-list me-2"></i>Pedido Pendente
+        </h6>
+        <span class="count">{{ tarefasPendentes.length }}</span>
+      </div>
+      <div
+        class="kanban-cards"
+        cdkDropList
+        [cdkDropListData]="tarefasPendentes"
+        (cdkDropListDropped)="drop($event)"
+        id="PENDENTES"
+      >
+        @for (tarefa of tarefasPendentes; track tarefa.titulo) {
+        <app-card-component
+          cdkDrag
+          [data]="tarefa"
+          (checklistItemSelected)="handleChecklistItemClick($event)"
+        ></app-card-component>
+        }
+      </div>
+    </div>
+
+    <div class="kanban-column shadow-sm">
+      <div class="kanban-column-header d-flex justify-content-between">
+        <h6 class="fw-bold">
+          <i class="fas fa-clipboard-list me-2"></i>Pedido em analíse
+        </h6>
+        <span class="count">{{ tarefasEmAndamento.length }}</span>
+      </div>
+      <div
+        class="kanban-cards"
+        cdkDropList
+        [cdkDropListData]="tarefasEmAndamento"
+        (cdkDropListDropped)="drop($event)"
+        id="EM_ANDAMENTO"
+      >
+        @for (tarefa of tarefasEmAndamento; track tarefa.titulo) {
+        <app-card-component
+          cdkDrag
+          [data]="tarefa"
+          (checklistItemSelected)="handleChecklistItemClick($event)"
+        ></app-card-component>
+        }
+      </div>
+    </div>
+
+    <div class="kanban-column shadow-sm">
+      <div class="kanban-column-header d-flex justify-content-between">
+        <h6 class="fw-bold">
+          <i class="fas fa-clipboard-list me-2"></i>Pedido em execução
+        </h6>
+        <span class="count">{{ tarefas.length }}</span>
+      </div>
+      <div
+        class="kanban-cards"
+        cdkDropList
+        [cdkDropListData]="tarefas"
+        (cdkDropListDropped)="drop($event)"
+      >
+        @for (tarefa of tarefas; track tarefa.titulo) {
+        <app-card-component
+          cdkDrag
+          [data]="tarefa"
+          (checklistItemSelected)="handleChecklistItemClick($event)"
+        ></app-card-component>
+        }
+      </div>
+    </div>
+
+    <div class="kanban-column shadow-sm">
+      <div class="kanban-column-header d-flex justify-content-between">
+        <h6 class="fw-bold">
+          <i class="fas fa-clipboard-list me-2"></i>Retorno do pedido
+        </h6>
+        <span class="count">{{ tarefasTeste.length }}</span>
+      </div>
+      <div
+        class="kanban-cards"
+        cdkDropList
+        [cdkDropListData]="tarefasTeste"
+        (cdkDropListDropped)="drop($event)"
+        id="CONCLUIDAS"
+      >
+        @for (tarefa of tarefasTeste; track tarefa.titulo) {
+        <app-card-component
+          cdkDrag
+          [data]="tarefa"
+          (checklistItemSelected)="handleChecklistItemClick($event)"
+        ></app-card-component>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+/* Container geral da página */
+.page-container {
+  background-color: #eef0f3;
+  min-height: calc(100vh - 80px);
+  padding: 24px;
+}
+
+/* Card principal da agenda */
+.page-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  height: calc(100vh - 140px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabeçalho da agenda */
+.agenda-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e5e7eb;
+
+  h5 {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  button {
+    border-radius: 8px;
+  }
+}
+
+/* Área principal */
+.agenda-grid {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+/* Coluna de horários */
+.agenda-times {
+  width: 80px;
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  padding-top: 40px;
+
+  div {
+    height: 60px;
+    font-size: 12px;
+    color: #6b7280;
+    padding-left: 12px;
+    display: flex;
+    align-items: flex-start;
+  }
+}
+
+/* Dias da semana */
+.agenda-days {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+/* Cada dia */
+.agenda-day {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e7eb;
+  background: #ffffff;
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+/* Cabeçalho do dia */
+.day-header {
+  height: 40px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Corpo do dia */
+.day-body {
+  position: relative;
+  flex: 1;
+  background: repeating-linear-gradient(
+    to bottom,
+    #ffffff,
+    #ffffff 59px,
+    #f1f5f9 60px
+  );
+}
+
+/* Eventos */
+.event {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Hover no evento */
+.event:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+/* Cores dos eventos */
+.event {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+}
+
+.event.secondary {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+}

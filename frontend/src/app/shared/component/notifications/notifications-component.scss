@@ -1,0 +1,30 @@
+.notif-wrapper {
+  position: relative;
+}
+
+.dropdown-panel {
+  position: absolute;
+  right: 0;
+  top: 36px;
+  width: 360px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+}
+
+
+.list { max-height: 360px; overflow: auto; }
+
+.item {
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+}
+.item.unread { background: #f6f9ff; }
+
+.title { font-weight: 700; font-size: 14px; }
+.msg { font-size: 13px; color: #666; margin-top: 4px; }
+.actions { display: flex; gap: 8px; margin-top: 8px; }
+
+.empty { padding: 18px; color: #777; }

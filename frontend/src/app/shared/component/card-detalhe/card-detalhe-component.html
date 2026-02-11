@@ -1,0 +1,101 @@
+<div class="modal-header border-0">
+  <h4 class="modal-title" id="modal-basic-title">
+    <i class="bi bi-clock-history"></i> Histórico do Pedido
+  </h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="activeModal.dismiss('Cross click')"
+  ></button>
+</div>
+
+<div class="modal-body border-0">
+  <div class="horizontal-timeline-container d-flex justify-content-between">
+    <div class="timeline-line"></div>
+
+    <div
+      *ngFor="let fase of fases; let i = index"
+      class="timeline-item-h text-center"
+      [style.width.%]="100 / fases.length"
+    >
+      <div
+        class="timeline-point-h mx-auto"
+        [ngClass]="{
+          'bg-success': fase.concluido,
+          'bg-primary': !fase.concluido && i === getProximaFaseIndex(),
+          'bg-secondary': !fase.concluido && i !== getProximaFaseIndex()
+        }"
+      >
+        <i *ngIf="fase.concluido" class="fas fa-check text-white small"></i>
+        <i
+          *ngIf="!fase.concluido && i === getProximaFaseIndex()"
+          class="fas fa-arrow-right text-white small"
+        ></i>
+      </div>
+
+      <div class="timeline-content-h mt-3">
+        <h6
+          class="small"
+          [ngClass]="{
+            'fw-bold': fase.concluido || i === getProximaFaseIndex()
+          }"
+        >
+          {{ fase.nome }}
+        </h6>
+        <p *ngIf="fase.data" class="text-muted small timeline-date">
+          {{ fase.data | date : 'shortDate' }}
+        </p>
+        <span
+          *ngIf="!fase.concluido && i === getProximaFaseIndex()"
+          class="badge bg-primary mt-1"
+          >Atual</span
+        >
+      </div>
+    </div>
+  </div>
+  <!-- ================= CONTEÚDO DA FASE ================= -->
+  <hr class="my-4" />
+
+  <!-- 🔹 FASE: CRIADO -->
+  <div *ngIf="faseAtual === 'CRIADO'">
+    <h5 class="fw-bold">Pedido criado</h5>
+    <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+    <!-- aqui depois entra o resumo dos dados -->
+    <button class="btn btn-primary">Enviar para análise</button>
+  </div>
+
+  <!-- 🔹 FASE: EM ANÁLISE -->
+  <div *ngIf="faseAtual === 'EM_ANALISE'">
+    <h5 class="fw-bold">Pedido em análise</h5>
+    <p class="text-muted">O pedido está aguardando avaliação do gestor.</p>
+
+    <!-- botões só aparecem se tiver permissão (depois) -->
+    <div class="d-flex gap-2">
+      <button class="btn btn-success">Aprovar</button>
+
+      <button class="btn btn-warning">Solicitar correção</button>
+    </div>
+  </div>
+
+  <!-- 🔹 FASE: RETORNO -->
+  <div *ngIf="faseAtual === 'RETORNO_PEDIDO'">
+    <h5 class="fw-bold text-warning">Correções solicitadas</h5>
+    <p>Ajuste os dados solicitados e reenvie para análise.</p>
+
+    <button class="btn btn-primary">Editar pedido</button>
+  </div>
+
+  <!-- 🔹 FASE: MARCAÇÃO -->
+  <div *ngIf="faseAtual === 'MARCACAO_CIRURGIA'">
+    <h5 class="fw-bold">Marcação da cirurgia</h5>
+    <p class="text-muted">Pedido aprovado. Aguardando marcação.</p>
+  </div>
+
+  <!-- 🔹 FASE: FINALIZADO -->
+  <div *ngIf="faseAtual === 'FINALIZADO'">
+    <h5 class="fw-bold text-success">Pedido finalizado</h5>
+  </div>
+</div>
+<!-- fecha modal-body -->

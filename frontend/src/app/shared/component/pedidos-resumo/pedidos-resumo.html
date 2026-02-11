@@ -1,0 +1,118 @@
+<div class="row g-3">
+  <!-- Resumo -->
+  <div class="col-12">
+    <h6 class="fw-bold">Resumo do Pedido</h6>
+  </div>
+
+  <div class="col-12">
+    <strong>Título:</strong>
+    <p>{{ pedido.titulo }}</p>
+  </div>
+
+  <div class="col-12">
+    <strong>Descrição:</strong>
+    <p>{{ pedido.descricao }}</p>
+  </div>
+
+  <!-- Dados pessoais -->
+  <div class="col-12 mt-3">
+    <h6 class="fw-bold">Dados do Paciente</h6>
+  </div>
+
+  <div class="col-md-6">
+    <strong>Nome:</strong>
+    <p>{{ pedido.nomeCompleto }}</p>
+  </div>
+
+  <div class="col-md-3">
+    <strong>CPF:</strong>
+    <p>{{ pedido.cpf }}</p>
+  </div>
+
+  <div class="col-md-3">
+    <strong>Sexo:</strong>
+    <p>{{ pedido.sexo }}</p>
+  </div>
+
+  <!-- Contato -->
+  <div class="col-md-6">
+    <strong>Telefone:</strong>
+    <p>{{ pedido.telefone1 }}</p>
+  </div>
+
+  <div class="col-md-6">
+    <strong>E-mail:</strong>
+    <p>{{ pedido.email }}</p>
+  </div>
+
+  <!-- Convênio -->
+  <div class="col-12 mt-3">
+    <h6 class="fw-bold">Dados do convênio</h6>
+  </div>
+
+  <div class="col-md-6">
+    <strong>Convênio:</strong>
+    <p>{{ pedido.convenio }}</p>
+  </div>
+
+  <div class="col-md-6">
+    <strong>Carteirinha:</strong>
+    <p>{{ pedido.numeroCarteirinha }}</p>
+  </div>
+
+  <!-- Médico -->
+  <div class="col-12 mt-3">
+    <h6 class="fw-bold">Dados Médicos</h6>
+  </div>
+
+  <div class="col-md-6">
+    <strong>Médico:</strong>
+    <p>{{ pedido.medicoSolicitante }}</p>
+  </div>
+
+  <div class="d-flex flex-wrap gap-4 mb-5">
+    <!-- Pedido médico -->
+    <div class="d-flex align-items-center gap-2">
+      <span
+        class="status-circle"
+        [ngClass]="pedido.documentos.pedidoMedico ? 'bg-success text-white' : 'bg-danger text-white'"
+      >
+        {{ pedido.documentos.pedidoMedico ? '✔' : '✕' }}
+      </span>
+      <span>Pedido médico</span>
+    </div>
+
+    <!-- Exames -->
+    <div class="d-flex align-items-center gap-2">
+      <span
+        class="status-circle"
+        [ngClass]="pedido.documentos.exames ? 'bg-success text-white' : 'bg-danger text-white'"
+      >
+        {{ pedido.documentos.exames ? '✔' : '✕' }}
+      </span>
+      <span>Exames</span>
+    </div>
+
+    <!-- Documento de identidade -->
+    <div class="d-flex align-items-center gap-2">
+      <span
+        class="status-circle"
+        [ngClass]="pedido.documentos.documentoIdentidade ? 'bg-success text-white' : 'bg-danger text-white'"
+      >
+        {{ pedido.documentos.documentoIdentidade ? '✔' : '✕' }}
+      </span>
+      <span>Documento de identidade</span>
+    </div>
+
+    <!-- Carteirinha do convênio -->
+    <div class="d-flex align-items-center gap-2">
+      <span
+        class="status-circle"
+        [ngClass]="pedido.documentos.carteirinhaConvenio ? 'bg-success text-white' : 'bg-danger text-white'"
+      >
+        {{ pedido.documentos.carteirinhaConvenio ? '✔' : '✕' }}
+      </span>
+      <span>Carteirinha do convênio</span>
+    </div>
+  </div>
+</div>
