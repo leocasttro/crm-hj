@@ -1,0 +1,28 @@
+<nav class="navbar bg-body-tertiary">
+  <div class="container-fluid">
+    <div class="wrapper d-flex justify-content-between w-100 m-3">
+      <div class="titulo">
+        <h4 class="fw-bolder">{{ pageTitle }}</h4>
+        <span class="text-body-tertiary fs-6">{{ pageSubtitle }}</span>
+      </div>
+
+      <div class="perfil-btn">
+        <button
+          *ngIf="actionLabel"
+          class="btn btn-primary fw-bolder p-2 m-2"
+          (click)="emitAction()"
+        >
+          <fa-icon [icon]="faPlus"></fa-icon>
+          {{ actionLabel }}
+        </button>
+
+        <div class="icons d-inline-flex">
+          <div class="icons d-inline-flex align-items-center gap-3">
+            <app-notifications-component></app-notifications-component>
+            <fa-icon class="text-secondary" [icon]="faSearch"></fa-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

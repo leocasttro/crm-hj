@@ -1,0 +1,67 @@
+/* O quadro principal que segura as colunas */
+.kanban-board {
+  display: flex; /* Organiza as colunas lado a lado */
+  overflow-x: auto; /* Adiciona scroll horizontal se as colunas não couberem na tela */
+  min-height: 80vh; /* Altura mínima para ocupar a maior parte da tela */
+  gap: 1.5rem; /* Espaço entre as colunas */
+  padding-bottom: 1rem; /* Espaço na parte de baixo para o scroll não cortar a sombra */
+}
+
+/* Estilo de cada coluna (raia) */
+.kanban-column {
+  flex: 0 0 390px; /* Não cresce, não encolhe, largura base de 320px */
+  background-color: #ffff; /* Um cinzento muito claro */
+  border-radius: 8px; /* Cantos arredondados */
+  display: flex;
+  flex-direction: column; /* Organiza o header e os cards um em cima do outro */
+}
+
+/* O cabeçalho de cada coluna */
+.kanban-column-header {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid #dee2e6; /* Linha separadora */
+}
+
+/* A área que contém os cartões */
+.kanban-cards {
+  flex-grow: 1; /* Faz esta área crescer para ocupar o espaço disponível na coluna */
+  overflow-y: auto; /* Adiciona scroll vertical se houver muitos cartões */
+  padding: 1rem;
+}
+
+/* O "fantasma" do card que segue o mouse */
+.cdk-drag-preview {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+/* O espaço vazio que fica no lugar original do card */
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+/* Animação suave para os outros cards se moverem */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms ease;
+}
+
+.count {
+  // Define uma largura e altura iguais
+  width: 25px;
+  height: 25px;
+
+  // Usa 50% para um círculo perfeito
+  border-radius: 50%;
+
+  // Estilo da borda
+  background-color: #dee2e6;
+
+  // Propriedades de Flexbox para centralizar o conteúdo
+  display: flex;
+  align-items: center;    // Centraliza verticalmente
+  justify-content: center; // Centraliza horizontalmente
+
+  // Opcional: para garantir que o texto não fique muito grande
+  font-size: 14px;
+}

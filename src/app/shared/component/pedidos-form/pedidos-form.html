@@ -1,0 +1,251 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    Novo pedido
+  </h5>
+  <button class="btn-close" (click)="cancelar()"></button>
+</div>
+
+<!-- 🔴 O FORM É OBRIGATÓRIO -->
+<form [formGroup]="pacienteForm">
+  <div class="modal-body">
+    <!-- ================== RESUMO DO PEDIDO ================== -->
+    <h6 class="fw-bold">Resumo do Pedido</h6>
+
+    <div class="row g-2 mb-3">
+      <div class="col-12">
+        <label class="form-label">Título do pedido</label>
+        <input
+          class="form-control"
+          formControlName="titulo"
+          placeholder="Ex: Artroplastia total de joelho direito"
+          maxlength="100"
+        />
+        <small class="text-muted">
+          {{ pacienteForm.get('titulo')?.value?.length || 0 }}/100 caracteres
+        </small>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Descrição resumida</label>
+        <textarea
+          class="form-control"
+          rows="3"
+          formControlName="descricao"
+          placeholder="Descreva resumidamente o pedido"
+          maxlength="300"
+        ></textarea>
+        <small class="text-muted">
+          {{ pacienteForm.get('descricao')?.value?.length || 0 }}/300 caracteres
+        </small>
+      </div>
+    </div>
+
+    <!-- ================== DADOS PESSOAIS ================== -->
+    <h6 class="fw-bold">Dados Pessoais</h6>
+    <div class="row g-2">
+      <div class="col-12">
+        <label for="nomeCompleto">Nome completo</label>
+        <input
+          class="form-control"
+          placeholder="Ex: Maria da Silva"
+          formControlName="nomeCompleto"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label for="dataNascimento">Data de nascimento</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="dataNascimento"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label for="cpf">CPF</label>
+        <input
+          class="form-control"
+          placeholder="000.000.000-00"
+          formControlName="cpf"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label for="sexo">Sexo</label>
+        <select class="form-select" formControlName="sexo">
+          <option value="">Ex: Feminino</option>
+          <option value="M">Masculino</option>
+          <option value="F">Feminino</option>
+          <option value="O">Outro</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ================== CONTATO ================== -->
+    <h6 class="fw-bold mt-4">Contato</h6>
+    <div class="row g-2">
+      <div class="col-12">
+        <label for="endereco">Endereço completo</label>
+        <input
+          class="form-control"
+          placeholder="Endereço completo"
+          formControlName="endereco"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label for="telefone1">Telefone 1</label>
+        <input
+          class="form-control"
+          placeholder="Telefone 1"
+          formControlName="telefone1"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label for="telefone2">Telefone 2</label>
+        <input
+          class="form-control"
+          placeholder="Telefone 2"
+          formControlName="telefone2"
+        />
+      </div>
+
+      <div class="col-12">
+        <label for="email">E-mail</label>
+        <input
+          type="email"
+          class="form-control"
+          placeholder="E-mail"
+          formControlName="email"
+        />
+      </div>
+    </div>
+
+    <!-- ================== CONVÊNIO ================== -->
+    <h6 class="fw-bold mt-4">Convênio</h6>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Nome do convênio</label>
+        <input
+          class="form-control"
+          formControlName="convenio"
+          placeholder="Ex: Unimed"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Número da carteirinha</label>
+        <input
+          class="form-control"
+          formControlName="numeroCarteirinha"
+          placeholder="000000000"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Validade da carteirinha</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="validadeCarteirinha"
+        />
+      </div>
+
+      <!-- 👇 AQUI FICAM NA MESMA LINHA -->
+      <div class="col-md-6">
+        <label class="form-label">Carteirinha (PDF ou imagem)</label>
+        <input
+          type="file"
+          class="form-control"
+          (change)="onFileChange($event, 'anexoCarteirinha')"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Documento de identidade</label>
+        <input
+          type="file"
+          class="form-control"
+          (change)="onFileChange($event, 'anexoIdentidade')"
+        />
+      </div>
+    </div>
+
+    <!-- ================== DADOS MÉDICOS ================== -->
+    <h6 class="fw-bold mt-4">Dados Médicos</h6>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Médico solicitante</label>
+        <input
+          class="form-control"
+          formControlName="medicoSolicitante"
+          placeholder="Nome do médico"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">CRM</label>
+        <input
+          class="form-control"
+          formControlName="crmMedico"
+          placeholder="CRM do médico"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Procedimento solicitado</label>
+        <input
+          class="form-control"
+          formControlName="procedimento"
+          placeholder="Descrição do procedimento"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">CID</label>
+        <input
+          class="form-control"
+          formControlName="cid"
+          placeholder="Ex: M16.1"
+        />
+      </div>
+
+      <!-- <div class="col-md-4">
+        <label class="form-label">Lateralidade</label>
+        <select class="form-select" formControlName="lateralidade">
+          <option value="">Selecione</option>
+          <option value="D">Direita</option>
+          <option value="E">Esquerda</option>
+          <option value="B">Bilateral</option>
+        </select>
+      </div> -->
+
+      <div class="col-md-4">
+        <label class="form-label">Prioridade</label>
+        <select class="form-select" formControlName="prioridade">
+          <option value="">Selecione</option>
+          <option value="ELETIVA">Eletiva</option>
+          <option value="URGENCIA">Urgência</option>
+          <option value="PRIORIDADE">Prioridade</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Data do pedido</label>
+        <input type="date" class="form-control" formControlName="dataPedido" />
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="cancelar()">
+      Cancelar
+    </button>
+    <button type="button" class="btn btn-primary" (click)="salvar()">
+      Salvar
+    </button>
+  </div>
+</form>

@@ -1,0 +1,52 @@
+<div class="notif-wrapper">
+  <button
+    class="btn btn-link position-relative p-0 text-secondary"
+    (click)="toggle()"
+    aria-label="Notificações"
+  >
+    <fa-icon [icon]="faBell" size="lg"></fa-icon>
+
+    <span
+      *ngIf="store.unreadCount() > 0"
+      class="badge bg-danger position-absolute top-0 start-100 translate-middle"
+    >
+      {{ store.unreadCount() }}
+    </span>
+  </button>
+
+  <div class="dropdown-panel" *ngIf="open()">
+    <div class="d-flex justify-content-between align-items-center px-3 py-2">
+      <strong>Notificações</strong>
+      <button
+        class="btn btn-sm btn-outline-secondary"
+        (click)="store.markAllRead()"
+      >
+        Marcar tudo lido
+      </button>
+    </div>
+
+    <div class="list">
+      <div
+        *ngFor="let n of store.items()"
+        class="item"
+        [class.unread]="!n.readAt"
+      >
+        <div class="title">{{ n.title }}</div>
+        <div class="msg" *ngIf="n.message">{{ n.message }}</div>
+
+        <div class="actions">
+          <button class="btn btn-sm btn-primary" (click)="openLink(n)">
+            Abrir
+          </button>
+          <button class="btn btn-sm btn-link" (click)="store.remove(n.id)">
+            Remover
+          </button>
+        </div>
+      </div>
+
+      <div class="empty" *ngIf="store.items().length === 0">
+        Sem notificações
+      </div>
+    </div>
+  </div>
+</div>

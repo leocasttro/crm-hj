@@ -1,0 +1,207 @@
+/* Acessibilidade: label “invisível” */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  background: #fff;
+}
+
+/* Painel esquerdo */
+.login-left {
+  position: relative;
+  flex: 1.1;
+  overflow: hidden;
+  color: #fff;
+
+  /* Gradiente azul tipo a imagem */
+  background: linear-gradient(135deg, #0b63f6 0%, #00c2b8 55%, #7a6cff 100%);
+
+  .brand {
+    position: relative;
+    z-index: 2;
+    padding: 72px 64px;
+    max-width: 520px;
+
+    .brand-logo {
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+    }
+
+    .brand-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .brand-text {
+      font-size: 12px;
+      line-height: 1.6;
+      opacity: 0.9;
+      max-width: 300px;
+    }
+  }
+
+  /* “faixa curva” clara */
+  .left-wave {
+    position: absolute;
+    top: -120px;
+    right: -140px;
+    width: 520px;
+    height: 120%;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.28);
+    transform: rotate(8deg);
+    z-index: 1;
+    filter: blur(0.2px);
+  }
+}
+
+/* Lado direito */
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: #fff;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: center;
+}
+
+.form {
+  width: 100%;
+  max-width: 380px;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background: #f6f7fb;
+  border: 1px solid #e6eaf2;
+  border-radius: 8px;
+  padding: 0 12px;
+  gap: 10px;
+}
+
+.icon {
+  width: 18px;
+  opacity: 0.6;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon.lock {
+  font-size: 13px;
+}
+
+.input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 13px;
+  color: #2b2f3a;
+
+  &::placeholder {
+    color: #9aa4b2;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 2px 22px;
+  gap: 14px;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+
+  input {
+    width: 14px;
+    height: 14px;
+    accent-color: #0b63f6;
+  }
+}
+
+.forgot {
+  font-size: 12px;
+  color: #6b7280;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btn {
+  width: 220px;
+  height: 44px;
+  display: block;
+  margin: 0 auto;
+  border: 0;
+  cursor: pointer;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #fff;
+
+  background: linear-gradient(90deg, #0b63f6 0%, #00c2b8 100%);
+  box-shadow: 0 12px 22px rgba(11, 99, 246, 0.25);
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+}
+
+.error {
+  margin-top: 14px;
+  text-align: center;
+  color: #e11d48;
+  font-size: 12px;
+}
+
+/* Responsivo: no mobile esconde o painel esquerdo */
+@media (max-width: 900px) {
+  .login-left {
+    display: none;
+  }
+  .login-right {
+    flex: 1;
+  }
+}

@@ -1,0 +1,60 @@
+<div class="container">
+  <div class="wrapper d-inline-flex align-items-center mt-1">
+    <div class="icon rounded bg-primary p-2 me-2">
+      <fa-icon class="fs-5 text-light" [icon]="faStethoscope"></fa-icon>
+    </div>
+
+    <div>
+      <h4 class="fw-bolder titulo mb-0">MediCRM</h4>
+      <span class="text-muted subtext">Gerenciador de cirurgia</span>
+    </div>
+  </div>
+
+  <div class="menu mt-5 w-100">
+    <nav class="nav flex-column">
+
+      <a
+        class="nav-link"
+        routerLink="/cirurgias"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <fa-icon class="fs-5 me-2" [icon]="faTable"></fa-icon>
+        Cirurgias
+      </a>
+
+      <a
+        class="nav-link"
+        routerLink="/pacientes"
+        routerLinkActive="active"
+      >
+        <fa-icon class="fs-5 me-2" [icon]="faPeople"></fa-icon>
+        Pacientes
+      </a>
+
+      <a
+        class="nav-link"
+        routerLink="/agenda"
+        routerLinkActive="active"
+      >
+        <fa-icon class="fs-5 me-2" [icon]="faCalendar"></fa-icon>
+        Agenda
+      </a>
+
+      <a
+        class="nav-link"
+        routerLink="/relatorios"
+        routerLinkActive="active"
+      >
+        <fa-icon class="fs-5 me-2" [icon]="faChart"></fa-icon>
+        Relatórios
+      </a>
+
+      <a class="nav-link disabled">
+        <fa-icon class="fs-5 me-2" [icon]="faGear"></fa-icon>
+        Configurações
+      </a>
+
+    </nav>
+  </div>
+</div>

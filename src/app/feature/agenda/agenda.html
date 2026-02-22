@@ -1,0 +1,41 @@
+<div class="page-container m-4">
+  <div class="page-card agenda-container">
+    <!-- Cabeçalho -->
+    <div class="agenda-header">
+      <button class="btn btn-light">&lt;</button>
+      <h5 class="mb-0">Semana Atual</h5>
+      <button class="btn btn-light">&gt;</button>
+    </div>
+
+    <!-- Grade -->
+    <div class="agenda-grid">
+      <!-- Coluna Horários -->
+      <div class="agenda-times">
+        <div *ngFor="let h of [].constructor(10); let i = index">
+          {{ 8 + i }}:00
+        </div>
+      </div>
+
+      <!-- Dias -->
+      <div class="agenda-days">
+        <div class="agenda-day" *ngFor="let dia of [0,1,2,3,4]">
+          <div class="day-header">
+            {{ ['Seg','Ter','Qua','Qui','Sex'][dia] }}
+          </div>
+
+          <div class="day-body">
+            <div
+              class="event"
+              *ngFor="let evento of eventosPorDia(dia)"
+              [style.top.px]="calcularTop(evento)"
+              [style.height.px]="calcularAltura(evento)"
+              [ngClass]="evento.tipo"
+            >
+              {{ evento.titulo }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

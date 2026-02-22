@@ -1,0 +1,38 @@
+.titulo {
+  font-size: larger;
+}
+
+.subtext {
+  font-size: small;
+}
+
+.nav-link {
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+  height: 80px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding-left: 20px;
+  color: #6c757d;
+}
+
+.nav-link:hover {
+  background-color: rgba(13, 110, 253, 0.08);
+  color: #0d6efd;
+}
+
+.nav-link.active {
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: 500;
+  border-color: #0d6efd;
+  border-radius: 8px;
+}
+
+.nav-link.active:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}
