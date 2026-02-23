@@ -1,118 +1,105 @@
-<div class="row g-3">
-  <!-- Resumo -->
-  <div class="col-12">
-    <h6 class="fw-bold">Resumo do Pedido</h6>
-  </div>
+@if (pedido) {
+  <div class="row g-3">
 
-  <div class="col-12">
-    <strong>Título:</strong>
-    <p>{{ pedido.titulo }}</p>
-  </div>
-
-  <div class="col-12">
-    <strong>Descrição:</strong>
-    <p>{{ pedido.descricao }}</p>
-  </div>
-
-  <!-- Dados pessoais -->
-  <div class="col-12 mt-3">
-    <h6 class="fw-bold">Dados do Paciente</h6>
-  </div>
-
-  <div class="col-md-6">
-    <strong>Nome:</strong>
-    <p>{{ pedido.nomeCompleto }}</p>
-  </div>
-
-  <div class="col-md-3">
-    <strong>CPF:</strong>
-    <p>{{ pedido.cpf }}</p>
-  </div>
-
-  <div class="col-md-3">
-    <strong>Sexo:</strong>
-    <p>{{ pedido.sexo }}</p>
-  </div>
-
-  <!-- Contato -->
-  <div class="col-md-6">
-    <strong>Telefone:</strong>
-    <p>{{ pedido.telefone1 }}</p>
-  </div>
-
-  <div class="col-md-6">
-    <strong>E-mail:</strong>
-    <p>{{ pedido.email }}</p>
-  </div>
-
-  <!-- Convênio -->
-  <div class="col-12 mt-3">
-    <h6 class="fw-bold">Dados do convênio</h6>
-  </div>
-
-  <div class="col-md-6">
-    <strong>Convênio:</strong>
-    <p>{{ pedido.convenio }}</p>
-  </div>
-
-  <div class="col-md-6">
-    <strong>Carteirinha:</strong>
-    <p>{{ pedido.numeroCarteirinha }}</p>
-  </div>
-
-  <!-- Médico -->
-  <div class="col-12 mt-3">
-    <h6 class="fw-bold">Dados Médicos</h6>
-  </div>
-
-  <div class="col-md-6">
-    <strong>Médico:</strong>
-    <p>{{ pedido.medicoSolicitante }}</p>
-  </div>
-
-  <div class="d-flex flex-wrap gap-4 mb-5">
-    <!-- Pedido médico -->
-    <div class="d-flex align-items-center gap-2">
-      <span
-        class="status-circle"
-        [ngClass]="pedido.documentos.pedidoMedico ? 'bg-success text-white' : 'bg-danger text-white'"
-      >
-        {{ pedido.documentos.pedidoMedico ? '✔' : '✕' }}
-      </span>
-      <span>Pedido médico</span>
+    <!-- Resumo -->
+    <div class="col-12">
+      <h6 class="fw-bold">Resumo do Pedido</h6>
     </div>
 
-    <!-- Exames -->
-    <div class="d-flex align-items-center gap-2">
-      <span
-        class="status-circle"
-        [ngClass]="pedido.documentos.exames ? 'bg-success text-white' : 'bg-danger text-white'"
-      >
-        {{ pedido.documentos.exames ? '✔' : '✕' }}
-      </span>
-      <span>Exames</span>
+    <div class="col-md-8">
+      <strong>Procedimento:</strong>
+      <p class="mb-0">{{ pedido.procedimento }} ({{ pedido.procedimentoCodigo }})</p>
     </div>
 
-    <!-- Documento de identidade -->
-    <div class="d-flex align-items-center gap-2">
-      <span
-        class="status-circle"
-        [ngClass]="pedido.documentos.documentoIdentidade ? 'bg-success text-white' : 'bg-danger text-white'"
-      >
-        {{ pedido.documentos.documentoIdentidade ? '✔' : '✕' }}
-      </span>
-      <span>Documento de identidade</span>
+    <div class="col-md-4">
+      <strong>Status:</strong>
+      <p class="mb-0">{{ pedido.status }}</p>
     </div>
 
-    <!-- Carteirinha do convênio -->
-    <div class="d-flex align-items-center gap-2">
-      <span
-        class="status-circle"
-        [ngClass]="pedido.documentos.carteirinhaConvenio ? 'bg-success text-white' : 'bg-danger text-white'"
-      >
-        {{ pedido.documentos.carteirinhaConvenio ? '✔' : '✕' }}
-      </span>
-      <span>Carteirinha do convênio</span>
+    <div class="col-md-4">
+      <strong>Prioridade:</strong>
+      <p class="mb-0">{{ pedido.prioridade }}</p>
     </div>
+
+    <div class="col-md-4">
+      <strong>Convênio:</strong>
+      <p class="mb-0">{{ pedido.convenio }}</p>
+    </div>
+
+    <div class="col-md-4">
+      <strong>Validade carteirinha:</strong>
+      <p class="mb-0">{{ pedido.convenioValidadeCarteira | date:'shortDate' }}</p>
+    </div>
+
+    <div class="col-md-6" *ngIf="pedido.agendadoPara">
+      <strong>Agendado para:</strong>
+      <p class="mb-0">{{ pedido.agendadoPara | date:'short' }}</p>
+    </div>
+
+    <!-- Dados do Paciente -->
+    <div class="col-12 mt-3">
+      <h6 class="fw-bold">Dados do Paciente</h6>
+    </div>
+
+    <div class="col-md-6">
+      <strong>Paciente:</strong>
+      <p class="mb-0">
+        {{ pedido.paciente?.nomeCompleto ?? '(Paciente não carregado)' }}
+      </p>
+    </div>
+
+    <div class="col-md-3">
+      <strong>Documento:</strong>
+      <p class="mb-0">{{ pedido.paciente?.documentoNumero ?? '-' }}</p>
+    </div>
+
+    <div class="col-md-3">
+      <strong>Sexo:</strong>
+      <p class="mb-0">{{ pedido.paciente?.sexoDescricao ?? '-' }}</p>
+    </div>
+
+    <div class="col-md-6">
+      <strong>E-mail:</strong>
+      <p class="mb-0">{{ pedido.paciente?.email ?? '-' }}</p>
+    </div>
+
+    <div class="col-md-6">
+      <strong>Telefones:</strong>
+      <p class="mb-0">{{ pedido.paciente?.telefones ?? '-' }}</p>
+    </div>
+
+    <!-- Médico -->
+    <div class="col-12 mt-3">
+      <h6 class="fw-bold">Dados Médicos</h6>
+    </div>
+
+    <div class="col-md-6">
+      <strong>Médico solicitante:</strong>
+      <p class="mb-0">{{ pedido.medicoSolicitante }}</p>
+    </div>
+
+    <div class="col-md-6">
+      <strong>Especialidade:</strong>
+      <p class="mb-0">{{ pedido.medicoSolicitanteEspecialidade }}</p>
+    </div>
+
+    <!-- Documentos -->
+    <div class="col-12 mt-3">
+      <h6 class="fw-bold">Documentos</h6>
+    </div>
+
+    <div class="d-flex flex-wrap gap-4 mb-2">
+      <!-- ✅ por enquanto o backend só tem temDocumentos (geral) -->
+      <div class="d-flex align-items-center gap-2">
+        <span
+          class="status-circle"
+          [ngClass]="pedido.temDocumentos ? 'bg-success text-white' : 'bg-danger text-white'"
+        >
+          {{ pedido.temDocumentos ? '✔' : '✕' }}
+        </span>
+        <span>Documentos anexados</span>
+      </div>
+    </div>
+
   </div>
-</div>
+}
