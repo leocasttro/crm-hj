@@ -107,8 +107,8 @@ export class Pedidos implements OnInit, OnDestroy {
   }
 
   adicionarPedidoAoKanban(p: PedidoDto): void {
-    const card = this.toCardData(p);
-    this.tarefasPendentes.unshift(card);
+    // const card = this.toCardData(p);
+    // this.tarefasPendentes.unshift(card);
   }
 
   /* ================== DRAG & DROP ================== */
@@ -130,7 +130,6 @@ export class Pedidos implements OnInit, OnDestroy {
       return;
     }
 
-    // ✅ capture o card ANTES de transferir (porque depois ele some do array de origem)
     const movedCard = event.previousContainer.data[event.previousIndex];
 
     // move de fato
@@ -232,7 +231,6 @@ export class Pedidos implements OnInit, OnDestroy {
   }
 
   private applyColumnVisual(card: CardData, colunaId: string) {
-    // ajuste visual do card conforme a coluna
     if (colunaId === 'PENDENTES') {
       card.badgeTexto = 'Criado';
       card.badgeClasseCor = 'bg-secondary';
@@ -245,27 +243,31 @@ export class Pedidos implements OnInit, OnDestroy {
     }
   }
 
-  private toCardData(p: PedidoDto): CardData {
-    const prioridadeVisual = this.visualFromPrioridade(p.prioridade);
+  formatarNomeProprio = (nome: string) => {
+    if (!nome) return '';
+    const siglas = ['CRM', 'RG', 'CPF', 'SUS', 'SIS'];
 
-    return {
-      titulo: p.procedimento ?? '(Sem procedimento)',
-      descricao: `${p.medicoSolicitante ?? ''} • ${p.convenio ?? ''}`.trim(),
+    return nome
+      .toLowerCase()
+      .split(' ')
+      .map((palavra) => {
+        if (siglas.includes(palavra.toUpperCase())) {
+          return palavra.toUpperCase();
+        }
+        return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+      })
+      .join(' ');
+  };
 
-      prioridade: prioridadeVisual.texto,
-      prioridadeClasse: prioridadeVisual.text,
+  formatarConvenio = (convenio: string) => {
+    if (!convenio) return '';
 
-      badgeTexto: prioridadeVisual.texto,
-      badgeClasseCor: prioridadeVisual.badge,
-
-      urlImagem: this.avatarFromName(p.medicoSolicitante ?? 'P'),
-      dataCriacao: formatarDataHoraPtBr(p.criadoEm),
-
-      pedido: p,
-      checklist: [],
-      timelineFases: [],
-    };
-  }
+    return convenio
+      .toLowerCase()
+      .split(' ')
+      .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+      .join(' ');
+  };
 
   private toCardDataComPaciente(
     p: PedidoDto,
@@ -278,22 +280,20 @@ export class Pedidos implements OnInit, OnDestroy {
 
     return {
       titulo: p.procedimento ?? '(Sem procedimento)',
-      descricao:
-        `${pacienteNome} • ${p.medicoSolicitante ?? ''} • ${p.convenio ?? ''}`.trim(),
+      descricao: `${this.formatarNomeProprio(pacienteNome) ?? ''} • ${this.formatarConvenio(p.convenio) ?? ''}`.trim(),
       badgeTexto: visual.badgeTexto,
       badgeClasseCor: visual.badgeClasseCor,
       urlImagem: this.avatarFromName(pacienteNome),
       dataCriacao: formatarDataHoraPtBr(p.criadoEm),
       prioridade: p.prioridade,
       prioridadeClasse: this.visualFromPrioridade(p.prioridade).text,
-      pedido: { ...p, paciente } as any, // guarda paciente dentro pra usar no modal
+      pedido: { ...p, paciente } as any,
       checklist: [],
       timelineFases: [],
     };
   }
 
   private visualFromStatus(status: string, prioridade?: string) {
-    // status manda mais que prioridade
     if (this.isConcluido(status)) {
       return { badgeTexto: 'Finalizado', badgeClasseCor: 'bg-success' };
     }
@@ -302,7 +302,6 @@ export class Pedidos implements OnInit, OnDestroy {
       return { badgeTexto: 'Em Progresso', badgeClasseCor: 'bg-primary' };
     }
 
-    // pendente / rascunho
     const pr = (prioridade ?? '').toUpperCase();
     if (pr === 'URGENTE' || pr === 'EMERGENCIA') {
       return { badgeTexto: 'Urgente', badgeClasseCor: 'bg-danger' };
@@ -318,7 +317,7 @@ export class Pedidos implements OnInit, OnDestroy {
 
   private carregarPedidosDoBackend(): void {
     this.pedidoService
-      .listar() // Observable<PedidoDto[]>
+      .listar()
       .pipe(
         switchMap((pedidos: PedidoDto[]) => {
           const ids: string[] = [
@@ -334,7 +333,7 @@ export class Pedidos implements OnInit, OnDestroy {
           }
 
           return this.pacienteService
-            .buscarPorIds(ids) // Observable<PacienteDto[]>
+            .buscarPorIds(ids)
             .pipe(map((pacientes: PacienteDto[]) => ({ pedidos, pacientes })));
         }),
         map(
@@ -350,7 +349,7 @@ export class Pedidos implements OnInit, OnDestroy {
             );
 
             return pedidos.map((pedido: PedidoDto) => {
-              const paciente = pacienteMap.get(pedido.pacienteId); // PacienteDto | undefined
+              const paciente = pacienteMap.get(pedido.pacienteId);
               return this.toCardDataComPaciente(pedido, paciente);
             });
           },

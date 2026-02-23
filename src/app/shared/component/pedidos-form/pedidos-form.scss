@@ -1,4 +1,487 @@
+/* pedidos-form.scss */
+
+/* ================== VARIÁVEIS ================== */
+$primary-color: #0d6efd;
+$secondary-color: #6c757d;
+$success-color: #198754;
+$danger-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #0dcaf0;
+$light-color: #f8f9fa;
+$dark-color: #212529;
+
+$border-color: #dee2e6;
+$text-muted: #6c757d;
+$text-primary: #495057;
+
+$transition-base: all 0.3s ease;
+
+/* ================== MODAL ================== */
+.modal-header {
+  background-color: $light-color;
+  border-bottom: 1px solid $border-color;
+  padding: 1rem 1.5rem;
+
+  .modal-title {
+    font-weight: 600;
+    color: $dark-color;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      color: $primary-color;
+      font-size: 1.5rem;
+    }
+  }
+
+  .btn-close {
+    transition: $transition-base;
+
+    &:hover {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+/* ================== ABAS (NAV TABS) ================== */
+.nav-tabs {
+  border-bottom: 1px solid $border-color;
+  padding: 0 1.5rem;
+  background-color: $light-color;
+
+  .nav-item {
+    margin-bottom: -1px;
+  }
+
+  .nav-link {
+    color: $text-primary;
+    font-weight: 500;
+    border: none;
+    border-bottom: 2px solid transparent;
+    transition: $transition-base;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+
+    i {
+      margin-right: 0.5rem;
+      font-size: 1rem;
+    }
+
+    &:hover {
+      border-bottom-color: $primary-color;
+      color: $primary-color;
+      background: transparent;
+    }
+
+    &.active {
+      color: $primary-color;
+      font-weight: 600;
+      border-bottom: 2px solid $primary-color;
+      background: transparent;
+    }
+
+    &.disabled {
+      color: lighten($secondary-color, 20%);
+      pointer-events: none;
+      opacity: 0.6;
+      border-bottom-color: transparent;
+    }
+  }
+}
+
+/* ================== SCROLL DO FORMULÁRIO ================== */
 .modal-body {
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px); /* Altura máxima considerando header e footer */
+  overflow-y: auto; /* Habilita scroll vertical */
+  padding: 1.5rem;
+}
+
+/* Para a aba do formulário especificamente */
+.tab-pane .modal-body {
+  max-height: calc(100vh - 250px); /* Ajuste conforme necessário */
   overflow-y: auto;
+}
+
+/* Garantir que o formulário ocupe toda a largura */
+form {
+  width: 100%;
+}
+
+/* ================== PAINÉIS DAS ABAS ================== */
+.tab-pane {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+}
+
+[ng-reflect-ng-if="activeTab === 'formulario'"] {
+  display: block !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================== ABA DE UPLOAD ================== */
+.upload-container {
+  text-align: center;
+  padding: 2rem;
+  border: 2px dashed $border-color;
+  border-radius: 0.5rem;
+  background-color: $light-color;
+  transition: $transition-base;
+
+  &:hover {
+    border-color: $primary-color;
+    background-color: lighten($primary-color, 45%);
+  }
+
+  i {
+    font-size: 3rem;
+    color: $primary-color;
+    margin-bottom: 1rem;
+
+    &.text-danger {
+      color: $danger-color;
+    }
+  }
+
+  h4 {
+    color: $dark-color;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: $text-muted;
+    margin-bottom: 1.5rem;
+  }
+
+  .file-input-wrapper {
+    margin-bottom: 1rem;
+
+    .form-control {
+      padding: 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid $border-color;
+
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 0.25rem rgba($primary-color, 0.25);
+      }
+    }
+  }
+
+  .file-info {
+    color: $success-color;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+
+    i {
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+  }
+
+  .btn-upload {
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: $transition-base;
+
+    &:not(:disabled) {
+      background-color: $primary-color;
+      border-color: $primary-color;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+        border-color: darken($primary-color, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba($primary-color, 0.3);
+      }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    i {
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+
+    .spinner-border {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.5rem;
+    }
+  }
+
+  .formatos-aceitos {
+    text-align: left;
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 0.375rem;
+    border: 1px solid $border-color;
+
+    h6 {
+      color: $dark-color;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+
+      li {
+        color: $text-muted;
+        font-size: 0.875rem;
+        padding: 0.25rem 0;
+
+        &:before {
+          content: "•";
+          color: $primary-color;
+          font-weight: bold;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+/* ================== ABA DO FORMULÁRIO ================== */
+.alert-success {
+  background-color: lighten($success-color, 50%);
+  border-color: lighten($success-color, 40%);
+  color: darken($success-color, 10%);
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+
+  i {
+    font-size: 1.25rem;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+/* ================== FORMULÁRIO ================== */
+form {
+  .form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: $text-primary;
+    margin-bottom: 0.25rem;
+  }
+
+  .text-danger {
+    color: $danger-color;
+    font-weight: bold;
+    margin-left: 0.25rem;
+  }
+
+  h6.fw-bold {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid $border-color;
+    color: $primary-color;
+    font-weight: 600;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  .form-control, .form-select {
+    border: 1px solid $border-color;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    transition: $transition-base;
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 0.25rem rgba($primary-color, 0.25);
+    }
+
+    &.is-invalid {
+      border-color: $danger-color;
+
+      &:focus {
+        box-shadow: 0 0 0 0.25rem rgba($danger-color, 0.25);
+      }
+    }
+
+    &[readonly] {
+      background-color: lighten($light-color, 2%);
+      opacity: 1;
+    }
+  }
+
+  .invalid-feedback {
+    color: $danger-color;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  small.text-muted {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+
+  /* ================== GRID ================== */
+  .row {
+    margin-bottom: 1rem;
+
+    &.g-2 {
+      margin-bottom: 0.5rem;
+    }
+
+    &.g-3 {
+      margin-bottom: 1rem;
+    }
+  }
+
+  /* ================== SEÇÕES ================== */
+  .mt-4 {
+    margin-top: 1.5rem;
+  }
+
+  /* ================== INPUT DE FILE ================== */
+  input[type="file"] {
+    padding: 0.375rem 0.75rem;
+
+    &::file-selector-button {
+      padding: 0.375rem 0.75rem;
+      margin-right: 0.75rem;
+      border-radius: 0.25rem;
+      border: 1px solid $border-color;
+      background-color: $light-color;
+      transition: $transition-base;
+
+      &:hover {
+        background-color: darken($light-color, 5%);
+      }
+    }
+  }
+}
+
+/* ================== MODAL FOOTER ================== */
+.modal-footer {
+  border-top: 1px solid $border-color;
+  padding: 1rem 1.5rem;
+  background-color: $light-color;
+
+  .btn {
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: $transition-base;
+
+    &.btn-secondary {
+      background-color: $secondary-color;
+      border-color: $secondary-color;
+
+      &:hover {
+        background-color: darken($secondary-color, 10%);
+        border-color: darken($secondary-color, 10%);
+      }
+    }
+
+    &.btn-primary {
+      background-color: $primary-color;
+      border-color: $primary-color;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+        border-color: darken($primary-color, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba($primary-color, 0.3);
+      }
+
+      i {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+/* ================== UTILITÁRIOS ================== */
+.bg-light {
+  background-color: $light-color;
+}
+
+.border {
+  border: 1px solid $border-color;
+}
+
+.rounded {
+  border-radius: 0.375rem;
+}
+
+.p-5 {
+  padding: 2rem;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-start {
+  text-align: left;
+}
+
+/* ================== RESPONSIVIDADE ================== */
+@media (max-width: 768px) {
+  .nav-tabs {
+    padding: 0 1rem;
+
+    .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  .upload-container {
+    padding: 1rem;
+
+    h4 {
+      font-size: 1.25rem;
+    }
+
+    .btn-upload {
+      padding: 0.5rem 1.5rem;
+    }
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1rem;
+
+    .btn {
+      padding: 0.375rem 1rem;
+    }
+  }
 }

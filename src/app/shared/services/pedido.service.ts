@@ -12,4 +12,11 @@ export class PedidoService {
   listar(): Observable<PedidoDto[]> {
     return this.http.get<PedidoDto[]>(this.baseUrl);
   }
+
+  importarPdf(arquivo: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('pdf', arquivo);
+
+    return this.http.post(`${this.baseUrl}/importar-pdf`, formData);
+  }
 }

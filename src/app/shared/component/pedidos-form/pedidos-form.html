@@ -1,243 +1,329 @@
+<!-- novo-pedido.component.html -->
 <div class="modal-header">
   <h5 class="modal-title">
-    Novo pedido
+    <i class="bi bi-file-medical me-2"></i>Novo Pedido
   </h5>
   <button class="btn-close" (click)="cancelar()"></button>
 </div>
 
-<!-- 🔴 O FORM É OBRIGATÓRIO -->
-<form [formGroup]="pacienteForm">
+<!-- Abas -->
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      [class.active]="activeTab === 'upload'"
+      (click)="mudarAba('upload')"
+      style="cursor: pointer;"
+    >
+      <i class="bi bi-cloud-upload me-1"></i> 1. Upload do Pedido
+    </a>
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      [class.active]="activeTab === 'formulario'"
+      [class.disabled]="!dadosCarregados"
+      (click)="dadosCarregados && mudarAba('formulario')"
+      style="cursor: pointer;"
+    >
+      <i class="bi bi-pencil-square me-1"></i> 2. Preenchimento Manual
+    </a>
+  </li>
+</ul>
+
+<!-- Aba de Upload -->
+<div *ngIf="activeTab === 'upload'" class="tab-pane">
   <div class="modal-body">
-    <!-- ================== RESUMO DO PEDIDO ================== -->
-    <h6 class="fw-bold">Resumo do Pedido</h6>
+    <div class="text-center p-5 border rounded bg-light">
+      <i class="bi bi-file-earmark-pdf fs-1 text-danger mb-3"></i>
+      <i class="bi bi-file-image fs-1 text-primary mb-3 mx-2"></i>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12">
-        <label class="form-label">Título do pedido</label>
-        <input
-          class="form-control"
-          formControlName="titulo"
-          placeholder="Ex: Artroplastia total de joelho direito"
-          maxlength="100"
-        />
-        <small class="text-muted">
-          {{ pacienteForm.get('titulo')?.value?.length || 0 }}/100 caracteres
-        </small>
-      </div>
+      <h4 class="mb-3">Upload do Pedido Médico</h4>
 
-      <div class="col-12">
-        <label class="form-label">Descrição resumida</label>
-        <textarea
-          class="form-control"
-          rows="3"
-          formControlName="descricao"
-          placeholder="Descreva resumidamente o pedido"
-          maxlength="300"
-        ></textarea>
-        <small class="text-muted">
-          {{ pacienteForm.get('descricao')?.value?.length || 0 }}/300 caracteres
-        </small>
-      </div>
-    </div>
+      <p class="text-muted mb-4">
+        Faça upload do pedido médico em PDF, imagem (JPG, PNG) ou documento de texto.
+        <br>
+        <small>O sistema irá ler automaticamente os dados e preencher o formulário.</small>
+      </p>
 
-    <!-- ================== DADOS PESSOAIS ================== -->
-    <h6 class="fw-bold">Dados Pessoais</h6>
-    <div class="row g-2">
-      <div class="col-12">
-        <label for="nomeCompleto">Nome completo</label>
-        <input
-          class="form-control"
-          placeholder="Ex: Maria da Silva"
-          formControlName="nomeCompleto"
-        />
-      </div>
-
-      <div class="col-md-4">
-        <label for="dataNascimento">Data de nascimento</label>
-        <input
-          type="date"
-          class="form-control"
-          formControlName="dataNascimento"
-        />
-      </div>
-
-      <div class="col-md-4">
-        <label for="cpf">CPF</label>
-        <input
-          class="form-control"
-          placeholder="000.000.000-00"
-          formControlName="cpf"
-        />
-      </div>
-
-      <div class="col-md-4">
-        <label for="sexo">Sexo</label>
-        <select class="form-select" formControlName="sexo">
-          <option value="">Ex: Feminino</option>
-          <option value="M">Masculino</option>
-          <option value="F">Feminino</option>
-          <option value="O">Outro</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- ================== CONTATO ================== -->
-    <h6 class="fw-bold mt-4">Contato</h6>
-    <div class="row g-2">
-      <div class="col-12">
-        <label for="endereco">Endereço completo</label>
-        <input
-          class="form-control"
-          placeholder="Endereço completo"
-          formControlName="endereco"
-        />
-      </div>
-
-      <div class="col-md-6">
-        <label for="telefone1">Telefone 1</label>
-        <input
-          class="form-control"
-          placeholder="Telefone 1"
-          formControlName="telefone1"
-        />
-      </div>
-
-      <div class="col-md-6">
-        <label for="telefone2">Telefone 2</label>
-        <input
-          class="form-control"
-          placeholder="Telefone 2"
-          formControlName="telefone2"
-        />
-      </div>
-
-      <div class="col-12">
-        <label for="email">E-mail</label>
-        <input
-          type="email"
-          class="form-control"
-          placeholder="E-mail"
-          formControlName="email"
-        />
-      </div>
-    </div>
-
-    <!-- ================== CONVÊNIO ================== -->
-    <h6 class="fw-bold mt-4">Convênio</h6>
-
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Nome do convênio</label>
-        <input
-          class="form-control"
-          formControlName="convenio"
-          placeholder="Ex: Unimed"
-        />
-      </div>
-
-      <div class="col-md-6">
-        <label class="form-label">Número da carteirinha</label>
-        <input
-          class="form-control"
-          formControlName="numeroCarteirinha"
-          placeholder="000000000"
-        />
-      </div>
-
-      <div class="col-md-6">
-        <label class="form-label">Validade da carteirinha</label>
-        <input
-          type="date"
-          class="form-control"
-          formControlName="validadeCarteirinha"
-        />
-      </div>
-
-      <!-- 👇 AQUI FICAM NA MESMA LINHA -->
-      <div class="col-md-6">
-        <label class="form-label">Carteirinha (PDF ou imagem)</label>
+      <div class="mb-3">
         <input
           type="file"
           class="form-control"
-          (change)="onFileChange($event, 'anexoCarteirinha')"
-        />
+          (change)="onFileSelected($event)"
+          accept=".pdf,.jpg,.jpeg,.png,.txt"
+          [disabled]="processandoArquivo"
+        >
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">Documento de identidade</label>
-        <input
-          type="file"
-          class="form-control"
-          (change)="onFileChange($event, 'anexoIdentidade')"
-        />
-      </div>
-    </div>
-
-    <!-- ================== DADOS MÉDICOS ================== -->
-    <h6 class="fw-bold mt-4">Dados Médicos</h6>
-
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Médico solicitante</label>
-        <input
-          class="form-control"
-          formControlName="medicoSolicitante"
-          placeholder="Nome do médico"
-        />
+      <div class="mb-3" *ngIf="arquivoSelecionado">
+        <p class="text-success">
+          <i class="bi bi-check-circle"></i>
+          Arquivo selecionado: {{ arquivoSelecionado.name }}
+        </p>
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">CRM</label>
-        <input
-          class="form-control"
-          formControlName="crmMedico"
-          placeholder="CRM do médico"
-        />
-      </div>
+      <button
+        class="btn btn-primary btn-lg"
+        (click)="uploadPedido()"
+        [disabled]="!arquivoSelecionado || processandoArquivo"
+      >
+        <span *ngIf="processandoArquivo" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!processandoArquivo" class="bi bi-cloud-upload me-2"></i>
+        {{ processandoArquivo ? 'Processando...' : 'Processar Pedido' }}
+      </button>
 
-      <div class="col-12">
-        <label class="form-label">Procedimento solicitado</label>
-        <input
-          class="form-control"
-          formControlName="procedimento"
-          placeholder="Descrição do procedimento"
-        />
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label">CID</label>
-        <input
-          class="form-control"
-          formControlName="cid"
-          placeholder="Ex: M16.1"
-        />
-      </div>
-
-      <!-- <div class="col-md-4">
-        <label class="form-label">Lateralidade</label>
-        <select class="form-select" formControlName="lateralidade">
-          <option value="">Selecione</option>
-          <option value="D">Direita</option>
-          <option value="E">Esquerda</option>
-          <option value="B">Bilateral</option>
-        </select>
-      </div> -->
-
-      <div class="col-md-4">
-        <label class="form-label">Prioridade</label>
-        <select class="form-select" formControlName="prioridade">
-          <option value="">Selecione</option>
-          <option value="ELETIVA">Eletiva</option>
-          <option value="URGENCIA">Urgência</option>
-          <option value="PRIORIDADE">Prioridade</option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label">Data do pedido</label>
-        <input type="date" class="form-control" formControlName="dataPedido" />
+      <div class="mt-4 text-start">
+        <h6>Formatos aceitos:</h6>
+        <ul class="text-muted small">
+          <li>PDF - Pedidos médicos digitalizados</li>
+          <li>Imagens (JPG, PNG) - Fotos do pedido</li>
+          <li>TXT - Texto simples com os dados</li>
+        </ul>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Aba do Formulário -->
+<div *ngIf="activeTab === 'formulario'" class="tab-pane">
+  <div class="modal-body">
+    <!-- Alerta de dados carregados -->
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <strong>Dados carregados com sucesso!</strong>
+      Os campos abaixo foram preenchidos automaticamente. Revise as informações e complete os dados faltantes.
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <form [formGroup]="pacienteForm">
+      <!-- ================== RESUMO DO PEDIDO ================== -->
+      <h6 class="fw-bold">Resumo do Pedido</h6>
+
+      <div class="row g-2 mb-3">
+        <div class="col-12">
+          <label class="form-label">Título do pedido</label>
+          <input
+            class="form-control"
+            formControlName="titulo"
+            placeholder="Ex: Artroplastia total de joelho direito"
+            maxlength="100"
+          />
+          <small class="text-muted">
+            {{ pacienteForm.get('titulo')?.value?.length || 0 }}/100 caracteres
+          </small>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Descrição</label>
+          <textarea
+            class="form-control"
+            rows="3"
+            formControlName="descricao"
+            placeholder="Descreva o pedido"
+            maxlength="300"
+          ></textarea>
+          <small class="text-muted">
+            {{ pacienteForm.get('descricao')?.value?.length || 0 }}/300 caracteres
+          </small>
+        </div>
+      </div>
+
+      <!-- ================== DADOS PESSOAIS ================== -->
+      <h6 class="fw-bold">Dados Pessoais</h6>
+      <div class="row g-2">
+        <div class="col-12">
+          <label for="nomeCompleto">Nome completo <span class="text-danger">*</span></label>
+          <input
+            class="form-control"
+            placeholder="Ex: Maria da Silva"
+            formControlName="nomeCompleto"
+            [class.is-invalid]="pacienteForm.get('nomeCompleto')?.invalid && pacienteForm.get('nomeCompleto')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="pacienteForm.get('nomeCompleto')?.invalid && pacienteForm.get('nomeCompleto')?.touched">
+            Nome completo é obrigatório
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label for="dataNascimento">Data de nascimento</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="dataNascimento"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label for="cpf">CPF</label>
+          <input
+            class="form-control"
+            placeholder="000.000.000-00"
+            formControlName="cpf"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label for="sexo">Sexo</label>
+          <select class="form-select" formControlName="sexo">
+            <option value="">Selecione</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+            <option value="O">Outro</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ================== CONTATO ================== -->
+      <h6 class="fw-bold mt-4">Contato</h6>
+      <div class="row g-2">
+        <div class="col-12">
+          <label for="endereco">Endereço completo</label>
+          <input
+            class="form-control"
+            placeholder="Endereço completo"
+            formControlName="endereco"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="telefone1">Telefone 1</label>
+          <input
+            class="form-control"
+            placeholder="Telefone 1"
+            formControlName="telefone1"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="telefone2">Telefone 2</label>
+          <input
+            class="form-control"
+            placeholder="Telefone 2"
+            formControlName="telefone2"
+          />
+        </div>
+
+        <div class="col-12">
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            class="form-control"
+            placeholder="E-mail"
+            formControlName="email"
+          />
+        </div>
+      </div>
+
+      <!-- ================== CONVÊNIO ================== -->
+      <h6 class="fw-bold mt-4">Convênio</h6>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nome do convênio</label>
+          <input
+            class="form-control"
+            formControlName="convenio"
+            placeholder="Ex: Unimed"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Número da carteirinha</label>
+          <input
+            class="form-control"
+            formControlName="numeroCarteirinha"
+            placeholder="000000000"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Validade da carteirinha</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="validadeCarteirinha"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Carteirinha (PDF ou imagem)</label>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onFileChange($event, 'anexoCarteirinha')"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Documento de identidade</label>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onFileChange($event, 'anexoIdentidade')"
+          />
+        </div>
+      </div>
+
+      <!-- ================== DADOS MÉDICOS ================== -->
+      <h6 class="fw-bold mt-4">Dados Médicos</h6>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Médico solicitante</label>
+          <input
+            class="form-control"
+            formControlName="medicoSolicitante"
+            placeholder="Nome do médico"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">CRM</label>
+          <input
+            class="form-control"
+            formControlName="crmMedico"
+            placeholder="CRM do médico"
+          />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Procedimento solicitado <span class="text-danger">*</span></label>
+          <input
+            class="form-control"
+            formControlName="procedimento"
+            placeholder="Descrição do procedimento"
+            [class.is-invalid]="pacienteForm.get('procedimento')?.invalid && pacienteForm.get('procedimento')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="pacienteForm.get('procedimento')?.invalid && pacienteForm.get('procedimento')?.touched">
+            Procedimento é obrigatório
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">CID</label>
+          <input
+            class="form-control"
+            formControlName="cid"
+            placeholder="Ex: M16.1"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Prioridade</label>
+          <select class="form-select" formControlName="prioridade">
+            <option value="ELETIVA">Eletiva</option>
+            <option value="URGENCIA">Urgência</option>
+            <option value="PRIORIDADE">Prioridade</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Data do pedido</label>
+          <input type="date" class="form-control" formControlName="dataPedido" />
+        </div>
+      </div>
+    </form>
   </div>
 
   <div class="modal-footer">
@@ -245,7 +331,7 @@
       Cancelar
     </button>
     <button type="button" class="btn btn-primary" (click)="salvar()">
-      Salvar
+      <i class="bi bi-check-circle me-1"></i>Salvar Pedido
     </button>
   </div>
-</form>
+</div>
