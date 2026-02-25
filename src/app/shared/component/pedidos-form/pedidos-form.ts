@@ -1,4 +1,10 @@
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewEncapsulation,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -16,7 +22,7 @@ import { PedidoService } from '../../services/pedido.service';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './pedidos-form.html',
   styleUrl: './pedidos-form.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class PedidosForm implements OnInit {
   pacienteForm!: FormGroup;
@@ -109,7 +115,7 @@ export class PedidosForm implements OnInit {
       const resposta: any = await firstValueFrom(
         this.pedidoService.importarPdf(this.arquivoSelecionado),
       );
-      console.log(resposta)
+      console.log(resposta);
       if (resposta && resposta.sucesso) {
         this.dadosExtraidos = resposta;
 
@@ -119,7 +125,6 @@ export class PedidosForm implements OnInit {
 
         this.activeTab = 'formulario';
         this.cdr.detectChanges();
-
       } else {
         console.log('14. resposta sem sucesso:', resposta?.mensagem);
       }
@@ -150,20 +155,31 @@ export class PedidosForm implements OnInit {
         .join(' ');
     };
 
+    // 🔥 TÍTULO: Usar procedimentos
     let titulo = '';
-    let descricao = '';
-
     if (dados.procedimentos && dados.procedimentos.length > 0) {
-      titulo = dados.procedimentos[0].descricao || '';
-      descricao = dados.procedimentos.map((p: any) => p.descricao).join('; ');
+      titulo = dados.procedimentos.map((p: any) => p.descricao).join(' | ');
     }
+
+    // 🔥 DESCRIÇÃO: Usar indicação clínica ou relatório pré-operatório
+    let descricao =
+      dados.indicacaoClinica || dados.relatorioPreOperatorio || '';
+
+    // 🔥 FORMATAR DATAS para o input (yyyy-MM-dd)
+    const dataNascimentoFormatada = this.formatarDataParaInput(
+      dados.dataNascimento,
+    );
+    const dataPedidoFormatada = this.formatarDataParaInput(dados.dataPedido);
+    const validadeCarteiraFormatada = this.formatarDataParaInput(
+      dados.validadeCarteira,
+    );
 
     this.pacienteForm.patchValue({
       titulo: titulo,
       descricao: descricao,
 
       nomeCompleto: formatarNome(dados.nomePaciente || ''),
-      dataNascimento: dados.dataNascimento || '',
+      dataNascimento: dataNascimentoFormatada,
       cpf: dados.cpf || '',
       sexo: this.mapearSexo(dados.sexo),
 
@@ -172,17 +188,16 @@ export class PedidosForm implements OnInit {
 
       convenio: formatarConvenio(dados.convenio || ''),
       numeroCarteirinha: dados.numeroCarteira || '',
-      validadeCarteirinha: dados.validadeCarteira || '',
+      validadeCarteirinha: validadeCarteiraFormatada,
 
-      medicoSolicitante: formatarNome(dados.nomeMedico || ''),
-      crmMedico:
-        dados.crmMedico || dados.crmNumero
-          ? dados.crmNumero + (dados.crmUf ? '/' + dados.crmUf : '')
-          : '',
+      medicoSolicitante: dados.medicoNome || '',
+      crmMedico: dados.crmCompleto || '',
       procedimento: titulo,
       cid: dados.cid || '',
-      prioridade: this.mapearPrioridade(dados.prioridade || dados.tipo),
-      dataPedido: dados.dataPedido || new Date().toISOString().split('T')[0],
+      prioridade: this.mapearPrioridade(
+        dados.prioridade || dados.tipo || dados.caraterAtendimento,
+      ),
+      dataPedido: dataPedidoFormatada,
     });
   }
 
@@ -274,5 +289,44 @@ export class PedidosForm implements OnInit {
   get nomeCompletoInvalido(): boolean {
     const control = this.pacienteForm.get('nomeCompleto');
     return (control?.invalid && (control?.dirty || control?.touched)) || false;
+  }
+
+  // Funções de formatação de data
+  private formatarDataParaExibicao(dataStr: string): string {
+    if (!dataStr) return '';
+
+    // Se já estiver no formato dd/MM/yyyy, retorna como está
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dataStr)) {
+      return dataStr;
+    }
+
+    // Tenta converter de ISO (yyyy-MM-dd) para dd/MM/yyyy
+    try {
+      const data = new Date(dataStr);
+      if (!isNaN(data.getTime())) {
+        return data.toLocaleDateString('pt-BR');
+      }
+    } catch (e) {
+      // Ignora erro
+    }
+
+    return dataStr;
+  }
+
+  private formatarDataParaInput(dataStr: string): string {
+    if (!dataStr) return '';
+
+    // Se já estiver no formato yyyy-MM-dd, retorna como está
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
+      return dataStr;
+    }
+
+    // Converte de dd/MM/yyyy para yyyy-MM-dd (formato do input date)
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dataStr)) {
+      const partes = dataStr.split('/');
+      return `${partes[2]}-${partes[1]}-${partes[0]}`;
+    }
+
+    return dataStr;
   }
 }

@@ -94,7 +94,7 @@ export class CardComponent {
       scrollable: true,
       size: 'xl',
     });
-
+    console.log('Pedido enviado para o modal:', this.data.pedido);
     modalRef.componentInstance.fases = this.getTimelineFases();
     modalRef.componentInstance.pedido = this.data.pedido; // 🔥 ESSENCIAL
   }

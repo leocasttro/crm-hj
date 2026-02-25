@@ -1,105 +1,335 @@
 @if (pedido) {
-  <div class="row g-3">
+<div class="pedido-resumo-container">
+  <!-- ==================== CABEÇALHO COM STATUS ==================== -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold m-0">Detalhes do Pedido</h5>
+    <span
+      class="badge px-3 py-2 rounded-pill"
+      [ngClass]="getStatusClass(pedido.status)"
+    >
+      <i class="bi bi-circle-fill me-1 small"></i>
+      {{ pedido.status }}
+    </span>
+  </div>
 
-    <!-- Resumo -->
-    <div class="col-12">
-      <h6 class="fw-bold">Resumo do Pedido</h6>
-    </div>
-
-    <div class="col-md-8">
-      <strong>Procedimento:</strong>
-      <p class="mb-0">{{ pedido.procedimento }} ({{ pedido.procedimentoCodigo }})</p>
-    </div>
-
-    <div class="col-md-4">
-      <strong>Status:</strong>
-      <p class="mb-0">{{ pedido.status }}</p>
-    </div>
-
-    <div class="col-md-4">
-      <strong>Prioridade:</strong>
-      <p class="mb-0">{{ pedido.prioridade }}</p>
-    </div>
-
-    <div class="col-md-4">
-      <strong>Convênio:</strong>
-      <p class="mb-0">{{ pedido.convenio }}</p>
-    </div>
-
-    <div class="col-md-4">
-      <strong>Validade carteirinha:</strong>
-      <p class="mb-0">{{ pedido.convenioValidadeCarteira | date:'shortDate' }}</p>
-    </div>
-
-    <div class="col-md-6" *ngIf="pedido.agendadoPara">
-      <strong>Agendado para:</strong>
-      <p class="mb-0">{{ pedido.agendadoPara | date:'short' }}</p>
-    </div>
-
-    <!-- Dados do Paciente -->
-    <div class="col-12 mt-3">
-      <h6 class="fw-bold">Dados do Paciente</h6>
-    </div>
-
-    <div class="col-md-6">
-      <strong>Paciente:</strong>
-      <p class="mb-0">
-        {{ pedido.paciente?.nomeCompleto ?? '(Paciente não carregado)' }}
-      </p>
-    </div>
-
-    <div class="col-md-3">
-      <strong>Documento:</strong>
-      <p class="mb-0">{{ pedido.paciente?.documentoNumero ?? '-' }}</p>
-    </div>
-
-    <div class="col-md-3">
-      <strong>Sexo:</strong>
-      <p class="mb-0">{{ pedido.paciente?.sexoDescricao ?? '-' }}</p>
-    </div>
-
-    <div class="col-md-6">
-      <strong>E-mail:</strong>
-      <p class="mb-0">{{ pedido.paciente?.email ?? '-' }}</p>
-    </div>
-
-    <div class="col-md-6">
-      <strong>Telefones:</strong>
-      <p class="mb-0">{{ pedido.paciente?.telefones ?? '-' }}</p>
-    </div>
-
-    <!-- Médico -->
-    <div class="col-12 mt-3">
-      <h6 class="fw-bold">Dados Médicos</h6>
-    </div>
-
-    <div class="col-md-6">
-      <strong>Médico solicitante:</strong>
-      <p class="mb-0">{{ pedido.medicoSolicitante }}</p>
-    </div>
-
-    <div class="col-md-6">
-      <strong>Especialidade:</strong>
-      <p class="mb-0">{{ pedido.medicoSolicitanteEspecialidade }}</p>
-    </div>
-
-    <!-- Documentos -->
-    <div class="col-12 mt-3">
-      <h6 class="fw-bold">Documentos</h6>
-    </div>
-
-    <div class="d-flex flex-wrap gap-4 mb-2">
-      <!-- ✅ por enquanto o backend só tem temDocumentos (geral) -->
-      <div class="d-flex align-items-center gap-2">
-        <span
-          class="status-circle"
-          [ngClass]="pedido.temDocumentos ? 'bg-success text-white' : 'bg-danger text-white'"
+  <!-- ==================== CARDS DE RESUMO ==================== -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="info-card p-3 bg-light rounded-3 h-100 d-flex flex-column">
+        <small class="text-muted text-uppercase fw-semibold"
+          >Procedimento</small
         >
-          {{ pedido.temDocumentos ? '✔' : '✕' }}
-        </span>
-        <span>Documentos anexados</span>
+        <h6
+          class="mt-1 mb-0 text-truncate flex-grow-1"
+          title="{{ pedido.procedimentoDescricao || pedido.procedimento }}"
+        >
+          {{ pedido.procedimentoDescricao || pedido.procedimento }}
+        </h6>
+        <small class="text-secondary"
+          >Cód: {{ pedido.procedimentoCodigoTUSS || pedido.procedimentoCodigo
+          }}</small
+        >
       </div>
     </div>
 
+    <div class="col-md-3 col-6">
+      <div class="info-card p-3 bg-light rounded-3 h-100 d-flex flex-column">
+        <small class="text-muted text-uppercase fw-semibold">Prioridade</small>
+        <h6
+          class="mt-1 mb-0 flex-grow-1 d-flex align-items-center"
+          [ngClass]="{
+        'text-danger': pedido.prioridade === 'URGENTE',
+        'text-primary': pedido.prioridade === 'ELETIVA',
+        'text-warning': pedido.prioridade === 'PRIORIDADE'
+      }"
+        >
+          <i class="bi bi-flag-fill me-1"></i>
+          {{ pedido.prioridade }}
+        </h6>
+        <!-- Espaço reservado para manter altura consistente -->
+        <small class="text-secondary opacity-0">Cód: placeholder</small>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="info-card p-3 bg-light rounded-3 h-100 d-flex flex-column">
+        <small class="text-muted text-uppercase fw-semibold">Convênio</small>
+        <h6
+          class="mt-1 mb-0 text-truncate flex-grow-1"
+          title="{{ pedido.convenioNome || pedido.convenio }}"
+        >
+          {{ pedido.convenioNome || pedido.convenio || '-' }}
+        </h6>
+        <small class="text-secondary"
+          >Carteira: {{ pedido.convenioNumeroCarteira || pedido.numeroCarteira
+          || '-' }}</small
+        >
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="info-card p-3 bg-light rounded-3 h-100 d-flex flex-column">
+        <small class="text-muted text-uppercase fw-semibold">Data</small>
+        <h6 class="mt-1 mb-0 flex-grow-1">
+          {{ pedido.dataPedido | date:'dd/MM/yyyy' }}
+        </h6>
+        <small class="text-secondary"
+          >Criação: {{ pedido.criadoEm | date:'dd/MM' }}</small
+        >
+      </div>
+    </div>
   </div>
+
+  <!-- ==================== DADOS DO PACIENTE ==================== -->
+  <div class="section-card mb-4 p-3 rounded-3 border">
+    <h6 class="section-title fw-bold mb-3">
+      <i class="bi bi-person-circle text-primary me-2"></i>Dados do Paciente
+    </h6>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Nome completo</small>
+          <span class="fw-semibold"
+            >{{ pedido.paciente?.nomeCompleto || pedido.nomePaciente || 'Não
+            informado' }}</span
+          >
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Nascimento</small>
+          <span
+            >{{ pedido.paciente?.dataNascimento || pedido.dataNascimento || '-'
+            | date:'dd/MM/yyyy' }}</span
+          >
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Sexo</small>
+          <span>
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-gender-male text-primary': (pedido.paciente?.sexo || pedido.sexoPaciente) === 'MASCULINO',
+                'bi-gender-female text-danger': (pedido.paciente?.sexo || pedido.sexoPaciente) === 'FEMININO'
+              }"
+            ></i>
+            {{ pedido.paciente?.sexoDescricao || pedido.sexoPaciente || '-' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="d-flex flex-column">
+          <small class="text-muted">CPF</small>
+          <span>{{ pedido.paciente?.cpf || pedido.cpfPaciente || '-' }}</span>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Telefone</small>
+          <span>
+            <i class="bi bi-telephone me-1"></i>
+            {{ pedido.paciente?.telefones || pedido.telefonePaciente || '-' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="d-flex flex-column">
+          <small class="text-muted">E-mail</small>
+          <span
+            class="text-truncate"
+            title="{{ pedido.paciente?.email || pedido.emailPaciente }}"
+          >
+            <i class="bi bi-envelope me-1"></i>
+            {{ pedido.paciente?.email || pedido.emailPaciente || '-' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DADOS MÉDICOS ==================== -->
+  <div class="section-card mb-4 p-3 rounded-3 border">
+    <h6 class="section-title fw-bold mb-3">
+      <i class="bi bi-person-badge text-primary me-2"></i>Dados Médicos
+    </h6>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Médico solicitante</small>
+          <span class="fw-semibold"
+            >{{ pedido.medicoSolicitante || pedido.medicoNome }}</span
+          >
+          <small class="text-secondary"
+            >{{ pedido.medicoSolicitanteCrm || pedido.crmCompleto }}</small
+          >
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Especialidade</small>
+          <span
+            >{{ pedido.medicoSolicitanteEspecialidade || pedido.cbo || 'Não
+            informada' }}</span
+          >
+        </div>
+      </div>
+
+      <div class="col-md-6" *ngIf="pedido.medicoExecutorNome">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Médico executor</small>
+          <span class="fw-semibold">{{ pedido.medicoExecutorNome }}</span>
+          <small class="text-secondary">{{ pedido.medicoExecutorCrm }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DADOS CLÍNICOS ==================== -->
+  <div class="section-card mb-4 p-3 rounded-3 border">
+    <h6 class="section-title fw-bold mb-3">
+      <i class="bi bi-file-medical text-primary me-2"></i>Dados Clínicos
+    </h6>
+
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="d-flex flex-column">
+          <small class="text-muted">CID Principal</small>
+          <span class="badge bg-primary bg-opacity-10 text-primary p-2 mt-1"
+            >{{ pedido.cidCodigo || pedido.cid || '-' }}</span
+          >
+        </div>
+      </div>
+
+      <div class="col-md-9" *ngIf="pedido.cidDescricao">
+        <div class="d-flex flex-column">
+          <small class="text-muted">Descrição</small>
+          <span>{{ pedido.cidDescricao }}</span>
+        </div>
+      </div>
+
+      <!-- CIDs Secundários -->
+      <div
+        class="col-12"
+        *ngIf="pedido.cidCodigo2 || pedido.cidCodigo3 || pedido.cidCodigo4"
+      >
+        <small class="text-muted d-block mb-2">CIDs Secundários</small>
+        <div class="d-flex gap-2 flex-wrap">
+          <span *ngIf="pedido.cidCodigo2" class="badge bg-secondary p-2"
+            >{{ pedido.cidCodigo2 }}</span
+          >
+          <span *ngIf="pedido.cidCodigo3" class="badge bg-secondary p-2"
+            >{{ pedido.cidCodigo3 }}</span
+          >
+          <span *ngIf="pedido.cidCodigo4" class="badge bg-secondary p-2"
+            >{{ pedido.cidCodigo4 }}</span
+          >
+        </div>
+      </div>
+
+      <!-- Indicação Clínica -->
+      <div class="col-12" *ngIf="pedido.indicacaoClinica">
+        <small class="text-muted d-block mb-2">Indicação Clínica</small>
+        <div class="bg-light p-3 rounded-3 small">
+          {{ pedido.indicacaoClinica }}
+        </div>
+      </div>
+
+      <!-- Relatório Pré-Operatório -->
+      <div class="col-12" *ngIf="pedido.relatorioPreOperatorio">
+        <small class="text-muted d-block mb-2">Relatório Pré-Operatório</small>
+        <div class="bg-light p-3 rounded-3 small">
+          {{ pedido.relatorioPreOperatorio }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DADOS DA GUIA E INTERNAÇÃO ==================== -->
+  <div class="row g-3 mb-4">
+    <!-- Dados da Guia -->
+    <div class="col-md-6">
+      <div class="section-card p-3 rounded-3 border h-100">
+        <h6 class="section-title fw-bold mb-3">
+          <i class="bi bi-card-text text-primary me-2"></i>Guia
+        </h6>
+
+        <div class="d-flex flex-column gap-2">
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">Nº Guia:</small>
+            <span class="fw-semibold">{{ pedido.numeroGuia || '-' }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">Registro ANS:</small>
+            <span>{{ pedido.registroAns || '-' }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">Guia Operadora:</small>
+            <span>{{ pedido.numeroGuiaOperadora || '-' }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">Código Operadora:</small>
+            <span>{{ pedido.codigoOperadora || '-' }}</span>
+          </div>
+          <div class="d-flex flex-column mt-2">
+            <small class="text-muted">Contratado:</small>
+            <span class="small">{{ pedido.nomeContratado || '-' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dados da Internação -->
+    <div class="col-md-6">
+      <div class="section-card p-3 rounded-3 border h-100">
+        <h6 class="section-title fw-bold mb-3">
+          <i class="bi bi-hospital text-primary me-2"></i>Internação
+        </h6>
+
+        <div class="row g-2">
+          <div class="col-6">
+            <small class="text-muted d-block">Caráter</small>
+            <span class="fw-semibold"
+              >{{ pedido.caraterAtendimento || '-' }}</span
+            >
+          </div>
+          <div class="col-6">
+            <small class="text-muted d-block">Tipo</small>
+            <span>{{ pedido.tipoInternacao || '-' }}</span>
+          </div>
+          <div class="col-6">
+            <small class="text-muted d-block">Regime</small>
+            <span>{{ pedido.regimeInternacao || '-' }}</span>
+          </div>
+          <div class="col-6">
+            <small class="text-muted d-block">Diárias</small>
+            <span>{{ pedido.qtdDiariasSolicitadas || '-' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DOCUMENTOS ==================== -->
+  <div class="mt-3 p-3 rounded-3 border" *ngIf="pedido.temDocumentos">
+    <div class="d-flex align-items-center gap-3">
+      <span class="status-circle bg-success text-white">
+        <i class="bi bi-check-lg"></i>
+      </span>
+      <span class="fw-semibold">Documentos anexados</span>
+      <span class="text-secondary small"
+        >({{ pedido.documentosAnexados?.length || 0 }} arquivos)</span
+      >
+    </div>
+  </div>
+</div>
 }

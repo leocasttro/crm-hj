@@ -320,6 +320,7 @@ export class Pedidos implements OnInit, OnDestroy {
       .listar()
       .pipe(
         switchMap((pedidos: PedidoDto[]) => {
+          console.log('Pedidos carregados do backend:', pedidos);
           const ids: string[] = [
             ...new Set(
               pedidos

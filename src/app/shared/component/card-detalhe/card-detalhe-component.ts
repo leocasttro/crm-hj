@@ -1,12 +1,20 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
-import { NgbActiveModal, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'; // ✨ 1. Importe o módulo aqui
+import { NgbActiveModal, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArrowDown,
   faArrowRight,
   faCheck,
   faMinus,
+  faClock,
+  faUser,
+  faShield,
+  faFileMedical,
+  faHospital,
+  faCalendar,
+  faTags,
+  faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 import { PedidosResumo } from '../pedidos-resumo/pedidos-resumo';
 import { Pedido } from '../../models/pedido';
@@ -60,14 +68,29 @@ export interface FasePedido {
 })
 export class CardDetalheComponent implements OnInit {
   @Input() fases: FasePedido[] = [];
-  @Input() pedido!: any; // 👈 DADOS DO PEDIDO (mock ou API)
+  @Input() pedido!: any;
 
   faseAtual!: CodigoFase;
+
+  // Ícones do FontAwesome
+  faArrowDown = faArrowDown;
+  faArrowRight = faArrowRight;
+  faCheck = faCheck;
+  faMinus = faMinus;
+  faClock = faClock;
+  faUser = faUser;
+  faShield = faShield;
+  faFileMedical = faFileMedical;
+  faHospital = faHospital;
+  faCalendar = faCalendar;
+  faTags = faTags;
+  faExclamationTriangle = faExclamationTriangle;
 
   constructor(public activeModal: NgbActiveModal) {}
 
   ngOnInit(): void {
     this.definirFaseAtual();
+    console.log('Pedido recebido no detalhe:', this.pedido);
   }
 
   definirFaseAtual(): void {
@@ -86,5 +109,60 @@ export class CardDetalheComponent implements OnInit {
       this.fases[index].data = new Date().toISOString();
       this.definirFaseAtual();
     }
+  }
+
+  getStatusClass(status: string): string {
+    const classes = {
+      RASCUNHO: 'bg-secondary',
+      PENDENTE: 'bg-warning',
+      EM_ANALISE: 'bg-info',
+      AGENDADO: 'bg-primary',
+      CONFIRMADO: 'bg-success',
+      REALIZADO: 'bg-success',
+      CANCELADO: 'bg-danger',
+      REJEITADO: 'bg-danger',
+    };
+    return classes[status as keyof typeof classes] || 'bg-secondary';
+  }
+
+  // Métodos auxiliares
+  formatarData(data: string | Date): string {
+    if (!data) return '';
+    return new Date(data).toLocaleDateString('pt-BR');
+  }
+
+  formatarDataHora(data: string | Date): string {
+    if (!data) return '';
+    return new Date(data).toLocaleString('pt-BR');
+  }
+
+  getPrimeiroNome(nomeCompleto: string): string {
+    if (!nomeCompleto) return '';
+    return nomeCompleto.split(' ')[0];
+  }
+
+  temCidsSecundarios(): boolean {
+    return !!(
+      this.pedido?.cidCodigo2 ||
+      this.pedido?.cidCodigo3 ||
+      this.pedido?.cidCodigo4
+    );
+  }
+
+  temDadosGuia(): boolean {
+    return !!(
+      this.pedido?.numeroGuia ||
+      this.pedido?.registroAns ||
+      this.pedido?.numeroGuiaOperadora
+    );
+  }
+
+  temDadosInternacao(): boolean {
+    return !!(
+      this.pedido?.caraterAtendimento ||
+      this.pedido?.tipoInternacao ||
+      this.pedido?.regimeInternacao ||
+      this.pedido?.qtdDiariasSolicitadas
+    );
   }
 }
