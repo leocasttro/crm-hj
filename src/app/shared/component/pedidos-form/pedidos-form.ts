@@ -60,7 +60,7 @@ interface EnderecoValue {
 interface UpdatePedidoRequest {
   nomePaciente?: NomeCompletoValue;
   dataNascimento?: DataNascimentoValue;
-  documento?: DocumentoValue;
+  cpfPaciente?: DocumentoValue;
   emailPaciente?: EmailValue;
   telefonesPaciente?: TelefoneValue[];
   sexoPaciente?: SexoValue;
@@ -419,7 +419,7 @@ export class PedidosForm implements OnInit {
     }
 
     if (this.pacienteForm.get('cpf')?.value) {
-      request.documento = {
+      request.cpfPaciente = {
         numero: this.pacienteForm.get('cpf')?.value.replace(/\D/g, ''),
         tipoDocumento: 'CPF',
       };
