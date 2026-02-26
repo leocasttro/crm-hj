@@ -83,6 +83,7 @@ export interface PedidoDto {
     telefones?: string;
   };
 
+  enderecoPaciente: string;
   // ==================== DADOS DO PACIENTE (campos diretos) ====================
   nomePaciente?: string;
   dataNascimento?: string;

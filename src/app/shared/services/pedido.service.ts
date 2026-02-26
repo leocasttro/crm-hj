@@ -19,4 +19,10 @@ export class PedidoService {
 
     return this.http.post(`${this.baseUrl}/importar-pdf`, formData);
   }
+
+  atualizarPedido(id: string, dados: any): Observable<any> {
+    console.log('🔧 Service - atualizarPedido chamado com ID:', id);
+
+    return this.http.put(`${this.baseUrl}/${id}`, dados);
+  }
 }
