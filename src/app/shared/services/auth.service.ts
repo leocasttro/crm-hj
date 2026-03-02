@@ -23,6 +23,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
+    console.log('Logout realizado');
   }
 
   getToken(): string | null {
