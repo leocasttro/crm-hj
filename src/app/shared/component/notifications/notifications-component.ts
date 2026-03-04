@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
-import { NotificationStore } from '../../services/notification.store';
+import { NotificationStore } from '../../../core/services/store/notification.store';
 
 @Component({
   selector: 'app-notifications-component',

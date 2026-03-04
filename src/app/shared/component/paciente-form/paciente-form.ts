@@ -7,7 +7,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Paciente } from '../../models/paciente';
+
+import { PacienteDto } from '@models/paciente';
+import {
+  mapPacienteDtoToForm,
+  mapFormToPacienteDto
+} from '@models/paciente';
 
 @Component({
   selector: 'app-paciente-form',
@@ -16,58 +21,49 @@ import { Paciente } from '../../models/paciente';
   templateUrl: './paciente-form.html',
   styleUrl: './paciente-form.scss',
 })
-export class PacienteForm {
-  @Input() paciente?: Paciente;
+export class PacienteFormComponent {
+  @Input() paciente?: PacienteDto;  // ✅ Recebe DTO
 
   pacienteForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    public activeModal: NgbActiveModal // 👈 ESSENCIAL
+    public activeModal: NgbActiveModal
   ) {}
 
   ngOnInit(): void {
-    this.pacienteForm = this.fb.group({
-      // ======================
-      // DADOS PESSOAIS
-      // ======================
-      nomeCompleto: ['', Validators.required],
-      dataNascimento: ['', Validators.required],
-      cpf: ['', Validators.required],
-      sexo: ['', Validators.required],
-
-      // ======================
-      // CONTATO
-      // ======================
-      endereco: ['', Validators.required],
-      telefone1: ['', Validators.required],
-      telefone2: [''],
-      email: ['', [Validators.required, Validators.email]],
-
-      // ======================
-      // CONVÊNIO
-      // ======================
-      convenio: ['', Validators.required],
-      numeroCarteirinha: ['', Validators.required],
-      validadeCarteirinha: ['', Validators.required],
-      anexoCarteirinha: [null, Validators.required],
-      anexoIdentidade: [null, Validators.required],
-
-      // ======================
-      // DADOS MÉDICOS
-      // ======================
-      medicoSolicitante: ['', Validators.required],
-      crmMedico: ['', Validators.required],
-      procedimento: ['', Validators.required],
-      cid: ['', Validators.required],
-      lateralidade: [''],
-      prioridade: ['', Validators.required],
-      dataPedido: ['', Validators.required],
-    });
+    this.initForm();
 
     if (this.paciente) {
-      this.pacienteForm.patchValue(this.paciente);
+      // ✅ Converte DTO para Form usando helper
+      const formData = mapPacienteDtoToForm(this.paciente);
+      this.pacienteForm.patchValue(formData);
     }
+  }
+
+  private initForm(): void {
+    this.pacienteForm = this.fb.group({
+      // ✅ Campos do PacienteForm (types)
+      primeiroNome: ['', Validators.required],
+      sobrenome: ['', Validators.required],
+      dataNascimento: ['', Validators.required],
+      sexoCodigo: ['', Validators.required],
+      documentoTipo: ['', Validators.required],
+      documentoNumero: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      telefonePrincipal: ['', Validators.required],
+      telefoneSecundario: [''],
+      possuiWhatsApp: [false],
+      logradouro: ['', Validators.required],
+      numero: ['', Validators.required],
+      complemento: [''],
+      bairro: ['', Validators.required],
+      cidade: ['', Validators.required],
+      estado: ['', Validators.required],
+      cep: ['', Validators.required],
+      pais: ['Brasil'],
+      observacoes: ['']
+    });
   }
 
   salvar(): void {
@@ -76,18 +72,12 @@ export class PacienteForm {
       return;
     }
 
-    // fecha o modal retornando os dados
-    this.activeModal.close(this.pacienteForm.value);
+    // ✅ Converte Form para DTO usando helper
+    const dadosParaBackend = mapFormToPacienteDto(this.pacienteForm.value);
+    this.activeModal.close(dadosParaBackend);
   }
 
   cancelar(): void {
     this.activeModal.dismiss();
-  }
-
-  onFileChange(event: Event, campo: string): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      this.pacienteForm.get(campo)?.setValue(file);
-    }
   }
 }

@@ -8,7 +8,7 @@ import {
   faMagnifyingGlass,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
-import { UiActionService } from '../services/ui-action.service';
+import { UiActionService } from '../../core/services/utils/ui-action.service';
 import { NotificationsComponent } from "../component/notifications/notifications-component";
 
 @Component({

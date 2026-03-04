@@ -1,22 +1,15 @@
+
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { NgbCollapseModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  faArrowDown,
   faMinus,
   faTimeline,
 } from '@fortawesome/free-solid-svg-icons';
 import { CardDetalheComponent } from '../card-detalhe/card-detalhe-component';
-import { CardData } from '../../models/cardData';
-
-
-export interface ChecklistItem {
-  id: number;
-  titulo: string;
-  status: 'Pendente' | 'Concluído';
-  arquivo?: File;
-}
+import { CardData } from '../../../core/models/pedido';
+import { ChecklistItem } from '@core/models';
 
 @Component({
   selector: 'app-card-component',
@@ -94,9 +87,8 @@ export class CardComponent {
       scrollable: true,
       size: 'xl',
     });
-    console.log('Pedido enviado para o modal:', this.data.pedido);
     modalRef.componentInstance.fases = this.getTimelineFases();
-    modalRef.componentInstance.pedido = this.data.pedido; // 🔥 ESSENCIAL
+    modalRef.componentInstance.pedido = this.data.pedido;
   }
 
   public gerarIdUnico(titulo: string): string {

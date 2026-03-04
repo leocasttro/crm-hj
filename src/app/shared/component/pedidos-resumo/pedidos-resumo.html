@@ -1,11 +1,8 @@
 @if (pedido) {
 <div class="pedido-resumo-container">
-
-
-
   <!-- ==================== CARDS PRINCIPAIS ==================== -->
   <div class="row g-3 mb-4">
-    <!-- Card de Procedimentos - OCUPA 6 COLUNAS -->
+    <!-- Card de Procedimentos -->
     <div class="col-lg-6">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body">
@@ -26,20 +23,17 @@
                 </span>
                 <small class="text-secondary">Código: {{ proc.codigoTUSS }}</small>
               </div>
-              <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
-                {{ proc.codigoTUSS }}
-              </span>
             </div>
 
             <!-- Fallback -->
-            <div *ngIf="!pedido.procedimentos || pedido.procedimentos.length === 0"
+            <div *ngIf="!pedido.procedimentos?.length"
                  class="procedimento-item d-flex justify-content-between align-items-center p-2 bg-light rounded-3">
               <div class="flex-grow-1 me-3">
-                <span class="d-block fw-semibold">{{ pedido.procedimentoDescricao || pedido.procedimento || 'Não informado' }}</span>
-                <small class="text-secondary">Código: {{ pedido.procedimentoCodigoTUSS || pedido.procedimentoCodigo }}</small>
+                <span class="d-block fw-semibold">{{ pedido.procedimentoDescricao || 'Não informado' }}</span>
+                <small class="text-secondary">Código: {{ pedido.procedimentoCodigoTUSS }}</small>
               </div>
               <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
-                {{ pedido.procedimentoCodigoTUSS || pedido.procedimentoCodigo }}
+                {{ pedido.procedimentoCodigoTUSS }}
               </span>
             </div>
           </div>
@@ -47,7 +41,7 @@
       </div>
     </div>
 
-    <!-- Card de Informações Rápidas - OCUPA 6 COLUNAS -->
+    <!-- Card de Informações Rápidas -->
     <div class="col-lg-6">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body">
@@ -78,10 +72,10 @@
                 <div class="d-flex align-items-center">
                   <i class="bi bi-building text-primary me-2"></i>
                   <div class="flex-grow-1">
-                    <div class="fw-bold text-truncate" [title]="pedido.convenioNome || pedido.convenio">
-                      {{ pedido.convenioNome || pedido.convenio || '-' }}
+                    <div class="fw-bold text-truncate" [title]="pedido.convenioNome">
+                      {{ pedido.convenioNome || '-' }}
                     </div>
-                    <small class="text-secondary d-block">Carteira: {{ pedido.convenioNumeroCarteira || pedido.numeroCarteira || '-' }}</small>
+                    <small class="text-secondary d-block">Carteira: {{ pedido.convenioNumeroCarteira || '-' }}</small>
                   </div>
                 </div>
               </div>
@@ -109,9 +103,9 @@
                   <i class="bi bi-file-code text-primary me-2"></i>
                   <div>
                     <span class="badge bg-primary bg-opacity-10 text-primary p-2">
-                      {{ pedido.cidCodigo || pedido.cid || '-' }}
+                      {{ pedido.cidCodigo || '-' }}
                     </span>
-                    <small *ngIf="pedido.cidDescricao" class="text-secondary d-block text-truncate" style="max-width: 150px;" [title]="pedido.cidDescricao">
+                    <small *ngIf="pedido.cidDescricao" class="text-secondary d-block text-truncate" [title]="pedido.cidDescricao">
                       {{ pedido.cidDescricao }}
                     </small>
                   </div>
@@ -145,7 +139,7 @@
         <div class="col-md-2">
           <div class="d-flex flex-column">
             <small class="text-muted">Nascimento</small>
-            <span>{{ pedido.paciente?.dataNascimento || pedido.dataNascimento || '-' | date:'dd/MM/yyyy' }}</span>
+            <span>{{ (pedido.paciente?.dataNascimento || pedido.dataNascimento)}}</span>
           </div>
         </div>
 
@@ -226,7 +220,7 @@
   </div>
 
   <!-- ==================== DADOS CLÍNICOS ==================== -->
-  <div class="card border-0 shadow-sm mb-4">
+  <div class="card border-0 shadow-sm mb-4" *ngIf="pedido.indicacaoClinica">
     <div class="card-body">
       <div class="d-flex align-items-center mb-3">
         <div class="icon-circle bg-primary bg-opacity-10 text-primary p-2 rounded-3 me-2">
@@ -235,14 +229,12 @@
         <h6 class="fw-bold mb-0">Dados Clínicos</h6>
       </div>
 
-      <!-- Indicação Clínica -->
-      <div class="mb-3" *ngIf="pedido.indicacaoClinica">
+      <div class="mb-3">
         <small class="text-muted d-block mb-2">Indicação Clínica</small>
         <div class="bg-light p-3 rounded-3">
           {{ pedido.indicacaoClinica }}
         </div>
       </div>
-
     </div>
   </div>
 
@@ -326,7 +318,5 @@
       </div>
     </div>
   </div>
-
-  <!-- ==================== OBSERVAÇÕES ==================== -->
 </div>
 }

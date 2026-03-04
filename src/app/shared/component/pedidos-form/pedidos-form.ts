@@ -15,8 +15,8 @@ import {
 } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
-import { PedidoService } from '../../services/pedido.service';
-import { PedidoDto } from '../../models/pedido.dto';
+import { PedidoService } from '@services/api';
+import { PedidoDto } from '../../../core/models/pedido/pedido.dto';
 
 // ==================== INTERFACES PARA O BACKEND (VALUE OBJECTS) ====================
 interface NomeCompletoValue {

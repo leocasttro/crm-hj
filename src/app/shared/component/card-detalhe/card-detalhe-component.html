@@ -11,91 +11,309 @@
 </div>
 
 <div class="modal-body border-0">
-  <div class="horizontal-timeline-container d-flex justify-content-between">
-    <div class="timeline-line"></div>
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+  </div>
 
-    <div
-      *ngFor="let fase of fases; let i = index"
-      class="timeline-item-h text-center"
-      [style.width.%]="100 / fases.length"
-    >
+  <ng-container *ngIf="!loading">
+    <!-- ================= TIMELINE ================= -->
+    <div class="horizontal-timeline-container d-flex justify-content-between position-relative">
+      <div class="timeline-line"></div>
+
       <div
-        class="timeline-point-h mx-auto"
-        [ngClass]="{
-          'bg-success': fase.concluido,
-          'bg-primary': !fase.concluido && i === getProximaFaseIndex(),
-          'bg-secondary': !fase.concluido && i !== getProximaFaseIndex()
-        }"
+        *ngFor="let fase of fases; let i = index"
+        class="timeline-item-h text-center"
+        [style.width.%]="100 / fases.length"
       >
-        <i *ngIf="fase.concluido" class="fas fa-check text-white small"></i>
-        <i
-          *ngIf="!fase.concluido && i === getProximaFaseIndex()"
-          class="fas fa-arrow-right text-white small"
-        ></i>
-      </div>
-
-      <div class="timeline-content-h mt-3">
-        <h6
-          class="small"
+        <div
+          class="timeline-point-h mx-auto"
           [ngClass]="{
-            'fw-bold': fase.concluido || i === getProximaFaseIndex()
+            'bg-success': fase.concluido,
+            'bg-primary': !fase.concluido && i === getProximaFaseIndex(),
+            'bg-secondary': !fase.concluido && i !== getProximaFaseIndex(),
+            'bg-warning': !fase.concluido && i === getProximaFaseIndex() && !podeAvancarFase()
           }"
         >
-          {{ fase.nome }}
-        </h6>
-        <p *ngIf="fase.data" class="text-muted small timeline-date">
-          {{ fase.data | date : 'shortDate' }}
-        </p>
-        <span
-          *ngIf="!fase.concluido && i === getProximaFaseIndex()"
-          class="badge bg-primary mt-1"
-          >Atual</span
-        >
+          <i *ngIf="fase.concluido" class="fas fa-check text-white small"></i>
+          <i
+            *ngIf="!fase.concluido && i === getProximaFaseIndex()"
+            class="fas fa-arrow-right text-white small"
+          ></i>
+        </div>
+
+        <div class="timeline-content-h mt-3">
+          <h6
+            class="small"
+            [ngClass]="{
+              'fw-bold': fase.concluido || i === getProximaFaseIndex()
+            }"
+          >
+            {{ fase.nome }}
+          </h6>
+          <p *ngIf="fase.data" class="text-muted small timeline-date">
+            {{ fase.data | date : 'shortDate' }}
+          </p>
+          <span
+            *ngIf="!fase.concluido && i === getProximaFaseIndex()"
+            class="badge mt-1"
+            [ngClass]="{
+              'bg-primary': podeAvancarFase(),
+              'bg-warning': !podeAvancarFase()
+            }"
+          >
+            {{ podeAvancarFase() ? 'Atual' : 'Aguardando documentos' }}
+          </span>
+        </div>
       </div>
     </div>
-  </div>
-  <!-- ================= CONTEÚDO DA FASE ================= -->
-  <hr class="my-4" />
 
-  <!-- 🔹 FASE: CRIADO -->
-  <div *ngIf="faseAtual === 'CRIADO'">
-    <h5 class="fw-bold">Pedido criado</h5>
-    <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+    <!-- ================= CHECKLIST SECTION ================= -->
+    <div class="checklist-section mt-4 p-3 bg-light rounded-3">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <h5 class="fw-bold mb-0">
+          <i class="bi bi-check2-square me-2"></i>Documentos Obrigatórios
+        </h5>
+        <span class="badge bg-info" *ngIf="getItensPendentesCount() > 0">
+          {{ getItensPendentesCount() }} pendente(s)
+        </span>
+        <span class="badge bg-success" *ngIf="getItensPendentesCount() === 0">
+          Todos ok!
+        </span>
+        <button
+          class="btn btn-sm btn-outline-secondary ms-auto"
+          (click)="isChecklistCollapsed = !isChecklistCollapsed"
+        >
+          <fa-icon [icon]="isChecklistCollapsed ? faArrowDown : faMinus"></fa-icon>
+        </button>
+      </div>
 
-    <!-- aqui depois entra o resumo dos dados -->
-    <button class="btn btn-primary">Enviar para análise</button>
-  </div>
+      <div [ngbCollapse]="isChecklistCollapsed" class="checklist-container">
+        <div *ngFor="let item of checklist" class="checklist-item p-3 mb-2 rounded-3 bg-white">
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div class="form-check flex-grow-1">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [checked]="item.status === 'Concluído'"
+                [disabled]="item.status === 'Concluído'"
+                (change)="toggleChecklistItem(item)"
+                [id]="'check-' + item.id"
+              >
+              <label class="form-check-label fw-medium" [for]="'check-' + item.id">
+                {{ item.titulo }}
+                <span *ngIf="item.obrigatorio" class="text-danger ms-1">*</span>
+              </label>
+            </div>
 
-  <!-- 🔹 FASE: EM ANÁLISE -->
-  <div *ngIf="faseAtual === 'EM_ANALISE'">
-    <h5 class="fw-bold">Pedido em análise</h5>
-    <p class="text-muted">O pedido está aguardando avaliação do gestor.</p>
+            <span class="badge" [ngClass]="{
+              'bg-success': item.status === 'Concluído',
+              'bg-warning': item.status === 'Pendente'
+            }">{{ item.status }}</span>
+          </div>
 
-    <!-- botões só aparecem se tiver permissão (depois) -->
-    <div class="d-flex gap-2">
-      <button class="btn btn-success">Aprovar</button>
+          <!-- Status do arquivo -->
+          <div class="mt-2">
+            <!-- Arquivo selecionado aguardando salvamento -->
+            <div *ngIf="item.arquivoSelecionado && !item.arquivo?.url" class="alert alert-info py-2 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark"></i>
+                <span class="small flex-grow-1">{{ item.arquivoSelecionado.name }}</span>
+                <span class="badge bg-warning text-dark">Aguardando salvamento</span>
+              </div>
+            </div>
 
-      <button class="btn btn-warning">Solicitar correção</button>
+            <!-- Arquivo já salvo -->
+            <div *ngIf="item.arquivo?.url && !item.arquivoSelecionado" class="alert alert-success py-2 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span class="small flex-grow-1">{{ item.arquivo?.nome }}</span>
+                <button class="btn btn-sm btn-link text-primary p-0 me-2" (click)="downloadArquivo(item)" title="Download">
+                  <i class="bi bi-cloud-download"></i>
+                </button>
+                <button class="btn btn-sm btn-link text-danger p-0" (click)="removerArquivo(item, $event)" title="Remover">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Área de upload -->
+          <div class="d-flex gap-2 mt-2 align-items-center">
+            <!-- Input file para selecionar o arquivo -->
+            <input
+              type="file"
+              class="form-control form-control-sm"
+              (change)="selecionarArquivo(item, $event)"
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              style="max-width: 300px;"
+              [disabled]="item.salvando || item.arquivo?.url"
+            >
+
+            <!-- Botão SALVAR explícito -->
+            <button
+              *ngIf="item.arquivoSelecionado && !item.arquivo?.url"
+              class="btn btn-sm btn-success"
+              (click)="salvarArquivo(item)"
+              [disabled]="item.salvando"
+              style="min-width: 80px;"
+            >
+              <span *ngIf="item.salvando" class="spinner-border spinner-border-sm me-1"></span>
+              <span *ngIf="!item.salvando"><i class="bi bi-cloud-upload me-1"></i>SALVAR</span>
+            </button>
+
+            <!-- Botão Cancelar seleção -->
+            <button
+              *ngIf="item.arquivoSelecionado && !item.arquivo?.url && !item.salvando"
+              class="btn btn-sm btn-outline-secondary"
+              (click)="cancelarSelecaoArquivo(item)"
+            >
+              <i class="bi bi-x-circle me-1"></i>Cancelar
+            </button>
+
+            <!-- Barra de progresso do upload -->
+            <div *ngIf="uploadProgress[item.id] !== undefined && uploadProgress[item.id] < 100"
+                 class="flex-grow-1 ms-2" style="min-width: 150px;">
+              <div class="progress" style="height: 8px;">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                  role="progressbar"
+                  [style.width.%]="uploadProgress[item.id]"
+                  [attr.aria-valuenow]="uploadProgress[item.id]"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <small class="text-muted">{{ uploadProgress[item.id] }}%</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de progresso do checklist -->
+        <div class="mt-3">
+          <div class="d-flex justify-content-between small mb-1">
+            <span>Progresso geral:</span>
+            <span>{{ getProgressoChecklist() }}%</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div
+              class="progress-bar bg-success"
+              role="progressbar"
+              [style.width.%]="getProgressoChecklist()"
+              [attr.aria-valuenow]="getProgressoChecklist()"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- 🔹 FASE: RETORNO -->
-  <div *ngIf="faseAtual === 'RETORNO_PEDIDO'">
-    <h5 class="fw-bold text-warning">Correções solicitadas</h5>
-    <p>Ajuste os dados solicitados e reenvie para análise.</p>
+    <!-- Alerta se houver pendências -->
+    <div *ngIf="!podeAvancarFase() && faseAtual !== 'FINALIZADO'" class="alert alert-warning mt-3">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      Complete todos os documentos obrigatórios antes de avançar.
+    </div>
 
-    <button class="btn btn-primary">Editar pedido</button>
-  </div>
+    <hr class="my-4" />
 
-  <!-- 🔹 FASE: MARCAÇÃO -->
-  <div *ngIf="faseAtual === 'MARCACAO_CIRURGIA'">
-    <h5 class="fw-bold">Marcação da cirurgia</h5>
-    <p class="text-muted">Pedido aprovado. Aguardando marcação.</p>
-  </div>
+    <!-- ================= CONTEÚDO DA FASE ================= -->
 
-  <!-- 🔹 FASE: FINALIZADO -->
-  <div *ngIf="faseAtual === 'FINALIZADO'">
-    <h5 class="fw-bold text-success">Pedido finalizado</h5>
-  </div>
+    <!-- 🔹 FASE: CRIADO -->
+    <div *ngIf="faseAtual === 'CRIADO'">
+      <h5 class="fw-bold">Pedido criado</h5>
+      <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+      <button
+        class="btn btn-primary mt-3"
+        (click)="enviarParaAnalise()"
+        [disabled]="loading || !podeAvancarFase()"
+      >
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Enviar para análise
+      </button>
+    </div>
+
+    <!-- 🔹 FASE: EM ANÁLISE -->
+    <div *ngIf="faseAtual === 'EM_ANALISE'">
+      <h5 class="fw-bold">Pedido em análise</h5>
+      <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+      <div class="d-flex gap-2 mt-3">
+        <button
+          class="btn btn-success"
+          (click)="aprovarPedido()"
+          [disabled]="loading || !podeAvancarFase()"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Aprovar
+        </button>
+
+        <button
+          class="btn btn-warning"
+          (click)="solicitarCorrecao()"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Solicitar correção
+        </button>
+      </div>
+
+      <!-- Aviso de checklist pendente -->
+      <div *ngIf="!podeAvancarFase()" class="alert alert-warning mt-3 small">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Complete todos os documentos obrigatórios para aprovar.
+      </div>
+    </div>
+
+    <!-- 🔹 FASE: RETORNO -->
+    <div *ngIf="faseAtual === 'RETORNO_PEDIDO'">
+      <h5 class="fw-bold text-warning">Correções solicitadas</h5>
+      <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+      <div class="d-flex gap-2 mt-3">
+        <button
+          class="btn btn-primary"
+          (click)="editarPedido()"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Editar pedido
+        </button>
+
+        <button
+          class="btn btn-success"
+          (click)="reenviarParaAnalise()"
+          [disabled]="loading || !podeAvancarFase()"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Reenviar para análise
+        </button>
+      </div>
+    </div>
+
+    <!-- 🔹 FASE: MARCAÇÃO -->
+    <div *ngIf="faseAtual === 'MARCACAO_CIRURGIA'">
+      <h5 class="fw-bold">Marcação da cirurgia</h5>
+      <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+      <button
+        class="btn btn-primary mt-3"
+        (click)="agendarCirurgia()"
+        [disabled]="loading || !podeAvancarFase()"
+      >
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Agendar cirurgia
+      </button>
+    </div>
+
+    <!-- 🔹 FASE: FINALIZADO -->
+    <div *ngIf="faseAtual === 'FINALIZADO'">
+      <h5 class="fw-bold text-success">Pedido finalizado</h5>
+      <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+    </div>
+  </ng-container>
 </div>
-<!-- fecha modal-body -->
+
