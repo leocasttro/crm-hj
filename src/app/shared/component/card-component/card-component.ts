@@ -6,6 +6,7 @@ import { faMinus, faTimeline } from '@fortawesome/free-solid-svg-icons';
 import { CardDetalheComponent } from '../card-detalhe/card-detalhe-component';
 import { CardData, PedidoDto } from '../../../core/models/pedido';
 import { ChecklistItem } from '@core/models';
+import { formatarDataHoraPtBr, formatarDataPtBr } from '@core/utils';
 
 @Component({
   selector: 'app-card-component',
@@ -23,6 +24,9 @@ export class CardComponent {
   faMinus = faMinus;
   faTimeLine = faTimeline;
 
+  formatarData = formatarDataPtBr;
+  formatarDataHora = formatarDataHoraPtBr;
+
   constructor(private modalService: NgbModal) {}
 
   onItemClick(item: ChecklistItem): void {
@@ -31,25 +35,158 @@ export class CardComponent {
     }
   }
 
+  /**
+   * Gera as fases da timeline com base nos dados REAIS do pedido
+   */
   private getTimelineFases(): any[] {
+    if (!this.data?.pedido) {
+      return this.getFasesPadrao();
+    }
+
+    const pedido = this.data.pedido;
+    const hoje = new Date().toISOString();
+
+    // Mapeia o status atual para determinar quais fases estão concluídas
+    const statusAtual = pedido.status?.toUpperCase() || 'RASCUNHO';
+
+    // Mapa de status para fases concluídas
+    const fasesConcluidas: Record<string, boolean> = {
+      CRIADO: true, // Sempre true quando o pedido existe
+      EM_ANALISE: statusAtual !== 'RASCUNHO' && statusAtual !== 'PENDENTE',
+      RETORNO_PEDIDO: statusAtual === 'REJEITADO' || statusAtual === 'APROVADO',
+      MARCACAO_CIRURGIA:
+        statusAtual === 'AGENDADO' ||
+        statusAtual === 'CONFIRMADO' ||
+        statusAtual === 'EM_PROGRESSO' ||
+        statusAtual === 'REALIZADO',
+      CONSULTA_PRE_OPERATORIA:
+        statusAtual === 'CONFIRMADO' ||
+        statusAtual === 'EM_PROGRESSO' ||
+        statusAtual === 'REALIZADO',
+      FATURAMENTO:
+        statusAtual === 'EM_PROGRESSO' || statusAtual === 'REALIZADO',
+      POS_OPERATORIO:
+        statusAtual === 'EM_PROGRESSO' || statusAtual === 'REALIZADO',
+      FINALIZADO: statusAtual === 'REALIZADO' || statusAtual === 'CANCELADO',
+    };
+
+    // Extrai datas das observações quando possível
+    const datasDasFases = this.extrairDatasDasObservacoes(
+      pedido.observacoes || [],
+    );
+
     return [
       {
         codigo: 'CRIADO',
         nome: 'Criado',
-        data: '2024-10-25',
-        concluido: false,
+        data: pedido.criadoEm || datasDasFases['CRIADO'] || hoje,
+        concluido: fasesConcluidas['CRIADO'],
       },
       {
         codigo: 'EM_ANALISE',
         nome: 'Em Análise',
-        data: '2024-10-26',
-        concluido: false,
+        data:
+          datasDasFases['EM_ANALISE'] ||
+          (fasesConcluidas['EM_ANALISE'] ? pedido.atualizadoEm : undefined),
+        concluido: fasesConcluidas['EM_ANALISE'],
       },
       {
         codigo: 'RETORNO_PEDIDO',
         nome: 'Retorno do Pedido',
-        concluido: false,
+        data:
+          datasDasFases['RETORNO_PEDIDO'] ||
+          (fasesConcluidas['RETORNO_PEDIDO'] ? pedido.atualizadoEm : undefined),
+        concluido: fasesConcluidas['RETORNO_PEDIDO'],
       },
+      {
+        codigo: 'MARCACAO_CIRURGIA',
+        nome: 'Marcação da Cirurgia',
+        data:
+          datasDasFases['MARCACAO_CIRURGIA'] ||
+          (fasesConcluidas['MARCACAO_CIRURGIA']
+            ? pedido.atualizadoEm
+            : undefined),
+        concluido: fasesConcluidas['MARCACAO_CIRURGIA'],
+      },
+      {
+        codigo: 'CONSULTA_PRE_OPERATORIA',
+        nome: 'Consulta Pré-Operatória',
+        data: datasDasFases['CONSULTA_PRE_OPERATORIA'],
+        concluido: fasesConcluidas['CONSULTA_PRE_OPERATORIA'],
+      },
+      {
+        codigo: 'FATURAMENTO',
+        nome: 'Faturamento',
+        data: datasDasFases['FATURAMENTO'],
+        concluido: fasesConcluidas['FATURAMENTO'],
+      },
+      {
+        codigo: 'POS_OPERATORIO',
+        nome: 'Pós-Operatório',
+        data:
+          datasDasFases['POS_OPERATORIO'] ||
+          (fasesConcluidas['POS_OPERATORIO'] ? pedido.atualizadoEm : undefined),
+        concluido: fasesConcluidas['POS_OPERATORIO'],
+      },
+      {
+        codigo: 'FINALIZADO',
+        nome: 'Finalizado',
+        data:
+          datasDasFases['FINALIZADO'] ||
+          (fasesConcluidas['FINALIZADO'] ? pedido.atualizadoEm : undefined),
+        concluido: fasesConcluidas['FINALIZADO'],
+      },
+    ];
+  }
+
+  /**
+   * Extrai datas das observações do pedido
+   */
+  private extrairDatasDasObservacoes(
+    observacoes: string[],
+  ): Record<string, string> {
+    const datas: Record<string, string> = {};
+
+    const palavrasChave: Record<string, string[]> = {
+      CRIADO: ['criado', 'criação'],
+      EM_ANALISE: ['EM_ANALISE', 'análise iniciada', 'análise'],
+      RETORNO_PEDIDO: ['APROVADO', 'rejeitado', 'correção', 'aprovado'],
+      MARCACAO_CIRURGIA: ['AGENDADO', 'agendamento', 'agendada'],
+      CONSULTA_PRE_OPERATORIA: ['consulta', 'pré-operatória', 'pré operatoria'],
+      FATURAMENTO: ['faturamento', 'faturado'],
+      POS_OPERATORIO: ['EM_PROGRESSO', 'procedimento', 'cirurgia'],
+      FINALIZADO: ['REALIZADO', 'finalizado', 'CANCELADO', 'cancelado'],
+    };
+
+    for (const obs of observacoes) {
+      for (const [fase, palavras] of Object.entries(palavrasChave)) {
+        if (!datas[fase]) {
+          // Só pega a primeira ocorrência
+          const encontrou = palavras.some((palavra) =>
+            obs.toLowerCase().includes(palavra.toLowerCase()),
+          );
+
+          if (encontrou) {
+            const match = obs.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
+            if (match) {
+              datas[fase] = match[1];
+            }
+          }
+        }
+      }
+    }
+
+    return datas;
+  }
+
+  /**
+   * Retorna fases padrão quando não há dados do pedido
+   */
+  private getFasesPadrao(): any[] {
+    return [
+      { codigo: 'CRIADO', nome: 'Criado', concluido: false },
+      { codigo: 'EM_ANALISE', nome: 'Em Análise', concluido: false },
+      { codigo: 'RETORNO_PEDIDO', nome: 'Retorno do Pedido', concluido: false },
       {
         codigo: 'MARCACAO_CIRURGIA',
         nome: 'Marcação da Cirurgia',
@@ -60,21 +197,9 @@ export class CardComponent {
         nome: 'Consulta Pré-Operatória',
         concluido: false,
       },
-      {
-        codigo: 'FATURAMENTO',
-        nome: 'Faturamento',
-        concluido: false,
-      },
-      {
-        codigo: 'POS_OPERATORIO',
-        nome: 'Pós-Operatório',
-        concluido: false,
-      },
-      {
-        codigo: 'FINALIZADO',
-        nome: 'Finalizado',
-        concluido: false,
-      },
+      { codigo: 'FATURAMENTO', nome: 'Faturamento', concluido: false },
+      { codigo: 'POS_OPERATORIO', nome: 'Pós-Operatório', concluido: false },
+      { codigo: 'FINALIZADO', nome: 'Finalizado', concluido: false },
     ];
   }
 
@@ -85,10 +210,10 @@ export class CardComponent {
       size: 'xl',
     });
 
+    // Passa as fases com datas REAIS
     modalRef.componentInstance.fases = this.getTimelineFases();
     modalRef.componentInstance.pedido = this.data.pedido;
 
-    // 🔥 Captura o resultado do modal
     modalRef.result
       .then((resultado) => {
         if (resultado?.pedido) {
@@ -96,7 +221,6 @@ export class CardComponent {
             '✅ Modal de timeline fechado com pedido atualizado:',
             resultado.pedido,
           );
-          // Emite para o componente pai (PedidosComponent)
           this.pedidoAtualizado.emit(resultado.pedido);
         }
       })

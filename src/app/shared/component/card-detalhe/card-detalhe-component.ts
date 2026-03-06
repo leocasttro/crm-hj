@@ -34,7 +34,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { PedidosResumo } from '../pedidos-resumo/pedidos-resumo';
-import { PedidoDto } from '@models/pedido';
+import { PedidoDto, PedidoStatus } from '@models/pedido';
 import { PedidoService } from '@services/api';
 import { ToastService } from '@services/utils';
 import { ChecklistItem } from '@models/checklist';
@@ -72,6 +72,7 @@ import {
   executarAcaoPedido,
   validarAntesAcao,
 } from '@models/pedido/pedido.helpers';
+import { formatarDataHoraPtBr, formatarDataPtBr } from '@core/utils/date.util';
 
 @Component({
   selector: 'app-card-detalhe',
@@ -95,9 +96,13 @@ export class CardDetalheComponent implements OnInit {
   @Output() checklistAtualizado = new EventEmitter<ChecklistItem[]>();
 
   faseAtual!: CodigoFase;
+  pedidoStatus!: PedidoStatus;
   loading = false;
   isChecklistCollapsed = true;
   uploadProgress: { [key: number]: number } = {};
+
+  formatarData = formatarDataPtBr;
+  formatarDataHora = formatarDataHoraPtBr;
 
   // Ícones
   faArrowDown = faArrowDown;
@@ -140,6 +145,9 @@ export class CardDetalheComponent implements OnInit {
 
   ngOnInit(): void {
     this.inicializarComponente();
+    if (this.pedidoStatus === this.pedido.status) {
+      console.log('Status não mudou, apenas inicializando fases');
+    }
   }
 
   inicializarComponente(): void {
@@ -449,20 +457,18 @@ export class CardDetalheComponent implements OnInit {
   }
 
   async aprovarPedido() {
-    const validacao = validarAntesAcao(
-      this.checklist,
-      this.faseAtual,
-      'aprovar',
-    );
-    if (!validacao.valido) {
-      this.toast.warning(validacao.mensagem!);
-      return;
-    }
-
     const resultado = await executarAcaoPedido(
       () =>
-        this.pedidoService.aprovarPedido(this.pedido.id, 'Aprovado na análise'),
-      (loading) => (this.loading = loading),
+        this.pedidoService.atualizarStatus(
+          this.pedido.id,
+          'APROVADO',
+          'Aprovado na análise',
+        ), // ← Status: APROVADO, Observação: Aprovado na análise
+      (loading) => {
+        console.log('🔄 Loading state:', loading);
+        this.loading = loading;
+        this.cdRef.detectChanges();
+      },
       this.toast,
       'Pedido aprovado!',
       'Erro ao aprovar pedido',
@@ -472,6 +478,17 @@ export class CardDetalheComponent implements OnInit {
       this.pedido = resultado.pedido;
       this.atualizarFasesPorStatus(this.pedido.status);
       this.faseAvancada.emit(this.pedido);
+
+      this.loading = false;
+      this.cdRef.detectChanges();
+
+      setTimeout(() => {
+        this.activeModal.close({
+          sucesso: true,
+          mensagem: 'Pedido aprovado com sucesso',
+          pedido: this.pedido,
+        });
+      }, 100);
     }
   }
 
@@ -566,8 +583,8 @@ export class CardDetalheComponent implements OnInit {
       RASCUNHO: 'CRIADO',
       PENDENTE: 'CRIADO',
       EM_ANALISE: 'EM_ANALISE',
-      REJEITADO: 'RETORNO_PEDIDO',
-      APROVADO: 'RETORNO_PEDIDO',
+      APROVADO: 'RETORNO_PEDIDO', // 🔥 APROVADO continua na mesma fase EM_ANALISE
+      REJEITADO: 'EM_ANALISE',
       AGENDADO: 'MARCACAO_CIRURGIA',
       CONFIRMADO: 'MARCACAO_CIRURGIA',
       EM_PROGRESSO: 'POS_OPERATORIO',
@@ -577,17 +594,25 @@ export class CardDetalheComponent implements OnInit {
 
     const faseCodigo = mapaStatusParaFase[status] || 'CRIADO';
 
+    // Reseta todas as fases
     this.fases.forEach((f) => (f.concluido = false));
 
     let encontrou = false;
     for (let fase of this.fases) {
       if (fase.codigo === faseCodigo) {
         encontrou = true;
+
+        // FASE ATUAL
+        if (!fase.data) {
+          fase.data = this.pedido.atualizadoEm || new Date().toISOString();
+        }
       }
+
       if (!encontrou) {
+        // FASES ANTERIORES
         fase.concluido = true;
         if (!fase.data) {
-          fase.data = new Date().toISOString();
+          fase.data = this.pedido.criadoEm;
         }
       }
     }
@@ -598,7 +623,7 @@ export class CardDetalheComponent implements OnInit {
   private gerarFasesPadrao(): FasePedido[] {
     return [
       { codigo: 'CRIADO', nome: 'Criado', concluido: false },
-      { codigo: 'EM_ANALISE', nome: 'Em Análise', concluido: false },
+      { codigo: 'EM_ANALISE', nome: 'Em Análise', concluido: false }, // 🔥 Única fase para EM_ANALISE e APROVADO
       { codigo: 'RETORNO_PEDIDO', nome: 'Retorno do Pedido', concluido: false },
       {
         codigo: 'MARCACAO_CIRURGIA',

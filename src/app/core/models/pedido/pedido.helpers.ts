@@ -1,26 +1,32 @@
-import { Observable } from "rxjs";
-import { ChecklistItem } from "../checklist";
-import { CardData } from "./card-data.types";
-import { PedidoDto } from "./pedido.dto";
-import { FasePedido } from "./pedido.types";
+import { Observable } from 'rxjs';
+import { ChecklistItem } from '../checklist';
+import { CardData } from './card-data.types';
+import { PedidoDto } from './pedido.dto';
+import { FasePedido } from './pedido.types';
 
 export function getProcedimentoPrincipal(pedido: PedidoDto): string {
-  return pedido.procedimentoDescricao ||
-         pedido.procedimento ||
-         'Procedimento não informado';
+  return (
+    pedido.procedimentoDescricao ||
+    pedido.procedimento ||
+    'Procedimento não informado'
+  );
 }
 
 export function getNomePaciente(pedido: PedidoDto): string {
-  return pedido.paciente?.nomeCompleto ||
-         pedido.nomePaciente ||
-         'Paciente não informado';
+  return (
+    pedido.paciente?.nomeCompleto ||
+    pedido.nomePaciente ||
+    'Paciente não informado'
+  );
 }
 
 export function getCrmMedico(pedido: PedidoDto): string {
-  return pedido.medicoSolicitante ||
-         pedido.medicoSolicitanteCrm ||
-         pedido.crmCompleto ||
-         'CRM não informado';
+  return (
+    pedido.medicoSolicitante ||
+    pedido.medicoSolicitanteCrm ||
+    pedido.crmCompleto ||
+    'CRM não informado'
+  );
 }
 
 export function formatarDataPedido(pedido: PedidoDto): string {
@@ -32,9 +38,9 @@ export function formatarDataPedido(pedido: PedidoDto): string {
 
 export function formatarPrioridade(prioridade: string): string {
   const mapa: Record<string, string> = {
-    'ELETIVA': 'Eletiva',
-    'URGENCIA': 'Urgência',
-    'PRIORIDADE': 'Prioridade'
+    ELETIVA: 'Eletiva',
+    URGENCIA: 'Urgência',
+    PRIORIDADE: 'Prioridade',
   };
   return mapa[prioridade] || prioridade;
 }
@@ -72,7 +78,7 @@ export function getStatusClass(status: string): string {
     AGENDADO: 'bg-primary',
     CONFIRMADO: 'bg-success',
     REALIZADO: 'bg-success',
-    CANCELADO: 'bg-danger'
+    CANCELADO: 'bg-danger',
   };
   return classes[status] || 'bg-secondary';
 }
@@ -81,7 +87,7 @@ export function getPrioridadeClasse(prioridade: string): string {
   const classes: Record<string, string> = {
     ELETIVA: 'bg-success',
     URGENCIA: 'bg-danger',
-    PRIORIDADE: 'bg-warning'
+    PRIORIDADE: 'bg-warning',
   };
   return classes[prioridade] || 'bg-secondary';
 }
@@ -93,7 +99,7 @@ export function getIconeStatus(status: string): string {
     APROVADO: 'bi-check-circle',
     REJEITADO: 'bi-x-circle',
     AGENDADO: 'bi-calendar-check',
-    REALIZADO: 'bi-check-all'
+    REALIZADO: 'bi-check-all',
   };
   return icones[status] || 'bi-question-circle';
 }
@@ -102,10 +108,10 @@ export function getIconeStatus(status: string): string {
 export function mapPedidoToCardData(
   pedido: PedidoDto,
   checklist?: ChecklistItem[],
-  timelineFases?: FasePedido[]
+  timelineFases?: FasePedido[],
 ): CardData {
   return {
-    titulo: getProcedimentoPrincipal(pedido),  // ✅ Corrigido: passa pedido direto
+    titulo: getProcedimentoPrincipal(pedido), // ✅ Corrigido: passa pedido direto
     descricao: pedido.indicacaoClinica || '',
     prioridade: pedido.prioridade,
     prioridadeClasse: getPrioridadeClasse(pedido.prioridade),
@@ -115,7 +121,7 @@ export function mapPedidoToCardData(
     dataCriacao: pedido.criadoEm,
     pedido,
     checklist,
-    timelineFases
+    timelineFases,
   };
 }
 
@@ -132,7 +138,7 @@ export async function executarAcaoPedido(
   loadingSetter: (loading: boolean) => void,
   toast: any,
   mensagemSucesso: string,
-  mensagemErro: string
+  mensagemErro: string,
 ): Promise<AcaoPedidoResult> {
   loadingSetter(true);
 
@@ -143,7 +149,7 @@ export async function executarAcaoPedido(
         toast.success(mensagemSucesso);
         resolve({
           sucesso: true,
-          pedido: response.pedido || response
+          pedido: response.pedido || response,
         });
       },
       error: (err) => {
@@ -151,7 +157,7 @@ export async function executarAcaoPedido(
         toast.error(mensagemErro);
         console.error(err);
         resolve({ sucesso: false, mensagem: mensagemErro });
-      }
+      },
     });
   });
 }
@@ -161,16 +167,16 @@ export async function executarAcaoPedido(
 export function validarAntesAcao(
   checklist: ChecklistItem[],
   faseAtual: string,
-  acao: string
+  acao: string,
 ): { valido: boolean; mensagem?: string } {
   const obrigatoriosPendentes = checklist.some(
-    item => item.obrigatorio && item.status === 'Pendente'
+    (item) => item.obrigatorio && item.status === 'Pendente',
   );
 
   if (obrigatoriosPendentes) {
     return {
       valido: false,
-      mensagem: `Complete todos os documentos obrigatórios antes de ${acao}.`
+      mensagem: `Complete todos os documentos obrigatórios antes de ${acao}.`,
     };
   }
 
@@ -181,7 +187,7 @@ export function validarAntesAcao(
 export const LABELS_COLUNA: Record<string, string> = {
   PENDENTES: 'Pendentes',
   EM_ANDAMENTO: 'Em andamento',
-  CONCLUIDAS: 'Concluídas'
+  CONCLUIDAS: 'Concluídas',
 };
 
 // ==================== VISUAIS ====================
@@ -285,7 +291,9 @@ export function avatarFromName(nome: string): string {
 
 // ==================== VALIDAÇÕES DE STATUS ====================
 export function isEmAndamento(status: string): boolean {
-  return ['EM_ANALISE', 'AGENDADO', 'EM_ANDAMENTO'].includes(status);
+  return ['EM_ANALISE', 'APROVADO', 'REJEITADO', 'AGENDADO', 'EM_ANDAMENTO'].includes(
+    status,
+  );
 }
 
 export function isConcluido(status: string): boolean {

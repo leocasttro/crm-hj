@@ -54,7 +54,7 @@
             {{ fase.nome }}
           </h6>
           <p *ngIf="fase.data" class="text-muted small timeline-date">
-            {{ fase.data | date : 'shortDate' }}
+            {{ formatarData(fase.data) }}
           </p>
           <span
             *ngIf="!fase.concluido && i === getProximaFaseIndex()"
@@ -269,29 +269,16 @@
     </div>
 
     <!-- 🔹 FASE: RETORNO -->
-    <div *ngIf="faseAtual === 'RETORNO_PEDIDO'">
-      <h5 class="fw-bold text-warning">Correções solicitadas</h5>
+    <div *ngIf="pedido.status == 'APROVADO'">
+      <h5 class="fw-bold text-success">Aguardando retorno</h5>
       <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
-
-      <div class="d-flex gap-2 mt-3">
-        <button
-          class="btn btn-primary"
-          (click)="editarPedido()"
-          [disabled]="loading"
-        >
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-          Editar pedido
-        </button>
-
-        <button
-          class="btn btn-success"
-          (click)="reenviarParaAnalise()"
-          [disabled]="loading || !podeAvancarFase()"
-        >
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-          Reenviar para análise
-        </button>
-      </div>
+      <button
+        class="btn btn-secondary mt-3"
+        [disabled]="loading || !podeAvancarFase()"
+      >
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Avançar
+      </button>
     </div>
 
     <!-- 🔹 FASE: MARCAÇÃO -->
