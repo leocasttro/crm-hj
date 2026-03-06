@@ -359,11 +359,8 @@ export class PedidosForm implements OnInit {
   }
 
   private atualizarPedido(): void {
-    // 🔥 VERIFICAÇÃO CRÍTICA COM LOG DETALHADO
-    console.log('🔍 Verificando pedidoId antes do envio:', this.pedidoId);
 
     if (!this.pedidoId) {
-      console.error('❌ ERRO CRÍTICO: pedidoId está undefined!');
       console.log('📋 Estado do componente:', {
         modoEdicao: this.modoEdicao,
         pedidoExistente: this.pedidoExistente,
@@ -374,17 +371,13 @@ export class PedidosForm implements OnInit {
     }
 
     const dadosAtualizados = this.montarDadosAtualizacao();
-    console.log(
-      '📤 Enviando requisição PUT para:',
-      `/api/pedidos/${this.pedidoId}`,
-    );
-    console.log('📦 Dados:', JSON.stringify(dadosAtualizados, null, 2));
 
     this.pedidoService
       .atualizarPedido(this.pedidoId, dadosAtualizados)
       .subscribe({
         next: (response) => {
           console.log('✅ Pedido atualizado com sucesso!', response);
+
           this.activeModal.close(response);
         },
         error: (err) => {
@@ -395,7 +388,6 @@ export class PedidosForm implements OnInit {
       });
   }
 
-  // 🔥 MONTAR DADOS NO FORMATO CORRETO COM VALUE OBJECTS
   private montarDadosAtualizacao(): UpdatePedidoRequest {
     const request: UpdatePedidoRequest = {};
 

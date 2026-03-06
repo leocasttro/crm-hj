@@ -126,21 +126,77 @@ export class PedidosComponent implements OnInit {
     });
 
     if (pedido) {
-      modalRef.componentInstance.pedido = pedido;
+      modalRef.componentInstance.pedidoExistente = pedido;
+      modalRef.componentInstance.modoEdicao = true;
     }
 
     modalRef.result
-      .then((dados) => {
-        if (dados) {
-          this.salvarPedido(dados);
+      .then((resultado) => {
+        if (resultado) {
+          console.log('✅ Modal fechado com resultado:', resultado);
+
+          if (resultado.pedido) {
+            this.atualizarPedidoNasColunas(resultado.pedido);
+          }
         }
       })
-      .catch(() => {});
+      .catch((erro) => {
+        if (erro && erro !== 'Cross click' && erro !== 'cancel') {
+          console.log('❌ Modal fechado sem salvar:', erro);
+        }
+      });
   }
 
-  salvarPedido(dados: PedidoDto): void {
-    // TODO: Implementar chamada HTTP
-    console.log('Salvar pedido:', dados);
+  atualizarPedidoNasColunas(pedidoAtualizado: PedidoDto): void {
+    console.log('🔄 Atualizando pedido nas colunas:', pedidoAtualizado);
+
+    this.pacienteService.buscarPorId(pedidoAtualizado.pacienteId).subscribe({
+      next: (paciente) => {
+        const pedidoComPaciente = {
+          ...pedidoAtualizado,
+          paciente: paciente,
+        };
+
+        const cardAtualizado = mapPedidoToCardData(pedidoComPaciente);
+        const pedidoId = cardAtualizado.pedido?.id;
+        const novoStatus = (cardAtualizado.pedido?.status ?? '').toUpperCase();
+
+        if (!pedidoId) return;
+
+        // Remove o card de todas as colunas
+        this.tarefasPendentes = this.tarefasPendentes.filter(
+          (c) => c.pedido?.id !== pedidoId,
+        );
+        this.tarefasEmAndamento = this.tarefasEmAndamento.filter(
+          (c) => c.pedido?.id !== pedidoId,
+        );
+        this.tarefasExecucao = this.tarefasExecucao.filter(
+          (c) => c.pedido?.id !== pedidoId,
+        );
+        this.tarefasConcluidas = this.tarefasConcluidas.filter(
+          (c) => c.pedido?.id !== pedidoId,
+        );
+
+        // Adiciona na coluna correta baseado no novo status
+        if (isConcluido(novoStatus)) {
+          this.tarefasConcluidas.push(cardAtualizado);
+          console.log(`✅ Pedido movido para CONCLUÍDAS`);
+        } else if (isEmAndamento(novoStatus)) {
+          this.tarefasEmAndamento.push(cardAtualizado);
+          console.log(`✅ Pedido movido para EM ANDAMENTO`);
+        } else {
+          this.tarefasPendentes.push(cardAtualizado);
+          console.log(`✅ Pedido movido para PENDENTES`);
+        }
+
+        // Força detecção de mudanças
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao buscar paciente, recarregando tudo:', err);
+        this.carregarPedidosDoBackend();
+      },
+    });
   }
 
   /* ================== DRAG & DROP ================== */

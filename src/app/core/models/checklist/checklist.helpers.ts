@@ -205,15 +205,15 @@ export function getChecklistPadrao(): ChecklistItem[] {
       prioridade: 'ALTA',
       ordem: 3,
     },
-    // {
-    //   id: 4,
-    //   titulo: 'Termo de consentimento',
-    //   status: 'Pendente',
-    //   obrigatorio: true,
-    //   categoria: 'TERMOS',
-    //   prioridade: 'MEDIA',
-    //   ordem: 4
-    // }
+    {
+      id: 4,
+      titulo: 'Carteirinha (PDF ou imagem)',
+      status: 'Pendente',
+      obrigatorio: true,
+      categoria: 'DOCUMENTOS_PACIENTE',
+      prioridade: 'ALTA',
+      ordem: 4
+    }
   ];
 }
 

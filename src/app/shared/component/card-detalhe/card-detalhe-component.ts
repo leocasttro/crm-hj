@@ -207,6 +207,7 @@ export class CardDetalheComponent implements OnInit {
 
     item.salvando = true;
     this.uploadProgress[item.id] = 0;
+    this.cdRef.detectChanges(); // ✅ Força detecção imediata
 
     const resultado = await processarUploadArquivo(
       item.arquivoSelecionado,
@@ -216,7 +217,7 @@ export class CardDetalheComponent implements OnInit {
       this.pedidoService,
       (progress) => {
         this.uploadProgress[item.id] = progress;
-        this.cdRef?.detectChanges();
+        this.cdRef.detectChanges(); // ✅ Força detecção a cada progresso
       },
     );
 
@@ -225,23 +226,28 @@ export class CardDetalheComponent implements OnInit {
       Object.assign(item, itemAtualizado);
 
       this.uploadProgress[item.id] = 100;
+      this.cdRef.detectChanges(); // ✅ Força detecção com 100%
 
       setTimeout(() => {
         delete this.uploadProgress[item.id];
-        this.cdRef?.detectChanges();
+        this.cdRef.detectChanges();
       }, 1500);
 
       this.toast.success('Arquivo salvo com sucesso!');
       this.checklistAtualizado.emit(this.checklist);
 
-      // Opcional: recarregar a lista de arquivos
-      await this.consultarArquivosExistentes();
+      // 🔥 Usa setTimeout para recarregar no próximo ciclo
+      setTimeout(() => {
+        this.consultarArquivosExistentes();
+      }, 0);
     } else {
       item.salvando = false;
       this.uploadProgress[item.id] = 0;
+      this.cdRef.detectChanges();
       this.toast.error(resultado.mensagem || 'Erro ao salvar arquivo');
     }
   }
+
   async consultarArquivosExistentes() {
     if (!this.pedido?.id) return;
 
@@ -265,7 +271,6 @@ export class CardDetalheComponent implements OnInit {
         arquivos = [response.arquivo];
       }
 
-      // Guarda os IDs dos itens que têm arquivo
       this.idsArquivosExistentes = arquivos
         .map((a) => a?.checklistItemId)
         .filter((id) => id !== undefined);
@@ -273,8 +278,10 @@ export class CardDetalheComponent implements OnInit {
       console.log('📋 ITENS COM ARQUIVO:', this.idsArquivosExistentes);
       console.log('📦 DETALHES:', arquivos);
 
-      // ===== NOVO: Atualiza o checklist =====
-      this.atualizarChecklistComArquivos(arquivos);
+      // 🔥 Usa setTimeout para atualizar no próximo ciclo
+      setTimeout(() => {
+        this.atualizarChecklistComArquivos(arquivos);
+      }, 0);
     } catch (error) {
       console.error('Erro ao consultar:', error);
       this.idsArquivosExistentes = [];
@@ -286,12 +293,11 @@ export class CardDetalheComponent implements OnInit {
 
     let atualizacoes = 0;
 
-    this.checklist = this.checklist.map((item) => {
+    const checklistAtualizado = this.checklist.map((item) => {
       const arquivo = arquivos.find((a) => a?.checklistItemId === item.id);
 
       if (arquivo) {
         atualizacoes++;
-
         return {
           ...item,
           arquivo: {
@@ -301,13 +307,14 @@ export class CardDetalheComponent implements OnInit {
             tamanho: arquivo.tamanhoBytes,
             tipo: this.getContentType(arquivo.nomeOriginal),
           },
-          status: 'Concluído',
+          status: 'Concluído' as const, // 🔥 Usa 'as const' para garantir o tipo literal
           dataConclusao: new Date().toISOString(),
         };
       }
       return item;
     });
 
+    this.checklist = checklistAtualizado as ChecklistItem[]; // 🔥 Type assertion
     this.cdRef.detectChanges();
 
     if (atualizacoes > 0) {
@@ -412,7 +419,11 @@ export class CardDetalheComponent implements OnInit {
 
     const resultado = await executarAcaoPedido(
       () => this.pedidoService.iniciarAnalise(this.pedido.id),
-      (loading) => (this.loading = loading),
+      (loading) => {
+        console.log('🔄 Loading state:', loading);
+        this.loading = loading;
+        this.cdRef.detectChanges(); // ✅ Força detecção
+      },
       this.toast,
       'Pedido enviado para análise!',
       'Erro ao enviar para análise',
@@ -422,6 +433,18 @@ export class CardDetalheComponent implements OnInit {
       this.pedido = resultado.pedido;
       this.atualizarFasesPorStatus(this.pedido.status);
       this.faseAvancada.emit(this.pedido);
+
+      this.loading = false;
+      this.cdRef.detectChanges(); // ✅ Força última detecção
+
+      setTimeout(() => {
+        // ✅ Fecha no próximo ciclo
+        this.activeModal.close({
+          sucesso: true,
+          mensagem: 'Pedido enviado para análise com sucesso',
+          pedido: this.pedido,
+        });
+      }, 100);
     }
   }
 
