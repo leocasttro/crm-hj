@@ -56,10 +56,13 @@ import {
   avatarFromName,
   isEmAndamento,
   isConcluido,
-  LABELS_COLUNA
+  LABELS_COLUNA,
 } from '@models/pedido/pedido.helpers';
 
-import { validarArquivo, processarUploadArquivo } from '@models/checklist/checklist.helpers';
+import {
+  validarArquivo,
+  processarUploadArquivo,
+} from '@models/checklist/checklist.helpers';
 
 @Component({
   selector: 'app-pedidos',
@@ -74,7 +77,8 @@ import { validarArquivo, processarUploadArquivo } from '@models/checklist/checkl
   templateUrl: './pedidos.html',
   styleUrl: './pedidos.scss',
 })
-export class PedidosComponent implements OnInit {  // ✅ Renomeado
+export class PedidosComponent implements OnInit {
+  // ✅ Renomeado
 
   /* ================== UPLOAD CHECKLIST ================== */
   @ViewChild('fileInput') fileInput!: ElementRef;
@@ -125,11 +129,13 @@ export class PedidosComponent implements OnInit {  // ✅ Renomeado
       modalRef.componentInstance.pedido = pedido;
     }
 
-    modalRef.result.then((dados) => {
-      if (dados) {
-        this.salvarPedido(dados);
-      }
-    }).catch(() => {});
+    modalRef.result
+      .then((dados) => {
+        if (dados) {
+          this.salvarPedido(dados);
+        }
+      })
+      .catch(() => {});
   }
 
   salvarPedido(dados: PedidoDto): void {
@@ -202,7 +208,9 @@ export class PedidosComponent implements OnInit {  // ✅ Renomeado
     }
 
     // TODO: Implementar upload real
-    console.log(`Arquivo ${arquivo.name} selecionado para ${this.itemSelecionadoParaUpload.titulo}`);
+    console.log(
+      `Arquivo ${arquivo.name} selecionado para ${this.itemSelecionadoParaUpload.titulo}`,
+    );
 
     this.itemSelecionadoParaUpload = null;
     input.value = '';
@@ -230,25 +238,30 @@ export class PedidosComponent implements OnInit {  // ✅ Renomeado
             .buscarPorIds(ids)
             .pipe(map((pacientes: PacienteDto[]) => ({ pedidos, pacientes })));
         }),
-        map(({ pedidos, pacientes }: { pedidos: PedidoDto[]; pacientes: PacienteDto[] }) => {
-          const pacienteMap = new Map<string, PacienteDto>(
-            pacientes.map((p: PacienteDto) => [p.id, p]),
-          );
+        map(
+          ({
+            pedidos,
+            pacientes,
+          }: {
+            pedidos: PedidoDto[];
+            pacientes: PacienteDto[];
+          }) => {
+            const pacienteMap = new Map<string, PacienteDto>(
+              pacientes.map((p: PacienteDto) => [p.id, p]),
+            );
 
-          return pedidos.map((pedido: PedidoDto) => {
-            const paciente = pacienteMap.get(pedido.pacienteId);
-            // ✅ Usa o helper existente com paciente enriquecido
-            const pedidoComPaciente = {
-              ...pedido,
-              paciente: paciente ? {
-                id: paciente.id,
-                nomeCompleto: paciente.nomeCompleto,
-                dataNascimento: paciente.dataNascimento
-              } : undefined
-            };
-            return mapPedidoToCardData(pedidoComPaciente);
-          });
-        }),
+            return pedidos.map((pedido: PedidoDto) => {
+              const paciente = pacienteMap.get(pedido.pacienteId);
+
+              const pedidoComPaciente = {
+                ...pedido,
+                paciente: paciente,
+              };
+
+              return mapPedidoToCardData(pedidoComPaciente);
+            });
+          },
+        ),
       )
       .subscribe({
         next: (cards: CardData[]) => {
