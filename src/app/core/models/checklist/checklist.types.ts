@@ -98,3 +98,11 @@ export interface ChecklistTemplate {
   descricao?: string;
   itens: Omit<ChecklistItem, 'id' | 'status' | 'dataConclusao'>[];
 }
+
+export interface ArquivoChecklistInfo {
+  id: string;
+  nomeOriginal: string;
+  tamanhoBytes: number;
+  sha256: string;
+  checklistItemId: number;
+}

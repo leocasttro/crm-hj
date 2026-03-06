@@ -121,6 +121,16 @@ export class PedidoService {
     });
   }
 
+  verificarArquivoExistente(pedidoId: string, checklistItemId: number): Observable<boolean> {
+    return this.http.get<boolean>(
+      `${this.baseUrl}/${pedidoId}/arquivos/checklist/${checklistItemId}/existe`
+    );
+  }
+
+  listarArquivosChecklist(pedidoId: string): Observable<ArquivoInfoResponse[]> {
+    return this.http.get<ArquivoInfoResponse[]>(`${this.baseUrl}/${pedidoId}/arquivos/lista`);
+  }
+
   /**
    * Obter URL para download do arquivo
    */

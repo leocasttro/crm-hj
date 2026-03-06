@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { NgbActiveModal, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -57,6 +64,7 @@ import {
   limparArquivoSelecionado,
   atualizarArquivoSalvo,
   podeAvancarFase as podeAvancarFaseHelper,
+  listarArquivosChecklist,
 } from '@models/checklist/checklist.helpers';
 
 // Helper de ações do pedido
@@ -121,6 +129,8 @@ export class CardDetalheComponent implements OnInit {
   formatarTamanhoArquivo = formatarTamanhoArquivo;
   TAMANHO_MAXIMO_ARQUIVO = TAMANHO_MAXIMO_ARQUIVO;
 
+  idsArquivosExistentes: number[] = [];
+
   constructor(
     public activeModal: NgbActiveModal,
     private pedidoService: PedidoService,
@@ -133,12 +143,10 @@ export class CardDetalheComponent implements OnInit {
   }
 
   inicializarComponente(): void {
-    // Usa helper para fases padrão
     if (!this.fases || this.fases.length === 0) {
       this.fases = this.gerarFasesPadrao();
     }
 
-    // Usa helper para checklist padrão
     if (!this.checklist || this.checklist.length === 0) {
       this.checklist = getChecklistPadrao();
     } else {
@@ -146,6 +154,7 @@ export class CardDetalheComponent implements OnInit {
     }
 
     this.atualizarFasesPorStatus(this.pedido.status);
+    this.consultarArquivosExistentes();
   }
 
   // ==================== TIMELINE ====================
@@ -206,35 +215,117 @@ export class CardDetalheComponent implements OnInit {
       item.observacao,
       this.pedidoService,
       (progress) => {
-        // Atualiza o progresso em tempo real
         this.uploadProgress[item.id] = progress;
-        // Força detecção de mudanças se necessário
         this.cdRef?.detectChanges();
       },
     );
 
     if (resultado.sucesso && resultado.arquivo) {
-      // Atualiza o item com o arquivo salvo
       const itemAtualizado = atualizarArquivoSalvo(item, resultado.arquivo);
       Object.assign(item, itemAtualizado);
 
-      // Garante que o progresso mostre 100% por um momento
       this.uploadProgress[item.id] = 100;
 
-      // Remove o progresso após 1.5 segundos
       setTimeout(() => {
         delete this.uploadProgress[item.id];
-        // Força detecção de mudanças novamente
         this.cdRef?.detectChanges();
       }, 1500);
 
       this.toast.success('Arquivo salvo com sucesso!');
       this.checklistAtualizado.emit(this.checklist);
+
+      // Opcional: recarregar a lista de arquivos
+      await this.consultarArquivosExistentes();
     } else {
       item.salvando = false;
       this.uploadProgress[item.id] = 0;
       this.toast.error(resultado.mensagem || 'Erro ao salvar arquivo');
     }
+  }
+  async consultarArquivosExistentes() {
+    if (!this.pedido?.id) return;
+
+    try {
+      const response = (await listarArquivosChecklist(
+        this.pedido.id,
+        this.pedidoService,
+      )) as any;
+
+      console.log('📦 RESPOSTA COMPLETA:', response);
+
+      let arquivos: any[] = [];
+
+      if (Array.isArray(response)) {
+        arquivos = response.map((item) => item.arquivo).filter((a) => a);
+      } else if (
+        response &&
+        typeof response === 'object' &&
+        'arquivo' in response
+      ) {
+        arquivos = [response.arquivo];
+      }
+
+      // Guarda os IDs dos itens que têm arquivo
+      this.idsArquivosExistentes = arquivos
+        .map((a) => a?.checklistItemId)
+        .filter((id) => id !== undefined);
+
+      console.log('📋 ITENS COM ARQUIVO:', this.idsArquivosExistentes);
+      console.log('📦 DETALHES:', arquivos);
+
+      // ===== NOVO: Atualiza o checklist =====
+      this.atualizarChecklistComArquivos(arquivos);
+    } catch (error) {
+      console.error('Erro ao consultar:', error);
+      this.idsArquivosExistentes = [];
+    }
+  }
+
+  private atualizarChecklistComArquivos(arquivos: any[]) {
+    if (!this.checklist || !this.pedido?.id) return;
+
+    let atualizacoes = 0;
+
+    this.checklist = this.checklist.map((item) => {
+      const arquivo = arquivos.find((a) => a?.checklistItemId === item.id);
+
+      if (arquivo) {
+        atualizacoes++;
+
+        return {
+          ...item,
+          arquivo: {
+            id: arquivo.id,
+            nome: arquivo.nomeOriginal,
+            url: `/api/pedidos/${this.pedido.id}/arquivos/checklist/${item.id}/download`,
+            tamanho: arquivo.tamanhoBytes,
+            tipo: this.getContentType(arquivo.nomeOriginal),
+          },
+          status: 'Concluído',
+          dataConclusao: new Date().toISOString(),
+        };
+      }
+      return item;
+    });
+
+    this.cdRef.detectChanges();
+
+    if (atualizacoes > 0) {
+      this.checklistAtualizado.emit(this.checklist);
+    }
+  }
+
+  private getContentType(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    const types: Record<string, string> = {
+      pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    };
+    return types[ext || ''] || 'application/octet-stream';
   }
 
   cancelarSelecaoArquivo(item: ChecklistItem) {

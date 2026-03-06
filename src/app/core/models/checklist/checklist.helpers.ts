@@ -5,8 +5,10 @@ import {
   ChecklistCategoria,
   ChecklistItemStatus,
   ChecklistValidation,
+  ArquivoChecklistInfo,
 } from './checklist.types';
 import { ChecklistItemDto, ChecklistItemRequest } from './checklist.dto';
+import { lastValueFrom } from 'rxjs';
 
 // ==================== MAPEAMENTO ====================
 
@@ -22,18 +24,20 @@ export function mapDtoToChecklistItem(dto: ChecklistItemDto): ChecklistItem {
     ordem: dto.ordem,
     observacao: dto.observacao,
     dataConclusao: dto.dataConclusao,
-    arquivo: dto.arquivoId ? {
-      id: dto.arquivoId,
-      nome: dto.arquivoNome || '',
-      url: dto.arquivoUrl || '',
-      tamanho: dto.arquivoTamanho,
-      tipo: dto.arquivoTipo,
-      dataUpload: dto.dataConclusao
-    } : undefined,
+    arquivo: dto.arquivoId
+      ? {
+          id: dto.arquivoId,
+          nome: dto.arquivoNome || '',
+          url: dto.arquivoUrl || '',
+          tamanho: dto.arquivoTamanho,
+          tipo: dto.arquivoTipo,
+          dataUpload: dto.dataConclusao,
+        }
+      : undefined,
     // Estado local (inicial)
     observacaoEditada: false,
     salvando: false,
-    expandido: false
+    expandido: false,
   };
 }
 
@@ -45,7 +49,7 @@ export function mapItemToRequest(item: ChecklistItem): ChecklistItemRequest {
     categoria: item.categoria,
     prioridade: item.prioridade,
     ordem: item.ordem,
-    observacao: item.observacao
+    observacao: item.observacao,
   };
 }
 
@@ -53,23 +57,25 @@ export function mapItemToRequest(item: ChecklistItem): ChecklistItemRequest {
 
 export function calcularProgresso(itens: ChecklistItem[]): ChecklistProgresso {
   const total = itens.length;
-  const concluidos = itens.filter(i => i.status === 'Concluído').length;
-  const obrigatorios = itens.filter(i => i.obrigatorio);
-  const obrigatoriosConcluidos = obrigatorios.filter(i => i.status === 'Concluído').length;
+  const concluidos = itens.filter((i) => i.status === 'Concluído').length;
+  const obrigatorios = itens.filter((i) => i.obrigatorio);
+  const obrigatoriosConcluidos = obrigatorios.filter(
+    (i) => i.status === 'Concluído',
+  ).length;
 
   return {
     total,
     concluidos,
     obrigatorios: {
       total: obrigatorios.length,
-      concluidos: obrigatoriosConcluidos
+      concluidos: obrigatoriosConcluidos,
     },
-    percentual: total > 0 ? Math.round((concluidos / total) * 100) : 100
+    percentual: total > 0 ? Math.round((concluidos / total) * 100) : 100,
   };
 }
 
 export function getItensPendentes(itens: ChecklistItem[]): ChecklistItem[] {
-  return itens.filter(i => i.status === 'Pendente' && i.obrigatorio);
+  return itens.filter((i) => i.status === 'Pendente' && i.obrigatorio);
 }
 
 export function validarChecklist(itens: ChecklistItem[]): ChecklistValidation {
@@ -77,9 +83,10 @@ export function validarChecklist(itens: ChecklistItem[]): ChecklistValidation {
   return {
     isValid: itensPendentes.length === 0,
     itensPendentes,
-    mensagem: itensPendentes.length > 0
-      ? `Complete ${itensPendentes.length} ${itensPendentes.length === 1 ? 'item obrigatório' : 'itens obrigatórios'}`
-      : undefined
+    mensagem:
+      itensPendentes.length > 0
+        ? `Complete ${itensPendentes.length} ${itensPendentes.length === 1 ? 'item obrigatório' : 'itens obrigatórios'}`
+        : undefined,
   };
 }
 
@@ -91,10 +98,10 @@ export function agruparPorCategoria(itens: ChecklistItem[]): ChecklistGroup[] {
     EXAMES: [],
     AUTORIZACOES: [],
     TERMOS: [],
-    OUTROS: []
+    OUTROS: [],
   };
 
-  itens.forEach(item => {
+  itens.forEach((item) => {
     const categoria = item.categoria || 'OUTROS';
     grupos[categoria].push(item);
   });
@@ -104,7 +111,7 @@ export function agruparPorCategoria(itens: ChecklistItem[]): ChecklistGroup[] {
     EXAMES: 'Exames',
     AUTORIZACOES: 'Autorizações',
     TERMOS: 'Termos e Consentimentos',
-    OUTROS: 'Outros Documentos'
+    OUTROS: 'Outros Documentos',
   };
 
   return Object.entries(grupos)
@@ -113,7 +120,7 @@ export function agruparPorCategoria(itens: ChecklistItem[]): ChecklistGroup[] {
       categoria: categoria as ChecklistCategoria,
       titulo: titulos[categoria as ChecklistCategoria],
       itens,
-      expanded: true
+      expanded: true,
     }));
 }
 
@@ -126,7 +133,7 @@ export function ordenarItens(itens: ChecklistItem[]): ChecklistItem[] {
       return a.ordem - b.ordem;
     }
     // Depois por prioridade
-    const prioridadePeso = { 'ALTA': 0, 'MEDIA': 1, 'BAIXA': 2 };
+    const prioridadePeso = { ALTA: 0, MEDIA: 1, BAIXA: 2 };
     const pesoA = a.prioridade ? prioridadePeso[a.prioridade] : 3;
     const pesoB = b.prioridade ? prioridadePeso[b.prioridade] : 3;
     if (pesoA !== pesoB) return pesoA - pesoB;
@@ -151,7 +158,7 @@ export function getCategoriaIcon(categoria?: ChecklistCategoria): string {
     EXAMES: 'bi-file-medical',
     AUTORIZACOES: 'bi-file-check',
     TERMOS: 'bi-file-text',
-    OUTROS: 'bi-files'
+    OUTROS: 'bi-files',
   };
   return icons[categoria || 'OUTROS'];
 }
@@ -162,7 +169,7 @@ export function getCategoriaColor(categoria?: ChecklistCategoria): string {
     EXAMES: '#198754',
     AUTORIZACOES: '#ffc107',
     TERMOS: '#6f42c1',
-    OUTROS: '#6c757d'
+    OUTROS: '#6c757d',
   };
   return colors[categoria || 'OUTROS'];
 }
@@ -178,7 +185,7 @@ export function getChecklistPadrao(): ChecklistItem[] {
       obrigatorio: true,
       categoria: 'DOCUMENTOS_PACIENTE',
       prioridade: 'ALTA',
-      ordem: 1
+      ordem: 1,
     },
     {
       id: 2,
@@ -187,7 +194,7 @@ export function getChecklistPadrao(): ChecklistItem[] {
       obrigatorio: true,
       categoria: 'EXAMES',
       prioridade: 'ALTA',
-      ordem: 2
+      ordem: 2,
     },
     {
       id: 3,
@@ -196,24 +203,24 @@ export function getChecklistPadrao(): ChecklistItem[] {
       obrigatorio: true,
       categoria: 'DOCUMENTOS_PACIENTE',
       prioridade: 'ALTA',
-      ordem: 3
+      ordem: 3,
     },
-    {
-      id: 4,
-      titulo: 'Termo de consentimento',
-      status: 'Pendente',
-      obrigatorio: true,
-      categoria: 'TERMOS',
-      prioridade: 'MEDIA',
-      ordem: 4
-    }
+    // {
+    //   id: 4,
+    //   titulo: 'Termo de consentimento',
+    //   status: 'Pendente',
+    //   obrigatorio: true,
+    //   categoria: 'TERMOS',
+    //   prioridade: 'MEDIA',
+    //   ordem: 4
+    // }
   ];
 }
 
 export function simularProgresso(
   currentProgress: number,
   setProgress: (value: number) => void,
-  interval: ReturnType<typeof setInterval>
+  interval: ReturnType<typeof setInterval>,
 ): void {
   if (currentProgress < 90) {
     setProgress(currentProgress + 10);
@@ -235,26 +242,38 @@ export const TIPOS_ARQUIVO_PERMITIDOS = [
   'image/jpeg',
   'image/png',
   'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ] as const;
 
-export const EXTENSOES_PERMITIDAS = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'];
+export const EXTENSOES_PERMITIDAS = [
+  '.pdf',
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.doc',
+  '.docx',
+];
 
 export const TAMANHO_MAXIMO_ARQUIVO = 10 * 1024 * 1024; // 10MB
 
-export function validarArquivo(file: File): { valido: boolean; mensagem?: string } {
+export function validarArquivo(file: File): {
+  valido: boolean;
+  mensagem?: string;
+} {
   if (file.size > TAMANHO_MAXIMO_ARQUIVO) {
     return {
       valido: false,
-      mensagem: `Arquivo muito grande. Máximo: ${formatarTamanhoArquivo(TAMANHO_MAXIMO_ARQUIVO)}`
+      mensagem: `Arquivo muito grande. Máximo: ${formatarTamanhoArquivo(TAMANHO_MAXIMO_ARQUIVO)}`,
     };
   }
 
-  if (!TIPOS_ARQUIVO_PERMITIDOS.includes(file.type as any) &&
-      !EXTENSOES_PERMITIDAS.some(ext => file.name.toLowerCase().endsWith(ext))) {
+  if (
+    !TIPOS_ARQUIVO_PERMITIDOS.includes(file.type as any) &&
+    !EXTENSOES_PERMITIDAS.some((ext) => file.name.toLowerCase().endsWith(ext))
+  ) {
     return {
       valido: false,
-      mensagem: 'Tipo de arquivo não permitido. Use PDF, JPEG, PNG ou DOC.'
+      mensagem: 'Tipo de arquivo não permitido. Use PDF, JPEG, PNG ou DOC.',
     };
   }
 
@@ -278,15 +297,15 @@ export interface UploadArquivoResult {
 export async function processarUploadArquivo(
   file: File,
   pedidoId: string,
-  itemId: number,
+  checklistItemId: number,
   observacao: string | undefined,
   pedidoService: any,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
 ): Promise<UploadArquivoResult> {
   const formData = new FormData();
   formData.append('arquivo', file);
   formData.append('pedidoId', pedidoId);
-  formData.append('itemId', itemId.toString());
+  formData.append('checklistItemId', checklistItemId.toString());
   formData.append('observacao', observacao || '');
 
   return new Promise((resolve) => {
@@ -304,12 +323,10 @@ export async function processarUploadArquivo(
 
     pedidoService.uploadArquivoChecklist(formData).subscribe({
       next: (response: any) => {
-        // Limpa a simulação se existir
         if (simulatedProgress) {
           clearInterval(simulatedProgress);
         }
 
-        // Garante que o progresso chegue a 100%
         if (onProgress) {
           onProgress(100);
         }
@@ -321,39 +338,72 @@ export async function processarUploadArquivo(
             nome: response.nomeArquivo || file.name,
             url: response.url,
             tamanho: file.size,
-            tipo: file.type
-          }
+            tipo: file.type,
+          },
         });
       },
       error: (err: any) => {
         console.error('Erro no upload:', err);
 
-        // Limpa a simulação em caso de erro
         if (simulatedProgress) {
           clearInterval(simulatedProgress);
         }
 
-        // Reseta o progresso em caso de erro
         if (onProgress) {
           onProgress(0);
         }
 
         resolve({
           sucesso: false,
-          mensagem: 'Erro ao salvar arquivo'
+          mensagem: 'Erro ao salvar arquivo',
         });
-      }
+      },
     });
   });
+}
+
+export async function verificarArquivoExistente(
+  pedidoId: string,
+  checklistItemId: number,
+  pedidoService: any,
+): Promise<boolean> {
+  try {
+    const existe = await lastValueFrom(
+      pedidoService.verificarArquivoExistente(pedidoId, checklistItemId),
+    );
+    return existe === true;
+  } catch (error) {
+    console.error('Erro ao verificar arquivo:', error);
+    return false;
+  }
+}
+
+export async function listarArquivosChecklist(
+  pedidoId: string,
+  pedidoService: any,
+): Promise<ArquivoChecklistInfo[]> {
+  try {
+    const arquivos = (await lastValueFrom(
+      pedidoService.listarArquivosChecklist(pedidoId),
+    )) as ArquivoChecklistInfo[];
+
+    return Array.isArray(arquivos) ? arquivos : [];
+  } catch (error) {
+    console.error('Erro ao listar arquivos do checklist:', error);
+    return [];
+  }
 }
 
 export function removerArquivo(
   item: ChecklistItem,
   pedidoId: string,
-  pedidoService: any
+  pedidoService: any,
 ): Promise<{ sucesso: boolean; mensagem?: string }> {
   if (!item.arquivo?.id) {
-    return Promise.resolve({ sucesso: false, mensagem: 'Arquivo não encontrado' });
+    return Promise.resolve({
+      sucesso: false,
+      mensagem: 'Arquivo não encontrado',
+    });
   }
 
   return new Promise((resolve) => {
@@ -362,7 +412,7 @@ export function removerArquivo(
       error: (err: any) => {
         console.error('Erro ao remover:', err);
         resolve({ sucesso: false, mensagem: 'Erro ao remover arquivo' });
-      }
+      },
     });
   });
 }
@@ -370,7 +420,7 @@ export function removerArquivo(
 export function carregarArquivo(
   item: ChecklistItem,
   pedidoId: string,
-  pedidoService: any
+  pedidoService: any,
 ): Promise<{ sucesso: boolean; arquivo?: any }> {
   return new Promise((resolve) => {
     pedidoService.getUrlArquivoChecklist(pedidoId, item.id).subscribe({
@@ -382,21 +432,24 @@ export function carregarArquivo(
             nome: response.nomeArquivo,
             url: response.url,
             tamanho: response.tamanho,
-            tipo: response.contentType
-          }
+            tipo: response.contentType,
+          },
         });
       },
       error: (err: any) => {
         console.error('Erro ao carregar arquivo:', err);
         resolve({ sucesso: false });
-      }
+      },
     });
   });
 }
 
 // ==================== VALIDAÇÕES ====================
 
-export function podeConcluirItem(item: ChecklistItem): { pode: boolean; mensagem?: string } {
+export function podeConcluirItem(item: ChecklistItem): {
+  pode: boolean;
+  mensagem?: string;
+} {
   if (item.status === 'Concluído') {
     return { pode: false, mensagem: 'Item já está concluído' };
   }
@@ -404,7 +457,7 @@ export function podeConcluirItem(item: ChecklistItem): { pode: boolean; mensagem
   if (item.obrigatorio && !item.arquivo?.url && !item.arquivoSelecionado) {
     return {
       pode: false,
-      mensagem: 'Selecione e salve o arquivo necessário antes de concluir'
+      mensagem: 'Selecione e salve o arquivo necessário antes de concluir',
     };
   }
 
@@ -415,24 +468,24 @@ export function podeConcluirItem(item: ChecklistItem): { pode: boolean; mensagem
 
 export function toggleItemStatus(
   item: ChecklistItem,
-  podeConcluir: boolean
+  podeConcluir: boolean,
 ): ChecklistItem {
   if (!podeConcluir) return item;
 
   return {
     ...item,
     status: 'Concluído',
-    dataConclusao: new Date().toISOString()
+    dataConclusao: new Date().toISOString(),
   };
 }
 
 export function selecionarArquivoLocal(
   item: ChecklistItem,
-  file: File
+  file: File,
 ): ChecklistItem {
   return {
     ...item,
-    arquivoSelecionado: file
+    arquivoSelecionado: file,
   };
 }
 
@@ -444,20 +497,26 @@ export function limparArquivoSelecionado(item: ChecklistItem): ChecklistItem {
 
 export function atualizarArquivoSalvo(
   item: ChecklistItem,
-  arquivo: { id: string; nome: string; url: string; tamanho?: number; tipo?: string }
+  arquivo: {
+    id: string;
+    nome: string;
+    url: string;
+    tamanho?: number;
+    tipo?: string;
+  },
 ): ChecklistItem {
   return {
     ...item,
     arquivo,
     arquivoSelecionado: undefined,
     salvando: false,
-    status: 'Concluído'
+    status: 'Concluído',
   };
 }
 
 export function podeAvancarFase(itens: ChecklistItem[]): boolean {
   const obrigatoriosPendentes = itens.some(
-    item => item.obrigatorio && item.status === 'Pendente'
+    (item) => item.obrigatorio && item.status === 'Pendente',
   );
   return !obrigatoriosPendentes;
 }
