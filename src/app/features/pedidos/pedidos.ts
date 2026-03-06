@@ -133,8 +133,6 @@ export class PedidosComponent implements OnInit {
     modalRef.result
       .then((resultado) => {
         if (resultado) {
-          console.log('✅ Modal fechado com resultado:', resultado);
-
           if (resultado.pedido) {
             this.atualizarPedidoNasColunas(resultado.pedido);
           }

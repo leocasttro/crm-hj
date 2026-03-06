@@ -68,11 +68,14 @@ export class PedidoService {
     return this.http.post<AtualizarStatusResponse>(`${this.baseUrl}/${id}/analise`, request);
   }
 
-  aprovarPedido(id: string, observacao?: string): Observable<AtualizarStatusResponse> {
-    return this.analisarPedido(id, {
-      aprovado: true,
-      observacao: observacao || 'Pedido aprovado'
-    });
+  atualizarStatus(id: string, status: string, observacao?: string): Observable<AtualizarStatusResponse> {
+    return this.http.patch<AtualizarStatusResponse>(
+      `${this.baseUrl}/${id}/status`,
+      {
+        status: status,
+        observacao: observacao
+      }
+    );
   }
 
   reprovarPedido(id: string, motivo: string, observacao?: string): Observable<AtualizarStatusResponse> {
@@ -92,11 +95,6 @@ export class PedidoService {
     return this.http.get<{ podeEditar: boolean; statusAtual: string }>(
       `${this.baseUrl}/${id}/pode-editar`
     );
-  }
-
-  atualizarStatus(id: string, status: string): Observable<PedidoDto> {
-    console.log('🔧 Service - atualizarStatus chamado com ID:', id, 'Status:', status);
-    return this.http.patch<PedidoDto>(`${this.baseUrl}/${id}/status`, { status });
   }
 
   // ==================== NOVOS MÉTODOS PARA CHECKLIST ====================
