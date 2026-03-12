@@ -53,12 +53,12 @@
                 <div class="d-flex align-items-center">
                   <i class="bi bi-flag-fill me-2" [ngClass]="{
                     'text-danger': pedido.prioridade === 'URGENTE',
-                    'text-primary': pedido.prioridade === 'ELETIVA',
+                    'text-success': pedido.prioridade === 'ELETIVA',
                     'text-warning': pedido.prioridade === 'PRIORIDADE'
                   }"></i>
                   <span class="fw-bold" [ngClass]="{
                     'text-danger': pedido.prioridade === 'URGENTE',
-                    'text-primary': pedido.prioridade === 'ELETIVA',
+                    'text-success': pedido.prioridade === 'ELETIVA',
                     'text-warning': pedido.prioridade === 'PRIORIDADE'
                   }">{{ pedido.prioridade }}</span>
                 </div>
@@ -139,7 +139,7 @@
         <div class="col-md-2">
           <div class="d-flex flex-column">
             <small class="text-muted">Nascimento</small>
-            <span>{{ (pedido.paciente?.dataNascimento || pedido.dataNascimento)}}</span>
+            <span>{{ formatarData(pedido.paciente?.dataNascimento || pedido.dataNascimento)}}</span>
           </div>
         </div>
 

@@ -16,6 +16,11 @@ export interface AtualizarStatusResponse {
   pedido: PedidoDto;
 }
 
+export interface AgendamentoRequest {
+  dataAgendamento: string; // LocalDateTime
+  observacao?: string;
+}
+
 // Interfaces para o checklist
 export interface UploadArquivoResponse {
   sucesso: boolean;
@@ -60,40 +65,67 @@ export class PedidoService {
 
   iniciarAnalise(id: string): Observable<PedidoDto> {
     console.log('🔧 Service - iniciarAnalise chamado com ID:', id);
-    return this.http.post<PedidoDto>(`${this.baseUrl}/${id}/analise/iniciar`, {});
+    return this.http.post<PedidoDto>(
+      `${this.baseUrl}/${id}/analise/iniciar`,
+      {},
+    );
   }
 
-  analisarPedido(id: string, request: AnalisarPedidoRequest): Observable<AtualizarStatusResponse> {
-    console.log('🔧 Service - analisarPedido chamado com ID:', id, 'Request:', request);
-    return this.http.post<AtualizarStatusResponse>(`${this.baseUrl}/${id}/analise`, request);
+  analisarPedido(
+    id: string,
+    request: AnalisarPedidoRequest,
+  ): Observable<AtualizarStatusResponse> {
+    console.log(
+      '🔧 Service - analisarPedido chamado com ID:',
+      id,
+      'Request:',
+      request,
+    );
+    return this.http.post<AtualizarStatusResponse>(
+      `${this.baseUrl}/${id}/analise`,
+      request,
+    );
   }
 
-  atualizarStatus(id: string, status: string, observacao?: string): Observable<AtualizarStatusResponse> {
+  atualizarStatus(
+    id: string,
+    status: string,
+    observacao?: string,
+  ): Observable<AtualizarStatusResponse> {
     return this.http.patch<AtualizarStatusResponse>(
       `${this.baseUrl}/${id}/status`,
       {
         status: status,
-        observacao: observacao
-      }
+        observacao: observacao,
+      },
     );
   }
 
-  reprovarPedido(id: string, motivo: string, observacao?: string): Observable<AtualizarStatusResponse> {
+  agendarPedido(pedidoId: string, dadosAgendamento: AgendamentoRequest): Observable<PedidoDto> {
+    console.log('📅 Agendando pedido:', pedidoId, dadosAgendamento);
+    return this.http.post<PedidoDto>(
+      `${this.baseUrl}/${pedidoId}/agendar`,
+      dadosAgendamento
+    );
+  }
+
+  reprovarPedido(
+    id: string,
+    motivo: string,
+    observacao?: string,
+  ): Observable<AtualizarStatusResponse> {
     return this.analisarPedido(id, {
       aprovado: false,
       observacao: observacao || 'Pedido reprovado',
-      motivoRejeicao: motivo
+      motivoRejeicao: motivo,
     });
   }
 
-  agendarPedido(id: string, dadosAgendamento: any): Observable<PedidoDto> {
-    console.log('🔧 Service - agendarPedido chamado com ID:', id);
-    return this.http.patch<PedidoDto>(`${this.baseUrl}/${id}/agendar`, dadosAgendamento);
-  }
-
-  podeEditar(id: string): Observable<{ podeEditar: boolean; statusAtual: string }> {
+  podeEditar(
+    id: string,
+  ): Observable<{ podeEditar: boolean; statusAtual: string }> {
     return this.http.get<{ podeEditar: boolean; statusAtual: string }>(
-      `${this.baseUrl}/${id}/pode-editar`
+      `${this.baseUrl}/${id}/pode-editar`,
     );
   }
 
@@ -102,11 +134,13 @@ export class PedidoService {
   /**
    * Upload de arquivo para um item do checklist
    */
-  uploadArquivoChecklist(formData: FormData): Observable<UploadArquivoResponse> {
+  uploadArquivoChecklist(
+    formData: FormData,
+  ): Observable<UploadArquivoResponse> {
     const pedidoId = formData.get('pedidoId') as string;
     return this.http.post<UploadArquivoResponse>(
       `${this.baseUrl}/${pedidoId}/arquivos`,
-      formData
+      formData,
     );
   }
 
@@ -115,26 +149,34 @@ export class PedidoService {
    */
   downloadArquivoChecklist(pedidoId: string, itemId: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${pedidoId}/arquivos/${itemId}`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 
-  verificarArquivoExistente(pedidoId: string, checklistItemId: number): Observable<boolean> {
+  verificarArquivoExistente(
+    pedidoId: string,
+    checklistItemId: number,
+  ): Observable<boolean> {
     return this.http.get<boolean>(
-      `${this.baseUrl}/${pedidoId}/arquivos/checklist/${checklistItemId}/existe`
+      `${this.baseUrl}/${pedidoId}/arquivos/checklist/${checklistItemId}/existe`,
     );
   }
 
   listarArquivosChecklist(pedidoId: string): Observable<ArquivoInfoResponse[]> {
-    return this.http.get<ArquivoInfoResponse[]>(`${this.baseUrl}/${pedidoId}/arquivos/lista`);
+    return this.http.get<ArquivoInfoResponse[]>(
+      `${this.baseUrl}/${pedidoId}/arquivos/lista`,
+    );
   }
 
   /**
    * Obter URL para download do arquivo
    */
-  getUrlArquivoChecklist(pedidoId: string, itemId: number): Observable<ArquivoInfoResponse> {
+  getUrlArquivoChecklist(
+    pedidoId: string,
+    itemId: number,
+  ): Observable<ArquivoInfoResponse> {
     return this.http.get<ArquivoInfoResponse>(
-      `${this.baseUrl}/${pedidoId}/arquivos/${itemId}/info`
+      `${this.baseUrl}/${pedidoId}/arquivos/${itemId}/info`,
     );
   }
 
@@ -142,16 +184,22 @@ export class PedidoService {
    * Deletar arquivo do checklist
    */
   deletarArquivoChecklist(pedidoId: string, itemId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${pedidoId}/arquivos/${itemId}`);
+    return this.http.delete<void>(
+      `${this.baseUrl}/${pedidoId}/arquivos/${itemId}`,
+    );
   }
 
   /**
    * Atualizar observação de um item do checklist
    */
-  atualizarObservacaoChecklist(pedidoId: string, itemId: number, observacao: string): Observable<void> {
+  atualizarObservacaoChecklist(
+    pedidoId: string,
+    itemId: number,
+    observacao: string,
+  ): Observable<void> {
     return this.http.patch<void>(
       `${this.baseUrl}/${pedidoId}/checklist/${itemId}`,
-      { observacao }
+      { observacao },
     );
   }
 
@@ -161,7 +209,7 @@ export class PedidoService {
   concluirItemChecklist(pedidoId: string, itemId: number): Observable<void> {
     return this.http.patch<void>(
       `${this.baseUrl}/${pedidoId}/checklist/${itemId}/concluir`,
-      {}
+      {},
     );
   }
 
@@ -175,9 +223,16 @@ export class PedidoService {
   /**
    * Download do arquivo como blob
    */
-  async downloadArquivoComoBlob(pedidoId: string, itemId: number, nomeArquivo: string): Promise<void> {
+  async downloadArquivoComoBlob(
+    pedidoId: string,
+    itemId: number,
+    nomeArquivo: string,
+  ): Promise<void> {
     try {
-      const blob = await this.downloadArquivoChecklist(pedidoId, itemId).toPromise();
+      const blob = await this.downloadArquivoChecklist(
+        pedidoId,
+        itemId,
+      ).toPromise();
       if (blob) {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');

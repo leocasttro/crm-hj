@@ -16,7 +16,7 @@ export type NotificationAction =
   | 'ATUALIZADO'
   | 'APROVADO'
   | 'REJEITADO'
-  | 'AGENDADO'
+  | 'AGENDAR'
   | 'CANCELADO'
   | 'PENDENTE'
   | 'DOCUMENTO_ANEXADO'

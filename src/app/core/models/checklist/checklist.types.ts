@@ -6,6 +6,7 @@ export type ChecklistCategoria =
   | 'EXAMES'
   | 'AUTORIZACOES'
   | 'TERMOS'
+  | 'CONSULTA_PRE'
   | 'OUTROS';
 
 export type ChecklistPrioridade = 'BAIXA' | 'MEDIA' | 'ALTA';

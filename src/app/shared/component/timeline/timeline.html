@@ -1,0 +1,30 @@
+<div class="horizontal-timeline-container d-flex justify-content-between position-relative">
+  <div class="timeline-line"></div>
+  <div *ngFor="let fase of fases; let i = index; trackBy: trackByCodigo"
+       class="timeline-item-h text-center"
+       [style.width.%]="100 / fases.length">
+    <div class="timeline-point-h mx-auto d-flex align-items-center justify-content-center"
+         [ngClass]="getFaseStatusClass(fase, i)">
+      <fa-icon *ngIf="getFaseIconClass(fase, i)"
+               [icon]="getFaseIconClass(fase, i)"
+               class="text-white small">
+      </fa-icon>
+    </div>
+    <div class="timeline-content-h mt-3">
+      <h6 class="small"
+          [ngClass]="{
+            'fw-bold': fase.concluido || isFaseAtual(fase) || i === getProximaFaseIndex()
+          }">
+        {{ fase.nome }}
+      </h6>
+      <p *ngIf="fase.data" class="text-muted small timeline-date">
+        {{ formatarData(fase.data) }}
+      </p>
+      <span *ngIf="deveMostrarBadge(fase, i)"
+            class="badge mt-1"
+            [ngClass]="getBadgeClass(fase, i)">
+        {{ getStatusText(fase, i) }}
+      </span>
+    </div>
+  </div>
+</div>

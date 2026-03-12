@@ -89,7 +89,7 @@ export function getRelativeTime(date: string): string {
 export function createPedidoNotification(
   pedidoId: string,
   pedidoNumero: string,
-  action: 'CRIADO' | 'APROVADO' | 'REJEITADO' | 'AGENDADO'
+  action: 'CRIADO' | 'APROVADO' | 'REJEITADO' | 'AGENDAR'
 ): AppNotification {
   const baseNotification: Partial<AppNotification> = {
     id: crypto.randomUUID(),
@@ -137,14 +137,14 @@ export function createPedidoNotification(
         priority: 'ALTA'
       } as AppNotification;
 
-    case 'AGENDADO':
+    case 'AGENDAR':
       return {
         ...baseNotification,
         type: 'SUCCESS',
         title: 'Cirurgia agendada',
-        message: `Pedido ${pedidoNumero} foi agendado`,
+        message: `Pedido ${pedidoNumero} avançou para agendamento de cirurgia`,
         category: 'AGENDAMENTO',
-        action: 'AGENDADO',
+        action: 'AGENDAR',
         priority: 'MEDIA'
       } as AppNotification;
   }

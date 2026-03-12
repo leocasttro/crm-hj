@@ -1,0 +1,273 @@
+.fase-container {
+  width: 100%;
+
+  .fase-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+
+    h5 {
+      color: #212529;
+      font-size: 1.1rem;
+
+      i {
+        color: #198754;
+      }
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.35em 0.65em;
+      font-weight: 500;
+
+      &.bg-info {
+        background-color: #0dcaf0 !important;
+      }
+
+      &.bg-success {
+        background-color: #198754 !important;
+      }
+    }
+  }
+
+  .fase-content {
+    .info-cirurgia {
+      border: 1px solid #e9ecef;
+
+      i {
+        font-size: 0.9rem;
+      }
+
+      .small {
+        font-size: 0.75rem;
+      }
+    }
+
+    .card-consulta {
+      border: 1px solid #e9ecef;
+
+      .icon-circle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+          font-size: 1.2rem;
+        }
+      }
+
+      .form-control,
+      .form-select {
+        &:focus {
+          border-color: #86b7fe;
+          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+      }
+
+      small.text-muted {
+        font-size: 0.7rem;
+        margin-top: 0.25rem;
+      }
+
+      .bg-light {
+        background-color: #f8f9fa !important;
+
+        i {
+          color: #198754;
+        }
+
+        .fw-semibold {
+          font-weight: 600;
+        }
+      }
+    }
+
+    .documentos-consulta {
+      border: 1px solid #e9ecef;
+
+      .badge {
+        font-size: 0.7rem;
+        padding: 0.35em 0.65em;
+
+        &.bg-info {
+          background-color: #0dcaf0 !important;
+        }
+
+        &.bg-success {
+          background-color: #198754 !important;
+        }
+      }
+
+      .checklist-item {
+        border: 1px solid #e9ecef;
+
+        .form-check-input {
+          width: 1em;
+          height: 1em;
+          margin-top: 0.15em;
+
+          &:checked {
+            background-color: #198754;
+            border-color: #198754;
+          }
+
+          &:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+          }
+        }
+
+        .badge {
+          font-size: 0.65rem;
+
+          &.bg-success {
+            background-color: #198754 !important;
+          }
+
+          &.bg-warning {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+          }
+        }
+      }
+    }
+
+    .info-adicional {
+      border: 1px solid #e9ecef;
+
+      i {
+        font-size: 0.9rem;
+      }
+
+      .small {
+        font-size: 0.75rem;
+      }
+    }
+
+    .proximos-passos {
+      border: 1px solid #e9ecef;
+
+      i {
+        font-size: 0.9rem;
+        color: #0d6efd;
+      }
+
+      p {
+        font-size: 0.75rem;
+        line-height: 1.4;
+      }
+    }
+
+    .action-footer {
+      .btn-success {
+        background-color: #198754;
+        border-color: #198754;
+        padding: 0.5rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background-color: #157347;
+          border-color: #146c43;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(25, 135, 84, 0.2);
+        }
+      }
+
+      .btn-outline-success {
+        border-color: #198754;
+        color: #198754;
+
+        &:hover:not(:disabled) {
+          background-color: #198754;
+          border-color: #198754;
+          color: white;
+        }
+      }
+
+      .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+
+        &:hover:not(:disabled) {
+          background-color: #0b5ed7;
+          border-color: #0a58ca;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+        }
+      }
+
+      .btn-outline-secondary {
+        border-color: #dee2e6;
+        color: #6c757d;
+
+        &:hover:not(:disabled) {
+          background-color: #e9ecef;
+          border-color: #ced4da;
+          color: #495057;
+        }
+      }
+
+      .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffecb5;
+        color: #664d03;
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+
+        i {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .fase-container {
+    .fase-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+
+      .badge {
+        align-self: flex-start;
+      }
+    }
+
+    .fase-content {
+      .action-footer {
+        .d-flex {
+          flex-direction: column;
+
+          button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animações
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fase-container {
+  animation: fadeIn 0.3s ease-out;
+}

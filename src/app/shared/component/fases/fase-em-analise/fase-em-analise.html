@@ -1,0 +1,85 @@
+<div class="fase-container">
+  <div class="fase-header">
+    <h5 class="fw-bold mb-0">
+      <i class="bi bi-search me-2"></i>
+      Pedido em Análise
+    </h5>
+    <span class="badge bg-warning text-dark">Em análise</span>
+  </div>
+
+  <div class="fase-content">
+    <!-- Resumo do Pedido -->
+    <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+    <!-- Informações adicionais da fase -->
+    <div class="info-card mt-3 p-3 bg-light rounded-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="icon-circle bg-warning bg-opacity-10 text-warning p-2 rounded-3">
+          <i class="bi bi-clock-history fs-5"></i>
+        </div>
+        <div class="flex-grow-1">
+          <h6 class="fw-semibold mb-1">Análise em andamento</h6>
+          <p class="text-muted small mb-0">
+            Revise os documentos anexados e tome uma decisão. Você pode aprovar o pedido
+            ou solicitar correções se necessário.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações do pedido -->
+    <div class="info-pedido mt-3 p-2 bg-white rounded-3 border">
+      <div class="d-flex align-items-center justify-content-between mt-1">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-clock text-muted"></i>
+          <span class="small text-muted">Última atualização:</span>
+        </div>
+        <span class="small fw-semibold">{{ dataAtualizacaoFormatada }}</span>
+      </div>
+      <div class="d-flex align-items-center justify-content-between mt-1">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-person text-muted"></i>
+          <span class="small text-muted">Criado por:</span>
+        </div>
+        <span class="small fw-semibold">{{ usuarioCriacao || 'Sistema' }}</span>
+      </div>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="action-footer mt-4">
+      <div class="d-flex gap-2 justify-content-end">
+        <button
+          class="btn btn-success"
+          (click)="onAprovar()"
+          [disabled]="loading || !podeAvancar"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!loading" class="bi bi-check-lg me-2"></i>
+          {{ loading ? 'Aprovando...' : 'Aprovar' }}
+        </button>
+
+        <button
+          class="btn btn-warning"
+          (click)="onSolicitarCorrecao()"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!loading" class="bi bi-exclamation-triangle me-2"></i>
+          {{ loading ? 'Solicitando...' : 'Solicitar correção' }}
+        </button>
+      </div>
+
+      <!-- Aviso de checklist pendente -->
+      <div *ngIf="!podeAvancar && !loading" class="alert alert-warning mt-3 small">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Complete todos os documentos obrigatórios no checklist acima antes de aprovar.
+      </div>
+
+      <!-- Aviso para correção solicitada -->
+      <div *ngIf="pedido.status === 'REJEITADO'" class="alert alert-info mt-3 small">
+        <i class="bi bi-info-circle me-2"></i>
+        Correções foram solicitadas para este pedido. Após as correções, ele retornará para análise.
+      </div>
+    </div>
+  </div>
+</div>

@@ -98,6 +98,7 @@ export function agruparPorCategoria(itens: ChecklistItem[]): ChecklistGroup[] {
     EXAMES: [],
     AUTORIZACOES: [],
     TERMOS: [],
+    CONSULTA_PRE: [],
     OUTROS: [],
   };
 
@@ -111,6 +112,7 @@ export function agruparPorCategoria(itens: ChecklistItem[]): ChecklistGroup[] {
     EXAMES: 'Exames',
     AUTORIZACOES: 'Autorizações',
     TERMOS: 'Termos e Consentimentos',
+    CONSULTA_PRE: 'Consulta Pré-operatória',
     OUTROS: 'Outros Documentos',
   };
 
@@ -158,6 +160,7 @@ export function getCategoriaIcon(categoria?: ChecklistCategoria): string {
     EXAMES: 'bi-file-medical',
     AUTORIZACOES: 'bi-file-check',
     TERMOS: 'bi-file-text',
+    CONSULTA_PRE: 'bi-stethoscope',
     OUTROS: 'bi-files',
   };
   return icons[categoria || 'OUTROS'];
@@ -169,6 +172,7 @@ export function getCategoriaColor(categoria?: ChecklistCategoria): string {
     EXAMES: '#198754',
     AUTORIZACOES: '#ffc107',
     TERMOS: '#6f42c1',
+    CONSULTA_PRE: '#fd7e14',
     OUTROS: '#6c757d',
   };
   return colors[categoria || 'OUTROS'];
@@ -212,8 +216,8 @@ export function getChecklistPadrao(): ChecklistItem[] {
       obrigatorio: true,
       categoria: 'DOCUMENTOS_PACIENTE',
       prioridade: 'ALTA',
-      ordem: 4
-    }
+      ordem: 4,
+    },
   ];
 }
 

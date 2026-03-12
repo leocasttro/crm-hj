@@ -54,12 +54,9 @@ export class CardComponent {
       CRIADO: true, // Sempre true quando o pedido existe
       EM_ANALISE: statusAtual !== 'RASCUNHO' && statusAtual !== 'PENDENTE',
       RETORNO_PEDIDO: statusAtual === 'REJEITADO' || statusAtual === 'APROVADO',
-      MARCACAO_CIRURGIA:
-        statusAtual === 'AGENDADO' ||
-        statusAtual === 'CONFIRMADO' ||
-        statusAtual === 'EM_PROGRESSO' ||
-        statusAtual === 'REALIZADO',
+      MARCACAO_CIRURGIA: statusAtual === 'AGENDAR', // ✅ Só AGENDAR fica aqui
       CONSULTA_PRE_OPERATORIA:
+        statusAtual === 'AGENDADO' || // ✅ AGENDADO vai para consulta pré
         statusAtual === 'CONFIRMADO' ||
         statusAtual === 'EM_PROGRESSO' ||
         statusAtual === 'REALIZADO',
@@ -111,7 +108,11 @@ export class CardComponent {
       {
         codigo: 'CONSULTA_PRE_OPERATORIA',
         nome: 'Consulta Pré-Operatória',
-        data: datasDasFases['CONSULTA_PRE_OPERATORIA'],
+        data:
+          datasDasFases['CONSULTA_PRE_OPERATORIA'] ||
+          (fasesConcluidas['CONSULTA_PRE_OPERATORIA']
+            ? pedido.atualizadoEm
+            : undefined),
         concluido: fasesConcluidas['CONSULTA_PRE_OPERATORIA'],
       },
       {
@@ -151,8 +152,14 @@ export class CardComponent {
       CRIADO: ['criado', 'criação'],
       EM_ANALISE: ['EM_ANALISE', 'análise iniciada', 'análise'],
       RETORNO_PEDIDO: ['APROVADO', 'rejeitado', 'correção', 'aprovado'],
-      MARCACAO_CIRURGIA: ['AGENDADO', 'agendamento', 'agendada'],
-      CONSULTA_PRE_OPERATORIA: ['consulta', 'pré-operatória', 'pré operatoria'],
+      MARCACAO_CIRURGIA: ['AGENDAR', 'agendamento', 'marcação'], // ✅ AGENDAR
+      CONSULTA_PRE_OPERATORIA: [
+        'AGENDADO', // ✅ AGENDADO
+        'agendada',
+        'consulta',
+        'pré-operatória',
+        'pré operatoria',
+      ],
       FATURAMENTO: ['faturamento', 'faturado'],
       POS_OPERATORIO: ['EM_PROGRESSO', 'procedimento', 'cirurgia'],
       FINALIZADO: ['REALIZADO', 'finalizado', 'CANCELADO', 'cancelado'],
@@ -161,7 +168,6 @@ export class CardComponent {
     for (const obs of observacoes) {
       for (const [fase, palavras] of Object.entries(palavrasChave)) {
         if (!datas[fase]) {
-          // Só pega a primeira ocorrência
           const encontrou = palavras.some((palavra) =>
             obs.toLowerCase().includes(palavra.toLowerCase()),
           );

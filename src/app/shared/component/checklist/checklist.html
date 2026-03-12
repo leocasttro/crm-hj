@@ -1,0 +1,175 @@
+<div class="checklist-section p-3 bg-light rounded-3 mb-4">
+  <!-- Cabeçalho -->
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <h5 class="fw-bold mb-0">
+      <i class="bi bi-check2-square me-2"></i>{{ titulo }}
+    </h5>
+
+    <!-- Badge de pendências -->
+    <span class="badge bg-info" *ngIf="getItensPendentesCount() > 0">
+      {{ getItensPendentesCount() }} pendente(s)
+    </span>
+    <span class="badge bg-success" *ngIf="getItensPendentesCount() === 0">
+      Todos anexados
+    </span>
+
+    <!-- Botão Collapse -->
+    <button
+      class="btn btn-sm btn-outline-secondary ms-auto"
+      (click)="isCollapsed = !isCollapsed"
+      [disabled]="false"
+    >
+      <fa-icon [icon]="isCollapsed ? faMinus : faArrowDown"></fa-icon>
+    </button>
+  </div>
+
+  <!-- Conteúdo do Checklist -->
+  <div [ngbCollapse]="!isCollapsed" class="checklist-container">
+    <!-- Loading interno -->
+    <div *ngIf="false" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+
+    <!-- Lista de Itens -->
+    <ng-container>
+      <div *ngFor="let item of checklist; trackBy: trackById"
+           class="checklist-item p-3 mb-2 rounded-3 bg-white">
+
+        <!-- Título e Status -->
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="form-check flex-grow-1">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [checked]="item.status === 'Concluído'"
+              [disabled]="item.status === 'Concluído' || !podeEditar"
+              (change)="onToggleItem(item)"
+              [id]="'check-' + item.id"
+            />
+            <label class="form-check-label fw-medium" [for]="'check-' + item.id">
+              {{ getTitulo(item) }}
+              <span *ngIf="item.obrigatorio" class="text-danger ms-1">*</span>
+            </label>
+          </div>
+
+          <span class="badge" [ngClass]="{
+            'bg-success': item.status === 'Concluído',
+            'bg-warning': item.status === 'Pendente'
+          }">
+            {{ item.status }}
+          </span>
+        </div>
+
+        <!-- Status do Arquivo -->
+        <div class="mt-2">
+          <!-- Arquivo selecionado aguardando salvamento -->
+          <div *ngIf="item.arquivoSelecionado && !item.arquivo?.url"
+               class="alert alert-info py-2 mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <fa-icon [icon]="getFileIcon(item.arquivoSelecionado.name)"></fa-icon>
+              <span class="small flex-grow-1">{{ item.arquivoSelecionado.name }}</span>
+              <span class="badge bg-warning text-dark">Aguardando salvamento</span>
+            </div>
+          </div>
+
+          <!-- Arquivo já salvo -->
+          <div *ngIf="item.arquivo?.url && !item.arquivoSelecionado"
+               class="alert alert-success py-2 mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <fa-icon [icon]="getFileIcon(getNomeArquivo(item))"></fa-icon>
+              <span class="small flex-grow-1">{{ getNomeArquivo(item) }}</span>
+              <span class="text-muted small me-2">
+                {{ formatarTamanho(item.arquivo?.tamanho) }}
+              </span>
+              <button class="btn btn-sm btn-link text-primary p-0 me-2"
+                      (click)="onDownload(item)"
+                      title="Download"
+                      [disabled]="!podeDownload(item)">
+                <fa-icon [icon]="faCloudDownload"></fa-icon>
+              </button>
+              <button class="btn btn-sm btn-link text-danger p-0"
+                      (click)="onRemoverArquivo(item, $event)"
+                      title="Remover"
+                      [disabled]="!podeRemover(item)">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área de Upload -->
+        <div class="d-flex gap-2 mt-2 align-items-center">
+          <!-- Input file -->
+          <input type="file"
+                 class="form-control form-control-sm"
+                 (change)="onFileSelected(item, $event)"
+                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                 style="max-width: 300px"
+                 [disabled]="!podeUpload(item)" />
+
+          <!-- Botão Salvar -->
+          <button *ngIf="podeSalvar(item)"
+                  class="btn btn-sm btn-success"
+                  (click)="onSalvarArquivo(item)"
+                  [disabled]="isSaving(item)"
+                  style="min-width: 80px">
+            <span *ngIf="isSaving(item)"
+                  class="spinner-border spinner-border-sm me-1"></span>
+            <span *ngIf="!isSaving(item)">
+              <fa-icon [icon]="faCloudUpload" class="me-1"></fa-icon>SALVAR
+            </span>
+          </button>
+
+          <!-- Botão Cancelar -->
+          <button *ngIf="podeCancelar(item)"
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="onCancelarSelecao(item)">
+            <fa-icon [icon]="faXmarkCircle" class="me-1"></fa-icon>Cancelar
+          </button>
+
+          <!-- Barra de Progresso -->
+          <div *ngIf="mostrarProgressoUpload(item)"
+               class="flex-grow-1 ms-2"
+               style="min-width: 150px">
+            <div class="progress" style="height: 8px">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                   role="progressbar"
+                   [style.width.%]="uploadProgress[item.id]"
+                   [attr.aria-valuenow]="uploadProgress[item.id]"
+                   aria-valuemin="0"
+                   aria-valuemax="100">
+              </div>
+            </div>
+            <small class="text-muted">{{ uploadProgress[item.id] }}%</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Progresso Geral -->
+      <div class="mt-3" *ngIf="mostrarProgresso">
+        <div class="d-flex justify-content-between small mb-1">
+          <span>Progresso geral:</span>
+          <span>
+            {{ getProgressoChecklist() }}%
+            <span *ngIf="!todosObrigatoriosConcluidos()"
+                  class="text-warning ms-2">
+              <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+              Pendente
+            </span>
+          </span>
+        </div>
+        <div class="progress" style="height: 8px">
+          <div class="progress-bar bg-success"
+               role="progressbar"
+               [style.width.%]="getProgressoChecklist()"
+               [attr.aria-valuenow]="getProgressoChecklist()"
+               aria-valuemin="0"
+               aria-valuemax="100">
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
