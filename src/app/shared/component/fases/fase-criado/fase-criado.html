@@ -1,0 +1,58 @@
+<div class="fase-container">
+  <div class="fase-header">
+    <h5 class="fw-bold mb-0">
+      <i class="bi bi-file-earmark-text me-2"></i>
+      Pedido Criado
+    </h5>
+    <span class="badge bg-primary">Fase inicial</span>
+  </div>
+
+  <div class="fase-content">
+    <!-- Resumo do Pedido -->
+    <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+    <!-- Informações adicionais da fase -->
+    <div class="info-card mt-3 p-3 bg-light rounded-3">
+      <div class="d-flex align-items-center gap-3">
+        <div
+          class="icon-circle bg-primary bg-opacity-10 text-primary p-2 rounded-3"
+        >
+          <i class="bi bi-info-circle fs-5"></i>
+        </div>
+        <div class="flex-grow-1">
+          <h6 class="fw-semibold mb-1">Próximos passos</h6>
+          <p class="text-muted small mb-0">
+            Revise as informações do pedido e envie para análise quando estiver
+            tudo correto. Todos os documentos obrigatórios devem ser anexados
+            antes de prosseguir.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mensagem de validação -->
+    <div
+      *ngIf="!podeAvancar && !loading"
+      class="alert alert-warning mt-3 small"
+    >
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      Complete todos os documentos obrigatórios antes de enviar para análise.
+    </div>
+
+    <!-- Botão de ação -->
+    <div class="action-footer mt-4 d-flex justify-content-end">
+      <button
+        class="btn btn-primary"
+        (click)="onEnviarParaAnalise()"
+        [disabled]="loading || !podeAvancar"
+      >
+        <span
+          *ngIf="loading"
+          class="spinner-border spinner-border-sm me-2"
+        ></span>
+        <i *ngIf="!loading" class="bi bi-send me-2"></i>
+        {{ loading ? 'Enviando...' : 'Enviar para análise' }}
+      </button>
+    </div>
+  </div>
+</div>

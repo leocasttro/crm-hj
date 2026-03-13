@@ -1,0 +1,134 @@
+.horizontal-timeline-container {
+  position: relative;
+  padding-top: 20px;
+  margin-bottom: 20px;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #e9ecef;
+  z-index: 1;
+}
+
+.timeline-item-h {
+  position: relative;
+  z-index: 2;
+  flex-grow: 1;
+  max-width: 25%;
+}
+
+.timeline-point-h {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  transition: background-color 0.3s ease;
+  position: relative;
+
+  margin-top: -12px;
+
+  &.bg-primary {
+    background-color: #0d6efd !important;
+  }
+
+  &.bg-success {
+    background-color: #198754 !important;
+  }
+
+  &.bg-warning {
+    background-color: #ffc107 !important;
+  }
+
+  &.bg-secondary {
+    background-color: #6c757d !important;
+  }
+
+  fa-icon {
+    font-size: 12px;
+    line-height: 1;
+  }
+}
+
+.timeline-content-h {
+  margin-top: 5px;
+  line-height: 1.2;
+
+  h6 {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    font-weight: 500;
+
+    &.fw-bold {
+      font-weight: 700 !important;
+    }
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+
+    &.bg-primary {
+      background-color: #0d6efd !important;
+    }
+
+    &.bg-warning {
+      background-color: #ffc107 !important;
+      color: #000 !important;
+    }
+
+    &.bg-success {
+      background-color: #198754 !important;
+    }
+  }
+}
+
+.timeline-date {
+  margin-top: 0;
+  line-height: 1;
+  font-size: 0.7rem;
+  color: #6c757d !important;
+}
+
+@media (max-width: 768px) {
+  .timeline-item-h {
+    max-width: 33.33%;
+  }
+
+  .timeline-point-h {
+    width: 22px;
+    height: 22px;
+    margin-top: -11px;
+
+    fa-icon {
+      font-size: 10px;
+    }
+  }
+
+  .timeline-content-h {
+    h6 {
+      font-size: 0.75rem;
+    }
+
+    .timeline-date {
+      font-size: 0.6rem;
+    }
+
+    .badge {
+      font-size: 0.55rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .timeline-item-h {
+    max-width: 50%;
+  }
+}

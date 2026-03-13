@@ -75,7 +75,7 @@ export function getStatusClass(status: string): string {
     EM_ANALISE: 'bg-info',
     REJEITADO: 'bg-danger',
     APROVADO: 'bg-success',
-    AGENDADO: 'bg-primary',
+    AGENDAR: 'bg-primary',
     CONFIRMADO: 'bg-success',
     REALIZADO: 'bg-success',
     CANCELADO: 'bg-danger',
@@ -98,7 +98,7 @@ export function getIconeStatus(status: string): string {
     EM_ANALISE: 'bi-search',
     APROVADO: 'bi-check-circle',
     REJEITADO: 'bi-x-circle',
-    AGENDADO: 'bi-calendar-check',
+    AGENDAR: 'bi-calendar-check',
     REALIZADO: 'bi-check-all',
   };
   return icones[status] || 'bi-question-circle';
@@ -291,7 +291,7 @@ export function avatarFromName(nome: string): string {
 
 // ==================== VALIDAÇÕES DE STATUS ====================
 export function isEmAndamento(status: string): boolean {
-  return ['EM_ANALISE', 'APROVADO', 'REJEITADO', 'AGENDADO', 'EM_ANDAMENTO'].includes(
+  return ['EM_ANALISE', 'APROVADO', 'REJEITADO', 'AGENDAR', 'EM_ANDAMENTO'].includes(
     status,
   );
 }

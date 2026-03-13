@@ -93,7 +93,6 @@ export interface PedidoDto {
   sexoPaciente?: string;
 
   // ==================== DADOS DA GUIA ====================
-  numeroGuia?: string;
   registroAns?: string;
   numeroGuiaOperadora?: string;
   codigoOperadora?: string;
@@ -120,4 +119,40 @@ export interface PedidoDto {
   // ==================== USUÁRIOS ====================
   usuarioCriacao?: string;
   usuarioAtualizacao?: string;
+
+  // 🔥 NOVOS CAMPOS - CONSULTA PRÉ-OPERATÓRIA
+  consultaPreDataHora?: string; // ISO string (data e hora da consulta)
+  consultaPreDataFormatada?: string; // Data formatada (dd/MM/yyyy)
+  consultaPreHoraFormatada?: string; // Hora formatada (HH:mm)
+  consultaPreCuidados?: string; // Cuidados necessários
+  consultaPreObservacoesEspeciais?: string; // Observações especiais
+  temConsultaPreAgendada?: boolean; // Flag indicando se existe consulta agendada
+
+  numeroGuia?: string;
+  senhaAutorizacao?: string;
+  statusAutorizacao?:
+    | 'AUTORIZADO'
+    | 'AUTORIZADO_PARCIAL'
+    | 'PENDENTE'
+    | 'NEGADO';
+  validadeAutorizacao?: string; // ISO date
+  tipoAcomodacao?: string;
+  formaPagamento?: string;
+
+  comprovanteUrl?: string; // URL do comprovante no servidor
+  comprovanteNome?: string; // Nome original do arquivo
+  comprovanteTamanho?: number; // Tamanho em bytes
+  comprovanteTipo?: string; // MIME type do arquivo
+  comprovanteDataUpload?: string; // Data de upload (ISO string)
+  temComprovante?: boolean; // Flag indicando se existe comprovante
+
+  hospital?: string;
+  fornecedor?: string;
+  agendamentoLocal?: string;
+  riscoCirurgico?: string;
+  termoConsentimentoUrl?: string;
+  termoConsentimentoNome?: string;
+  consultaPreLocal?: string;
+  consultaPreMedico?: string;
+  consultaPreMedicoCrm?: string;
 }

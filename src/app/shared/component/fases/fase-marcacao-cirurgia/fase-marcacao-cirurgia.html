@@ -1,0 +1,247 @@
+<div class="fase-container">
+  <div class="fase-header">
+    <h5 class="fw-bold mb-0">
+      <i class="bi bi-calendar-check me-2"></i>
+      Marcação da Cirurgia
+    </h5>
+    <span class="badge bg-primary">Agendamento</span>
+  </div>
+
+  <div class="fase-content">
+
+    <div class="info-autorizacao mt-3 p-2 bg-light rounded-3" *ngIf="pedido.numeroGuia">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-file-text text-primary"></i>
+        <span class="small text-muted">Guia:</span>
+        <span class="small fw-semibold">{{ pedido.numeroGuia }}</span>
+        <span class="badge ms-2" [ngClass]="getStatusAutorizacaoClass()">
+          {{ getStatusAutorizacaoTexto() }}
+        </span>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-1" *ngIf="pedido.validadeAutorizacao">
+        <i class="bi bi-calendar-check text-muted"></i>
+        <span class="small text-muted">Validade:</span>
+        <span class="small fw-semibold" [ngClass]="getValidadeClass()">
+          {{ dataValidadeFormatada }}
+          <span *ngIf="isValidadeProxima()" class="badge bg-warning text-dark ms-2 small">
+            <i class="bi bi-exclamation-triangle"></i>
+            Próximo ao vencimento
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="card-agendamento my-4 p-3 bg-white rounded-3 border">
+      <div class="d-flex align-items-center mb-3">
+        <div class="icon-circle bg-primary bg-opacity-10 text-primary p-2 rounded-3 me-2">
+          <i class="bi bi-calendar-check fs-5"></i>
+        </div>
+        <h6 class="fw-bold mb-0">Dados do Agendamento</h6>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-building me-1"></i>
+              Hospital
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-md"
+              [(ngModel)]="hospital"
+              (ngModelChange)="hospitalChange.emit($event)"
+              placeholder="Nome do hospital"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-truck me-1"></i>
+              Fornecedor
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-md"
+              [(ngModel)]="fornecedor"
+              (ngModelChange)="fornecedorChange.emit($event)"
+              placeholder="Nome do fornecedor"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-calendar me-1"></i>
+              Data da Cirurgia
+            </label>
+            <input
+              type="date"
+              class="form-control form-control-md"
+              [(ngModel)]="dataCirurgia"
+              (ngModelChange)="dataChange.emit($event)"
+              [min]="dataMinima"
+              [max]="dataMaxima"
+              [disabled]="loading"
+            />
+            <small class="text-muted">Campo opcional</small>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-clock me-1"></i>
+              Horário
+            </label>
+            <input
+              type="time"
+              class="form-control form-control-md"
+              [(ngModel)]="horario"
+              (ngModelChange)="horarioChange.emit($event)"
+              [disabled]="loading"
+            />
+            <small class="text-muted">Campo opcional</small>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-pin-map me-1"></i>
+              Local
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-md"
+              [(ngModel)]="local"
+              (ngModelChange)="localChange.emit($event)"
+              placeholder="Sala, andar, etc"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-exclamation-triangle me-1"></i>
+              Risco Cirúrgico
+            </label>
+            <select
+              class="form-select form-select-md"
+              [(ngModel)]="riscoCirurgico"
+              (ngModelChange)="riscoChange.emit($event)"
+              [disabled]="loading"
+            >
+              <option [ngValue]="null">Selecione o risco</option>
+              <option value="BAIXO">Baixo</option>
+              <option value="MODERADO">Moderado</option>
+              <option value="ALTO">Alto</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-file-text me-1"></i>
+              Termo de Consentimento
+            </label>
+            <div class="d-flex align-items-center gap-2">
+              <input
+                type="file"
+                class="form-control form-control-md"
+                (change)="onTermoSelecionado($event)"
+                accept=".pdf,.jpg,.jpeg,.png"
+                [disabled]="loading || salvandoTermo"
+              />
+              <button
+                *ngIf="termoSelecionado"
+                class="btn btn-sm btn-success"
+                (click)="salvarTermo()"
+                [disabled]="loading || salvandoTermo"
+              >
+                <span *ngIf="salvandoTermo" class="spinner-border spinner-border-sm me-1"></span>
+                <i *ngIf="!salvandoTermo" class="bi bi-cloud-upload"></i>
+                Salvar
+              </button>
+            </div>
+
+            <div *ngIf="temTermo && !termoSelecionado" class="mt-2 p-2 bg-light rounded-3">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-file-pdf text-danger"></i>
+                  <span class="small">{{ pedido.termoConsentimentoNome || 'Termo de consentimento' }}</span>
+                </div>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-link text-primary p-1" (click)="visualizarTermo()" title="Visualizar">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-link text-danger p-1" (click)="removerTermo()" title="Remover">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="progressoUpload > 0 && progressoUpload < 100" class="mt-2">
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-success"
+                     [style.width.%]="progressoUpload"
+                     role="progressbar"></div>
+              </div>
+              <small class="text-muted">{{ progressoUpload }}%</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+    <div class="proximos-passos mt-3 p-2 bg-light rounded-3">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle text-primary"></i>
+        <span class="small fw-semibold">Próximos passos:</span>
+      </div>
+      <p class="small text-muted mt-1 mb-0 ps-4">
+        Todos os campos são opcionais. Você pode salvar os dados mesmo incompletos e completar depois.
+      </p>
+    </div>
+
+    <div class="action-footer mt-4">
+      <div class="d-flex justify-content-end gap-2">
+        <button
+          class="btn btn-outline-primary"
+          (click)="onSalvarRascunho()"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!loading" class="bi bi-save me-2"></i>
+          Salvar Rascunho
+        </button>
+
+        <button
+          class="btn btn-primary"
+          (click)="onAvancar()"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!loading" class="bi bi-arrow-right-circle me-2"></i>
+          Avançar
+        </button>
+      </div>
+
+      <div class="alert alert-info mt-3 small">
+        <i class="bi bi-info-circle me-2"></i>
+        Todos os campos são opcionais. Você pode preencher agora ou depois.
+      </div>
+    </div>
+  </div>
+</div>

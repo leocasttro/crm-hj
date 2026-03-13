@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { formatarDataHoraPtBr, formatarDataPtBr } from '@core/utils/date.util';
 
 @Component({
   selector: 'app-pedidos-resumo',
@@ -12,6 +13,9 @@ import { Router } from '@angular/router';
 export class PedidosResumo {
   @Input() pedido: any | null = null;
 
+  formatarData = formatarDataPtBr;
+  formatarDataHora = formatarDataHoraPtBr;
+
   constructor(private router: Router) {}
 
   getStatusClass(status: string): string {
@@ -19,24 +23,13 @@ export class PedidosResumo {
       RASCUNHO: 'bg-secondary',
       PENDENTE: 'bg-warning',
       EM_ANALISE: 'bg-info',
-      AGENDADO: 'bg-primary',
+      AGENDAR: 'bg-primary',
       CONFIRMADO: 'bg-success',
       REALIZADO: 'bg-success',
       CANCELADO: 'bg-danger',
       REJEITADO: 'bg-danger',
     };
     return classes[status] || 'bg-secondary';
-  }
-
-  // Métodos auxiliares
-  formatarData(data: string): string {
-    if (!data) return '-';
-    return new Date(data).toLocaleDateString('pt-BR');
-  }
-
-  formatarDataHora(data: string): string {
-    if (!data) return '-';
-    return new Date(data).toLocaleString('pt-BR');
   }
 
   getPrimeiroNome(nomeCompleto: string): string {

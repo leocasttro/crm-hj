@@ -7,7 +7,7 @@ export type PedidoStatus =
   | 'EM_ANALISE'
   | 'REJEITADO'
   | 'APROVADO'
-  | 'AGENDADO'
+  | 'AGENDAR'
   | 'CONFIRMADO'
   | 'REALIZADO'
   | 'CANCELADO';

@@ -1,0 +1,331 @@
+<div class="fase-container">
+  <div class="fase-header">
+    <h5 class="fw-bold mb-0">
+      <i class="bi bi-heart-pulse me-2"></i>
+      Consulta Pré-Operatória
+    </h5>
+    <span class="badge" [ngClass]="getStatusBadgeClass()">
+      {{ getStatusTexto() }}
+    </span>
+  </div>
+
+  <div class="fase-content">
+    <!-- Informações da cirurgia agendada -->
+    <div
+      class="info-cirurgia mt-3 p-2 bg-light rounded-3"
+      *ngIf="pedido.agendadoPara"
+    >
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-calendar-check-fill text-primary"></i>
+        <span class="small text-muted">Cirurgia agendada para:</span>
+        <span class="small fw-semibold">
+          {{ formatarDataHora(pedido.agendadoPara) }}
+        </span>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-1" *ngIf="pedido.hospital">
+        <i class="bi bi-building text-primary"></i>
+        <span class="small text-muted">Hospital:</span>
+        <span class="small fw-semibold">{{ pedido.hospital }}</span>
+      </div>
+    </div>
+
+    <!-- Card de Agendamento da Consulta -->
+    <div class="card-consulta mt-3 p-3 bg-white rounded-3 border">
+      <div class="d-flex align-items-center mb-3">
+        <div
+          class="icon-circle bg-success bg-opacity-10 text-success p-2 rounded-3 me-2"
+        >
+          <i class="bi bi-calendar-check fs-5"></i>
+        </div>
+        <h6 class="fw-bold mb-0">Agendamento da Consulta Pré-Operatória</h6>
+      </div>
+
+      <div class="row g-4">
+        <!-- Data da Consulta -->
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-calendar me-1"></i>
+              Data da Consulta
+            </label>
+            <input
+              type="date"
+              class="form-control form-control-md"
+              [(ngModel)]="dataConsulta"
+              (ngModelChange)="dataChange.emit($event)"
+              [min]="dataMinima"
+              [max]="dataMaxima"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <!-- Hora da Consulta -->
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-clock me-1"></i>
+              Hora da Consulta
+            </label>
+            <input
+              type="time"
+              class="form-control form-control-md"
+              [(ngModel)]="horaConsulta"
+              (ngModelChange)="horaChange.emit($event)"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <!-- Local da Consulta -->
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-pin-map me-1"></i>
+              Local da Consulta
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-md"
+              [(ngModel)]="localConsulta"
+              (ngModelChange)="localChange.emit($event)"
+              placeholder="Ex: Consultório, Ambulatório, etc"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <!-- Médico Responsável -->
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-person-badge me-1"></i>
+              Médico Responsável
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-md"
+              [(ngModel)]="medicoResponsavel"
+              (ngModelChange)="medicoChange.emit($event)"
+              placeholder="Nome do médico"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <!-- Cuidados Pré-Operatórios -->
+        <div class="col-12">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-heart-pulse me-1"></i>
+              Cuidados Pré-Operatórios
+            </label>
+            <textarea
+              class="form-control form-control-md"
+              rows="2"
+              [(ngModel)]="cuidados"
+              (ngModelChange)="cuidadosChange.emit($event)"
+              placeholder="Ex: Jejum de 8 horas, suspender anticoagulantes, etc"
+              [disabled]="loading"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Observações Especiais -->
+        <div class="col-12">
+          <div class="d-flex flex-column">
+            <label class="text-muted mb-2">
+              <i class="bi bi-exclamation-triangle me-1"></i>
+              Observações Especiais
+            </label>
+            <textarea
+              class="form-control form-control-md"
+              rows="2"
+              [(ngModel)]="observacoesEspeciais"
+              (ngModelChange)="observacoesChange.emit($event)"
+              placeholder="Ex: Paciente alérgico a dipirona, diabético, etc"
+              [disabled]="loading"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Data selecionada (resumo) -->
+        <div class="col-12" *ngIf="dataConsulta">
+          <div class="bg-light p-3 rounded-3">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-info-circle-fill text-success me-2 fs-5"></i>
+              <div>
+                <span class="fw-semibold">Consulta agendada para: </span>
+                {{ dataConsulta | date:'dd/MM/yyyy' }}
+                <span *ngIf="horaConsulta">às {{ horaConsulta }}</span>
+                <span *ngIf="localConsulta"> - {{ localConsulta }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentos Específicos da Consulta -->
+    <div class="documentos-consulta mt-3 p-3 bg-light rounded-3">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <h6 class="fw-bold mb-0">
+          <i class="bi bi-file-medical me-2"></i>
+          Documentos da Consulta
+        </h6>
+        <span class="badge bg-info" *ngIf="itensPendentesConsulta > 0">
+          {{ itensPendentesConsulta }} pendente(s)
+        </span>
+        <span
+          class="badge bg-success"
+          *ngIf="itensPendentesConsulta === 0 && totalItensConsulta > 0"
+        >
+          Completos
+        </span>
+      </div>
+
+      <div
+        *ngFor="let item of getChecklistConsulta()"
+        class="checklist-item p-2 mb-2 bg-white rounded-3"
+      >
+        <div class="d-flex align-items-center gap-2">
+          <div class="form-check flex-grow-1">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [checked]="item.status === 'Concluído'"
+              [disabled]="item.status === 'Concluído' || loading"
+              (change)="onToggleDocumento.emit(item)"
+              [id]="'check-consulta-' + item.id"
+            />
+            <label
+              class="form-check-label small"
+              [for]="'check-consulta-' + item.id"
+            >
+              {{ item.titulo }}
+              <span *ngIf="item.obrigatorio" class="text-danger">*</span>
+            </label>
+          </div>
+          <span
+            class="badge"
+            [ngClass]="{
+            'bg-success': item.status === 'Concluído',
+            'bg-warning': item.status === 'Pendente'
+          }"
+          >
+            {{ item.status }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Próximos passos -->
+    <div class="proximos-passos my-3 p-2 bg-light rounded-3">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle text-primary"></i>
+        <span class="small fw-semibold">Próximos passos:</span>
+      </div>
+      <p class="small text-muted mt-1 mb-0 ps-4">
+        Após agendar a consulta e anexar todos os documentos, confirme a
+        realização para prosseguir com o procedimento cirúrgico.
+      </p>
+    </div>
+
+    <!-- Resumo do Pedido -->
+    <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
+
+    <!-- Botões de ação -->
+    <div class="action-footer mt-4">
+      <div class="d-flex justify-content-end gap-2">
+        <!-- Botão Agendar (quando AGENDADO e sem data) -->
+        <button
+          *ngIf="pedido.status === 'AGENDADO' && !dataConsulta"
+          class="btn btn-success"
+          (click)="onAgendarConsulta()"
+          [disabled]="loading"
+        >
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <i *ngIf="!loading" class="bi bi-calendar-check me-2"></i>
+          Agendar Consulta
+        </button>
+
+        <!-- Botão Confirmar Agendamento (quando tem data) -->
+        <button
+          *ngIf="pedido.status === 'AGENDADO' && dataConsulta"
+          class="btn btn-success"
+          (click)="onConfirmarAgendamento()"
+          [disabled]="loading"
+        >
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <i *ngIf="!loading" class="bi bi-check-circle me-2"></i>
+          Confirmar Agendamento
+        </button>
+
+        <!-- Botão Confirmar Consulta Realizada -->
+        <button
+          *ngIf="pedido.status === 'AGENDADO' && dataConsulta"
+          class="btn btn-outline-success"
+          (click)="onConfirmarConsulta()"
+          [disabled]="loading"
+        >
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <i *ngIf="!loading" class="bi bi-check-circle me-2"></i>
+          Confirmar Consulta Realizada
+        </button>
+
+        <!-- Botão Iniciar Procedimento -->
+        <button
+          *ngIf="pedido.status === 'CONFIRMADO'"
+          class="btn btn-primary"
+          (click)="onIniciarProcedimento()"
+          [disabled]="loading || !podeIniciarProcedimento"
+        >
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <i *ngIf="!loading" class="bi bi-arrow-right-circle me-2"></i>
+          Iniciar Procedimento
+        </button>
+
+        <!-- Botão Reagendar -->
+        <button
+          *ngIf="pedido.status === 'AGENDADO' && dataConsulta"
+          class="btn btn-outline-secondary"
+          (click)="onReagendar()"
+          [disabled]="loading"
+        >
+          <i class="bi bi-calendar-x me-2"></i>
+          Reagendar
+        </button>
+      </div>
+
+      <!-- Mensagens de validação -->
+      <div
+        *ngIf="pedido.status === 'AGENDADO' && !podeAgendar && dataConsulta"
+        class="alert alert-warning mt-3 small"
+      >
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Complete todos os documentos obrigatórios antes de agendar.
+      </div>
+
+      <div
+        *ngIf="pedido.status === 'CONFIRMADO' && !podeIniciarProcedimento"
+        class="alert alert-warning mt-3 small"
+      >
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Complete todos os documentos da consulta antes de iniciar o
+        procedimento.
+      </div>
+    </div>
+  </div>
+</div>
