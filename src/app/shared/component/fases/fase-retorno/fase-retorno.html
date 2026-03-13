@@ -45,7 +45,7 @@
           class="form-select form-select-sm"
           [(ngModel)]="pedido.statusAutorizacao"
           (ngModelChange)="onStatusChange()"
-          [disabled]="loading"
+          [disabled]="inputsDesabilitados" 
         >
           <option [ngValue]="null">Selecione o status</option>
           <option value="AUTORIZADO">Autorizado</option>
@@ -71,7 +71,7 @@
                 [(ngModel)]="pedido.numeroGuia"
                 (ngModelChange)="verificarAlteracao()"
                 placeholder="Digite o número da guia"
-                [disabled]="loading"
+                [disabled]="inputsDesabilitados"
               />
             </div>
           </div>
@@ -87,7 +87,7 @@
                 [(ngModel)]="pedido.senhaAutorizacao"
                 (ngModelChange)="verificarAlteracao()"
                 placeholder="Digite a senha"
-                [disabled]="loading"
+                [disabled]="inputsDesabilitados"
               />
             </div>
           </div>
@@ -106,7 +106,7 @@
             [(ngModel)]="pedido.validadeAutorizacao"
             (ngModelChange)="verificarAlteracao()"
             [min]="dataMinima"
-            [disabled]="loading"
+            [disabled]="inputsDesabilitados"
           />
         </div>
 
@@ -120,7 +120,7 @@
             class="form-select form-select-sm"
             [(ngModel)]="pedido.tipoAcomodacao"
             (ngModelChange)="verificarAlteracao()"
-            [disabled]="loading"
+            [disabled]="inputsDesabilitados"
           >
             <option [ngValue]="null">Selecione o tipo</option>
             <option value="APARTAMENTO">Apartamento</option>
@@ -140,7 +140,7 @@
             class="form-select form-select-sm"
             [(ngModel)]="pedido.formaPagamento"
             (ngModelChange)="verificarAlteracao()"
-            [disabled]="loading"
+            [disabled]="inputsDesabilitados"
           >
             <option [ngValue]="null">Selecione a forma</option>
             <option value="DINHEIRO">Dinheiro</option>
@@ -164,13 +164,13 @@
               class="form-control form-control-sm"
               (change)="onComprovanteSelecionado($event)"
               accept=".pdf,.jpg,.jpeg,.png"
-              [disabled]="loading || salvandoComprovante"
+              [disabled]="inputsDesabilitados"
             />
             <button
               *ngIf="temComprovanteSelecionado"
               class="btn btn-sm btn-success"
               (click)="salvarComprovante()"
-              [disabled]="loading || salvandoComprovante"
+              [disabled]="inputsDesabilitados"
             >
               <span
                 *ngIf="salvandoComprovante"
@@ -226,20 +226,23 @@
           </div>
         </div>
 
-        <!-- Botão para salvar alterações -->
         <div class="mt-3 d-flex justify-content-end">
           <button
             class="btn btn-sm btn-outline-primary"
             (click)="salvarDadosAutorizacao()"
-            [disabled]="loading || !houveAlteracao"
+            [disabled]="salvandoAutorizacao || !houveAlteracao"
           >
-            <i class="bi bi-check-circle me-1"></i>
-            Salvar dados da autorização
+            <span
+              *ngIf="salvandoAutorizacao"
+              class="spinner-border spinner-border-sm me-1"
+            ></span>
+            <i *ngIf="!salvandoAutorizacao" class="bi bi-check-circle me-1"></i>
+            {{ salvandoAutorizacao ? 'Salvando...' : 'Salvar dados da autorização'
+            }}
           </button>
         </div>
       </ng-container>
 
-      <!-- Mensagem quando não autorizado -->
       <div
         *ngIf="!isAutorizado() && pedido.statusAutorizacao"
         class="alert alert-info mt-3 small"
@@ -307,14 +310,14 @@
       <button
         class="btn btn-primary"
         (click)="onAvancar()"
-        [disabled]="loading || !podeAvancar || !podeAvancarParaMarcacao()"
+        [disabled]="botaoAvancarDesabilitado"
       >
         <span
-          *ngIf="loading"
+          *ngIf="processando"
           class="spinner-border spinner-border-sm me-2"
         ></span>
-        <i *ngIf="!loading" class="bi bi-arrow-right-circle me-2"></i>
-        {{ loading ? 'Avançando...' : 'Avançar para Marcação' }}
+        <i *ngIf="!processando" class="bi bi-arrow-right-circle me-2"></i>
+        {{ textoBotaoAvancar }}
       </button>
     </div>
   </div>

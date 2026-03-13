@@ -37,6 +37,22 @@ export interface ArquivoInfoResponse {
   tamanho: number;
 }
 
+export interface SalvarDadosAutorizacaoRequest {
+  statusAutorizacao: string | null;
+  numeroGuia?: string | null;
+  senhaAutorizacao?: string | null;
+  validadeAutorizacao?: string | null; // Formato: YYYY-MM-DD
+  tipoAcomodacao?: string | null;
+}
+
+export interface UpdateResponse {
+  sucesso: boolean;
+  mensagem: string;
+  alteracoes?: string[];
+  pedido?: PedidoDto;
+  erros?: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class PedidoService {
   private http = inject(HttpClient);
@@ -101,11 +117,14 @@ export class PedidoService {
     );
   }
 
-  agendarPedido(pedidoId: string, dadosAgendamento: AgendamentoRequest): Observable<PedidoDto> {
+  agendarPedido(
+    pedidoId: string,
+    dadosAgendamento: AgendamentoRequest,
+  ): Observable<PedidoDto> {
     console.log('📅 Agendando pedido:', pedidoId, dadosAgendamento);
     return this.http.post<PedidoDto>(
       `${this.baseUrl}/${pedidoId}/agendar`,
-      dadosAgendamento
+      dadosAgendamento,
     );
   }
 
@@ -245,5 +264,21 @@ export class PedidoService {
       console.error('Erro ao baixar arquivo:', error);
       throw error;
     }
+  }
+
+  salvarDadosAutorizacao(
+    pedidoId: string,
+    dados: SalvarDadosAutorizacaoRequest,
+  ): Observable<UpdateResponse> {
+    console.log(
+      '🔧 Service - salvarDadosAutorizacao chamado com ID:',
+      pedidoId,
+      'Dados:',
+      dados,
+    );
+    return this.http.put<UpdateResponse>(
+      `${this.baseUrl}/${pedidoId}/autorizacao`,
+      dados,
+    );
   }
 }

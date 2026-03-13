@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnInit,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -16,6 +23,7 @@ import { PedidosResumo } from '../../pedidos-resumo/pedidos-resumo';
 import { PedidoDto } from '@models/pedido';
 import { ChecklistItem } from '@models/checklist';
 import { formatarDataPtBr } from '@core/utils';
+import { PedidoService, SalvarDadosAutorizacaoRequest } from '@core/services';
 
 @Component({
   selector: 'app-fase-retorno',
@@ -54,10 +62,19 @@ export class FaseRetorno implements OnInit {
   salvandoComprovante: boolean = false;
   progressoUpload: number = 0;
 
+  avancoEmAndamento: boolean = false;
+  salvandoAutorizacao: boolean = false;
+  atualizandoStatus: boolean = false;
+
+  salvo: boolean = false;
   // Data mínima para validade (hoje)
   dataMinima: string = new Date().toISOString().split('T')[0];
 
-  constructor(private toast: ToastService) {}
+  constructor(
+    private toast: ToastService,
+    private pedidoService: PedidoService, // 🔥 INJEÇÃO DO SERVIÇO
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     console.log(
@@ -102,12 +119,28 @@ export class FaseRetorno implements OnInit {
   /**
    * Emite evento para avançar para a próxima fase
    */
-  onAvancar(): void {
-    if (this.podeAvancar) {
-      console.log('➡️ Avançando para marcação da cirurgia...');
+  async onAvancar(): Promise<void> {
+    // PREVENIR MÚLTIPLAS CHAMADAS
+    if (this.avancoEmAndamento) {
+      console.log('⏳ Avanço já em andamento, ignorando...');
+      return;
+    }
+
+    if (!this.podeAvancarParaMarcacao()) {
+      this.toast.warning(this.getMensagemImpedimento());
+      return;
+    }
+
+    this.avancoEmAndamento = true;
+
+    try {
+      // ✅ SÓ EMITE O EVENTO - O PAI FAZ O RESTO
+      console.log('🚀 Emitindo evento avancar para o pai');
       this.avancar.emit();
-    } else {
-      console.log('❌ Não é possível avançar: documentos pendentes');
+    } catch (error) {
+      console.error('Erro ao emitir avanço:', error);
+    } finally {
+      this.avancoEmAndamento = false;
     }
   }
 
@@ -133,41 +166,89 @@ export class FaseRetorno implements OnInit {
       this.dadosOriginais.formaPagamento !== this.pedido.formaPagamento;
   }
 
-  async salvarDadosAutorizacao(): Promise<void> {
-    if (!this.houveAlteracao) return;
+  // ==================== 🔥 NOVO MÉTODO - SALVAR DADOS DE AUTORIZAÇÃO ====================
 
-    this.loading = true;
+  async salvarDadosAutorizacao(): Promise<boolean> {
+    console.log('💾 salvarDadosAutorizacao iniciado');
+
+    if (!this.houveAlteracao) {
+      return true;
+    }
+
+    this.salvandoAutorizacao = true;
+    this.cdr.detectChanges();
 
     try {
-      // TODO: Chamar o serviço para salvar os dados
-      // await this.pedidoService.atualizarDadosAutorizacao(this.pedido.id, {
-      //   numeroGuia: this.pedido.numeroGuia,
-      //   senhaAutorizacao: this.pedido.senhaAutorizacao,
-      //   statusAutorizacao: this.pedido.statusAutorizacao,
-      //   validadeAutorizacao: this.pedido.validadeAutorizacao,
-      //   tipoAcomodacao: this.pedido.tipoAcomodacao,
-      //   formaPagamento: this.pedido.formaPagamento
-      // });
+      const dados: SalvarDadosAutorizacaoRequest = {
+        statusAutorizacao: this.pedido.statusAutorizacao || null,
+        numeroGuia: this.pedido.numeroGuia,
+        senhaAutorizacao: this.pedido.senhaAutorizacao,
+        validadeAutorizacao: this.pedido.validadeAutorizacao,
+        tipoAcomodacao: this.pedido.tipoAcomodacao,
+      };
 
-      // Simula um salvamento
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await this.pedidoService
+        .salvarDadosAutorizacao(this.pedido.id, dados)
+        .toPromise();
 
-      this.toast.success('Dados da autorização salvos com sucesso!');
-      this.salvarEstadoOriginal();
-      this.houveAlteracao = false;
-    } catch (error) {
-      console.error('Erro ao salvar dados:', error);
-      this.toast.error('Erro ao salvar dados da autorização');
+      if (response?.sucesso) {
+        this.toast.success('Dados da autorização salvos com sucesso!');
+
+        if (response.pedido) {
+          this.pedido = response.pedido;
+        }
+
+        this.salvarEstadoOriginal();
+        this.houveAlteracao = false;
+
+        // 🔥 MARCA COMO JÁ SALVO
+        this.salvo = true;
+
+        return true;
+      } else {
+        this.toast.error(response?.mensagem || 'Erro ao salvar dados');
+        return false;
+      }
+    } catch (error: any) {
+      console.error('❌ Erro ao salvar dados:', error);
+      this.toast.error(
+        error.error?.mensagem || 'Erro ao salvar dados da autorização',
+      );
+      return false;
     } finally {
-      this.loading = false;
+      this.salvandoAutorizacao = false;
+      this.cdr.detectChanges();
     }
   }
+
+  // ==================== 🔥 NOVO MÉTODO - CARREGAR DADOS DE AUTORIZAÇÃO ====================
+
+  async carregarDadosAutorizacao(): Promise<void> {
+    // try {
+    //   const dados = await this.pedidoService
+    //     .buscarDadosAutorizacao(this.pedido.id)
+    //     .toPromise();
+    //   if (dados) {
+    //     this.pedido.statusAutorizacao = dados.statusAutorizacao;
+    //     this.pedido.numeroGuia = dados.numeroGuia;
+    //     this.pedido.senhaAutorizacao = dados.senhaAutorizacao;
+    //     this.pedido.validadeAutorizacao = dados.validadeAutorizacao;
+    //     this.pedido.tipoAcomodacao = dados.tipoAcomodacao;
+    //     this.salvarEstadoOriginal();
+    //     this.verificarAlteracao();
+    //   }
+    // } catch (error) {
+    //   console.error('❌ Erro ao carregar dados de autorização:', error);
+    // }
+  }
+
+  // ==================== MÉTODOS DE COMPROVANTE ====================
 
   async removerComprovante(): Promise<void> {
     if (!confirm('Tem certeza que deseja remover o comprovante?')) return;
 
     try {
-      // TODO: Chamar serviço para remover
+      // TODO: Implementar endpoint de remoção de comprovante
       // await this.pedidoService.removerComprovante(this.pedido.id);
 
       this.pedido.comprovanteUrl = undefined;
@@ -214,11 +295,12 @@ export class FaseRetorno implements OnInit {
         }
       }, 100);
 
-      // TODO: Chamar o serviço de upload
-      // const resultado = await this.pedidoService.uploadComprovante(
-      //   this.pedido.id,
-      //   this.comprovanteSelecionado
-      // );
+      // TODO: Implementar endpoint de upload de comprovante
+      // const formData = new FormData();
+      // formData.append('arquivo', this.comprovanteSelecionado);
+      // formData.append('pedidoId', this.pedido.id);
+      // formData.append('tipo', 'COMPROVANTE_AUTORIZACAO');
+      // const resultado = await this.pedidoService.uploadArquivoChecklist(formData).toPromise();
 
       // Simula upload
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -246,6 +328,28 @@ export class FaseRetorno implements OnInit {
   }
 
   // ==================== GETTERS ====================
+
+  get processando(): boolean {
+    return this.atualizandoStatus || this.avancoEmAndamento;
+  }
+
+  get inputsDesabilitados(): boolean {
+    return this.salvo || this.salvandoAutorizacao;
+  }
+
+  get botaoAvancarDesabilitado(): boolean {
+    return (
+      this.processando || // 🔥 Apenas estados internos
+      !this.podeAvancar ||
+      !this.podeAvancarParaMarcacao()
+    );
+  }
+
+  get textoBotaoAvancar(): string {
+    if (this.salvandoAutorizacao) return 'Salvando dados...';
+    if (this.avancoEmAndamento) return 'Avançando...';
+    return 'Avançar para Marcação';
+  }
 
   get dataPedidoFormatada(): string {
     if (!this.pedido?.dataPedido) return 'Não informado';
