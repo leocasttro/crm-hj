@@ -317,6 +317,7 @@ export function isEmAndamento(status: string): boolean {
     'AGENDAR',
     'EM_ANDAMENTO',
     'AGUARDANDO_APROVACAO_AGENDAMENTO',
+    'AGENDADO'
   ].includes(status);
 }
 

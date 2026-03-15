@@ -833,6 +833,53 @@ export class CardDetalheComponent implements OnInit {
     ).length;
   }
 
+  async onAprovarAgendamento() {
+    const resultado = await executarAcaoPedido(
+      () => this.pedidoService.aprovarAgendamento(this.pedido.id),
+      (loading) => {
+        this.loading = loading;
+        this.cdRef.detectChanges();
+      },
+      this.toast,
+      'Agendamento aprovado com sucesso!',
+      'Erro ao aprovar agendamento',
+    );
+
+    if (resultado.sucesso && resultado.pedido) {
+      this.pedido = resultado.pedido;
+      this.atualizarFasesPorStatus(this.pedido.status);
+      this.faseAvancada.emit(this.pedido);
+
+      setTimeout(() => {
+        this.activeModal.close({
+          sucesso: true,
+          mensagem: 'Agendamento aprovado',
+          pedido: this.pedido,
+        });
+      }, 100);
+    }
+  }
+
+  async onRejeitarAgendamento(motivo: string) {
+    const resultado = await executarAcaoPedido(
+      () => this.pedidoService.rejeitarAgendamento(this.pedido.id, motivo),
+      (loading) => {
+        this.loading = loading;
+        this.cdRef.detectChanges();
+      },
+      this.toast,
+      'Agendamento rejeitado.',
+      'Erro ao rejeitar agendamento',
+    );
+
+    if (resultado.sucesso && resultado.pedido) {
+      this.pedido = resultado.pedido;
+      this.atualizarFasesPorStatus(this.pedido.status);
+      this.faseAvancada.emit(this.pedido);
+      this.cdRef.detectChanges();
+    }
+  }
+
   /**
    * Confirmar consulta pré-operatória
    */

@@ -95,24 +95,6 @@
           </div>
         </div>
 
-        <!-- Médico Responsável -->
-        <div class="col-md-6">
-          <div class="d-flex flex-column">
-            <label class="text-muted mb-2">
-              <i class="bi bi-person-badge me-1"></i>
-              Médico Responsável
-            </label>
-            <input
-              type="text"
-              class="form-control form-control-md"
-              [(ngModel)]="medicoResponsavel"
-              (ngModelChange)="medicoChange.emit($event)"
-              placeholder="Nome do médico"
-              [disabled]="loading"
-            />
-          </div>
-        </div>
-
         <!-- Cuidados Pré-Operatórios -->
         <div class="col-12">
           <div class="d-flex flex-column">
@@ -167,7 +149,7 @@
     </div>
 
     <!-- Documentos Específicos da Consulta -->
-    <div class="documentos-consulta mt-3 p-3 bg-light rounded-3">
+    <!-- <div class="documentos-consulta mt-3 p-3 bg-light rounded-3">
       <div class="d-flex align-items-center gap-2 mb-3">
         <h6 class="fw-bold mb-0">
           <i class="bi bi-file-medical me-2"></i>
@@ -217,7 +199,7 @@
           </span>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Próximos passos -->
     <div class="proximos-passos my-3 p-2 bg-light rounded-3">

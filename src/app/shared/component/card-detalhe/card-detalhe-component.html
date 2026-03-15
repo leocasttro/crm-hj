@@ -82,6 +82,8 @@
       [loading]="loading"
       (agendar)="agendarCirurgia($event)"
       (salvarRascunho)="salvarRascunhoCirurgia($event)"
+      (aprovarAgendamento)="onAprovarAgendamento()"
+      (rejeitarAgendamento)="onRejeitarAgendamento($event)"
     >
     </app-fase-marcacao-cirurgia>
 

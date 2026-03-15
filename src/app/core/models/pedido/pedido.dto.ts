@@ -128,6 +128,7 @@ export interface PedidoDto {
   consultaPreObservacoesEspeciais?: string; // Observações especiais
   temConsultaPreAgendada?: boolean; // Flag indicando se existe consulta agendada
 
+  numeroGuiaAutorizacao?: string;
   numeroGuia?: string;
   senhaAutorizacao?: string;
   statusAutorizacao?:
