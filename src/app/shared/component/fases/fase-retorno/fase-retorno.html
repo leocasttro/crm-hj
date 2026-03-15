@@ -45,7 +45,7 @@
           class="form-select form-select-sm"
           [(ngModel)]="pedido.statusAutorizacao"
           (ngModelChange)="onStatusChange()"
-          [disabled]="inputsDesabilitados" 
+          [disabled]="inputsDesabilitados"
         >
           <option [ngValue]="null">Selecione o status</option>
           <option value="AUTORIZADO">Autorizado</option>
@@ -68,7 +68,7 @@
               <input
                 type="text"
                 class="form-control form-control-sm"
-                [(ngModel)]="pedido.numeroGuia"
+                [(ngModel)]="pedido.numeroGuiaAutorizacao"
                 (ngModelChange)="verificarAlteracao()"
                 placeholder="Digite o número da guia"
                 [disabled]="inputsDesabilitados"
@@ -310,7 +310,6 @@
       <button
         class="btn btn-primary"
         (click)="onAvancar()"
-        [disabled]="botaoAvancarDesabilitado"
       >
         <span
           *ngIf="processando"

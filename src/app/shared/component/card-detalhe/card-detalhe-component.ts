@@ -332,7 +332,6 @@ export class CardDetalheComponent implements OnInit {
         .map((a) => a?.checklistItemId)
         .filter((id) => id !== undefined);
 
-      // 🔥 Usa setTimeout para atualizar no próximo ciclo
       setTimeout(() => {
         this.atualizarChecklistComArquivos(arquivos);
       }, 0);
@@ -644,7 +643,8 @@ export class CardDetalheComponent implements OnInit {
       EM_ANALISE: 'EM_ANALISE',
       APROVADO: 'RETORNO_PEDIDO',
       REJEITADO: 'EM_ANALISE',
-      AGENDAR: 'MARCACAO_CIRURGIA', // ✅ Aguardando agendamento
+      AGUARDANDO_APROVACAO_AGENDAMENTO: 'MARCACAO_CIRURGIA',
+      AGENDAR: 'MARCACAO_CIRURGIA',
       AGENDADO: 'CONSULTA_PRE_OPERATORIA', // ✅ ✅ NOVO: Agendado vai para Consulta Pré
       CONFIRMADO: 'CONSULTA_PRE_OPERATORIA', // ✅ Confirmado também na Consulta Pré
       EM_PROGRESSO: 'POS_OPERATORIO',
@@ -747,7 +747,7 @@ export class CardDetalheComponent implements OnInit {
 
       const resultado = await executarAcaoPedido(
         () =>
-          this.pedidoService.agendarPedido(this.pedido.id, dadosAgendamento),
+          this.pedidoService.salvarAgendamentoPedido(this.pedido.id, dadosAgendamento),
         (loading) => {
           this.loading = loading;
           this.cdRef.detectChanges();
@@ -831,6 +831,53 @@ export class CardDetalheComponent implements OnInit {
     return this.getChecklistConsultaPre().filter(
       (item) => item.status === 'Pendente' && item.obrigatorio,
     ).length;
+  }
+
+  async onAprovarAgendamento() {
+    const resultado = await executarAcaoPedido(
+      () => this.pedidoService.aprovarAgendamento(this.pedido.id),
+      (loading) => {
+        this.loading = loading;
+        this.cdRef.detectChanges();
+      },
+      this.toast,
+      'Agendamento aprovado com sucesso!',
+      'Erro ao aprovar agendamento',
+    );
+
+    if (resultado.sucesso && resultado.pedido) {
+      this.pedido = resultado.pedido;
+      this.atualizarFasesPorStatus(this.pedido.status);
+      this.faseAvancada.emit(this.pedido);
+
+      setTimeout(() => {
+        this.activeModal.close({
+          sucesso: true,
+          mensagem: 'Agendamento aprovado',
+          pedido: this.pedido,
+        });
+      }, 100);
+    }
+  }
+
+  async onRejeitarAgendamento(motivo: string) {
+    const resultado = await executarAcaoPedido(
+      () => this.pedidoService.rejeitarAgendamento(this.pedido.id, motivo),
+      (loading) => {
+        this.loading = loading;
+        this.cdRef.detectChanges();
+      },
+      this.toast,
+      'Agendamento rejeitado.',
+      'Erro ao rejeitar agendamento',
+    );
+
+    if (resultado.sucesso && resultado.pedido) {
+      this.pedido = resultado.pedido;
+      this.atualizarFasesPorStatus(this.pedido.status);
+      this.faseAvancada.emit(this.pedido);
+      this.cdRef.detectChanges();
+    }
   }
 
   /**

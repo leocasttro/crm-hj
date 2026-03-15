@@ -39,7 +39,7 @@ export interface ArquivoInfoResponse {
 
 export interface SalvarDadosAutorizacaoRequest {
   statusAutorizacao: string | null;
-  numeroGuia?: string | null;
+  numeroGuiaAutorizacao?: string | null;
   senhaAutorizacao?: string | null;
   validadeAutorizacao?: string | null; // Formato: YYYY-MM-DD
   tipoAcomodacao?: string | null;
@@ -117,13 +117,12 @@ export class PedidoService {
     );
   }
 
-  agendarPedido(
+  salvarAgendamentoPedido(
     pedidoId: string,
     dadosAgendamento: AgendamentoRequest,
   ): Observable<PedidoDto> {
-    console.log('📅 Agendando pedido:', pedidoId, dadosAgendamento);
     return this.http.post<PedidoDto>(
-      `${this.baseUrl}/${pedidoId}/agendar`,
+      `${this.baseUrl}/${pedidoId}/agendamento/solicitar`,
       dadosAgendamento,
     );
   }
@@ -145,6 +144,26 @@ export class PedidoService {
   ): Observable<{ podeEditar: boolean; statusAtual: string }> {
     return this.http.get<{ podeEditar: boolean; statusAtual: string }>(
       `${this.baseUrl}/${id}/pode-editar`,
+    );
+  }
+
+  aprovarAgendamento(
+    pedidoId: string,
+    observacao?: string,
+  ): Observable<AtualizarStatusResponse> {
+    return this.http.post<AtualizarStatusResponse>(
+      `${this.baseUrl}/${pedidoId}/agendamento/aprovar`,
+      { observacao },
+    );
+  }
+
+  rejeitarAgendamento(
+    pedidoId: string,
+    motivo: string,
+  ): Observable<AtualizarStatusResponse> {
+    return this.http.post<AtualizarStatusResponse>(
+      `${this.baseUrl}/${pedidoId}/agendamento/rejeitar`,
+      { motivo },
     );
   }
 

@@ -52,7 +52,7 @@
               [(ngModel)]="hospital"
               (ngModelChange)="hospitalChange.emit($event)"
               placeholder="Nome do hospital"
-              [disabled]="loading"
+              [disabled]="isAguardandoAprovacao"
             />
           </div>
         </div>
@@ -69,7 +69,7 @@
               [(ngModel)]="fornecedor"
               (ngModelChange)="fornecedorChange.emit($event)"
               placeholder="Nome do fornecedor"
-              [disabled]="loading"
+              [disabled]="isAguardandoAprovacao"
             />
           </div>
         </div>
@@ -87,7 +87,7 @@
               (ngModelChange)="dataChange.emit($event)"
               [min]="dataMinima"
               [max]="dataMaxima"
-              [disabled]="loading"
+              [disabled]="isAguardandoAprovacao"
             />
             <small class="text-muted">Campo opcional</small>
           </div>
@@ -104,7 +104,7 @@
               class="form-control form-control-md"
               [(ngModel)]="horario"
               (ngModelChange)="horarioChange.emit($event)"
-              [disabled]="loading"
+              [disabled]="isAguardandoAprovacao"
             />
             <small class="text-muted">Campo opcional</small>
           </div>
@@ -122,7 +122,7 @@
               [(ngModel)]="local"
               (ngModelChange)="localChange.emit($event)"
               placeholder="Sala, andar, etc"
-              [disabled]="loading"
+              [disabled]="isAguardandoAprovacao"
             />
           </div>
         </div>
@@ -137,7 +137,7 @@
               class="form-select form-select-md"
               [(ngModel)]="riscoCirurgico"
               (ngModelChange)="riscoChange.emit($event)"
-              [disabled]="loading"
+              [disabled]="isAguardandoAprovacao"
             >
               <option [ngValue]="null">Selecione o risco</option>
               <option value="BAIXO">Baixo</option>
@@ -159,13 +159,13 @@
                 class="form-control form-control-md"
                 (change)="onTermoSelecionado($event)"
                 accept=".pdf,.jpg,.jpeg,.png"
-                [disabled]="loading || salvandoTermo"
+                [disabled]="isAguardandoAprovacao || salvandoTermo"
               />
               <button
                 *ngIf="termoSelecionado"
                 class="btn btn-sm btn-success"
                 (click)="salvarTermo()"
-                [disabled]="loading || salvandoTermo"
+                [disabled]="isAguardandoAprovacao || salvandoTermo"
               >
                 <span *ngIf="salvandoTermo" class="spinner-border spinner-border-sm me-1"></span>
                 <i *ngIf="!salvandoTermo" class="bi bi-cloud-upload"></i>
@@ -203,6 +203,11 @@
       </div>
     </div>
 
+    <div class="alert alert-info mt-3 small">
+      <i class="bi bi-info-circle me-2"></i>
+        Todos os campos são opcionais. Você pode preencher agora ou depois.
+    </div>
+
     <app-pedidos-resumo [pedido]="pedido"></app-pedidos-resumo>
 
     <div class="proximos-passos mt-3 p-2 bg-light rounded-3">
@@ -211,22 +216,13 @@
         <span class="small fw-semibold">Próximos passos:</span>
       </div>
       <p class="small text-muted mt-1 mb-0 ps-4">
-        Todos os campos são opcionais. Você pode salvar os dados mesmo incompletos e completar depois.
+        Após avançar realizar marcação de cirurgia.
       </p>
     </div>
 
-    <div class="action-footer mt-4">
+    <!-- Botão salvar (apenas quando NÃO está aguardando aprovação) -->
+    <div *ngIf="!isAguardandoAprovacao" class="action-footer mt-4">
       <div class="d-flex justify-content-end gap-2">
-        <button
-          class="btn btn-outline-primary"
-          (click)="onSalvarRascunho()"
-          [disabled]="loading"
-        >
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-          <i *ngIf="!loading" class="bi bi-save me-2"></i>
-          Salvar Rascunho
-        </button>
-
         <button
           class="btn btn-primary"
           (click)="onAvancar()"
@@ -234,13 +230,37 @@
         >
           <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
           <i *ngIf="!loading" class="bi bi-arrow-right-circle me-2"></i>
-          Avançar
+          Solicitar Agendamento
         </button>
       </div>
+    </div>
 
-      <div class="alert alert-info mt-3 small">
-        <i class="bi bi-info-circle me-2"></i>
-        Todos os campos são opcionais. Você pode preencher agora ou depois.
+    <!-- Bloco de aprovação/rejeição -->
+    <div *ngIf="isAguardandoAprovacao" class="alert alert-light mt-3">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <i class="bi bi-hourglass-split"></i>
+        <span class="fw-semibold">Agendamento aguardando aprovação</span>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label small text-muted">Motivo da rejeição (obrigatório para rejeitar)</label>
+        <textarea
+          class="form-control form-control-sm"
+          rows="2"
+          [(ngModel)]="motivoRejeicao"
+          placeholder="Informe o motivo caso vá rejeitar..."
+        ></textarea>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button class="btn btn-danger" (click)="onRejeitar()" [disabled]="loading">
+          <i class="bi bi-x-circle me-2"></i>
+          Rejeitar
+        </button>
+        <button class="btn btn-success" (click)="onAprovar()" [disabled]="loading">
+          <i class="bi bi-check-circle me-2"></i>
+          Aprovar
+        </button>
       </div>
     </div>
   </div>

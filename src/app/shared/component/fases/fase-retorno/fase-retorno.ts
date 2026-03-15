@@ -146,7 +146,7 @@ export class FaseRetorno implements OnInit {
 
   private salvarEstadoOriginal(): void {
     this.dadosOriginais = {
-      numeroGuia: this.pedido.numeroGuia,
+      numeroGuiaAutorizacao: this.pedido.numeroGuiaAutorizacao,
       senhaAutorizacao: this.pedido.senhaAutorizacao,
       statusAutorizacao: this.pedido.statusAutorizacao,
       validadeAutorizacao: this.pedido.validadeAutorizacao,
@@ -157,7 +157,7 @@ export class FaseRetorno implements OnInit {
 
   verificarAlteracao(): void {
     this.houveAlteracao =
-      this.dadosOriginais.numeroGuia !== this.pedido.numeroGuia ||
+      this.dadosOriginais.numeroGuiaAutorizacao !== this.pedido.numeroGuiaAutorizacao ||
       this.dadosOriginais.senhaAutorizacao !== this.pedido.senhaAutorizacao ||
       this.dadosOriginais.statusAutorizacao !== this.pedido.statusAutorizacao ||
       this.dadosOriginais.validadeAutorizacao !==
@@ -181,7 +181,7 @@ export class FaseRetorno implements OnInit {
     try {
       const dados: SalvarDadosAutorizacaoRequest = {
         statusAutorizacao: this.pedido.statusAutorizacao || null,
-        numeroGuia: this.pedido.numeroGuia,
+        numeroGuiaAutorizacao: this.pedido.numeroGuiaAutorizacao,
         senhaAutorizacao: this.pedido.senhaAutorizacao,
         validadeAutorizacao: this.pedido.validadeAutorizacao,
         tipoAcomodacao: this.pedido.tipoAcomodacao,
@@ -517,7 +517,7 @@ export class FaseRetorno implements OnInit {
     if (!this.pedido.statusAutorizacao) return false;
 
     if (this.isAutorizado()) {
-      return !!this.pedido.numeroGuia && !!this.pedido.validadeAutorizacao;
+      return !!this.pedido.numeroGuiaAutorizacao && !!this.pedido.validadeAutorizacao;
     }
 
     return true; // Para outros status, apenas o status já é suficiente
@@ -592,7 +592,7 @@ export class FaseRetorno implements OnInit {
     this.verificarAlteracao();
 
     if (!this.isAutorizado()) {
-      this.pedido.numeroGuia = undefined;
+      this.pedido.numeroGuiaAutorizacao = undefined;
       this.pedido.senhaAutorizacao = undefined;
       this.pedido.validadeAutorizacao = undefined;
       this.pedido.tipoAcomodacao = undefined;
@@ -616,7 +616,7 @@ export class FaseRetorno implements OnInit {
     if (this.isAutorizado()) {
       return (
         this.podeAvancar &&
-        !!this.pedido.numeroGuia &&
+        !!this.pedido.numeroGuiaAutorizacao &&
         !!this.pedido.validadeAutorizacao
       );
     }
@@ -650,7 +650,7 @@ export class FaseRetorno implements OnInit {
     }
 
     if (this.isAutorizado()) {
-      if (!this.pedido.numeroGuia) {
+      if (!this.pedido.numeroGuiaAutorizacao) {
         return 'Informe o número da guia para prosseguir.';
       }
       if (!this.pedido.validadeAutorizacao) {

@@ -26,14 +26,9 @@ import { ToastService } from '@services/utils';
 @Component({
   selector: 'app-fase-marcacao-cirurgia',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    FontAwesomeModule,
-    PedidosResumo
-  ],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, PedidosResumo],
   templateUrl: './fase-marcacao-cirurgia.html',
-  styleUrls: ['./fase-marcacao-cirurgia.scss']
+  styleUrls: ['./fase-marcacao-cirurgia.scss'],
 })
 export class FaseMarcacaoCirurgia implements OnInit {
   @Input() pedido!: PedidoDto;
@@ -50,6 +45,9 @@ export class FaseMarcacaoCirurgia implements OnInit {
   @Output() horarioChange = new EventEmitter<string>();
   @Output() localChange = new EventEmitter<string>();
   @Output() riscoChange = new EventEmitter<string>();
+
+  @Output() aprovarAgendamento = new EventEmitter<void>();
+  @Output() rejeitarAgendamento = new EventEmitter<string>();
 
   // Ícones
   faSpinner = faSpinner;
@@ -72,6 +70,7 @@ export class FaseMarcacaoCirurgia implements OnInit {
   horario: string = '';
   local: string = '';
   riscoCirurgico: string = '';
+  motivoRejeicao: string = '';
 
   // Upload do termo
   termoSelecionado: File | null = null;
@@ -100,11 +99,10 @@ export class FaseMarcacaoCirurgia implements OnInit {
    * Carrega dados de agendamento existentes
    */
   private carregarDadosAgendamento(): void {
-    // Campos mapeados do pedido (você precisará adicionar esses campos no PedidoDto)
-    this.hospital = this.pedido.hospital || '';
-    this.fornecedor = this.pedido.fornecedor || '';
+    this.hospital = this.pedido.agendamentoHospital || '';
+    this.fornecedor = this.pedido.agendamentoFornecedor || '';
     this.local = this.pedido.agendamentoLocal || '';
-    this.riscoCirurgico = this.pedido.riscoCirurgico || '';
+    this.riscoCirurgico = this.pedido.agendamentoRiscoCirurgico || '';
 
     // Data e hora
     if (this.pedido.agendamentoDataHora) {
@@ -130,12 +128,32 @@ export class FaseMarcacaoCirurgia implements OnInit {
 
     this.totalDocumentos = this.checklist.length;
     this.documentosConcluidos = this.checklist.filter(
-      item => item.status === 'Concluído'
+      (item) => item.status === 'Concluído',
     ).length;
 
-    const obrigatorios = this.checklist.filter(item => item.obrigatorio);
-    const obrigatoriosConcluidos = obrigatorios.filter(item => item.status === 'Concluído');
-    this.todosDocumentosOk = obrigatorios.length === obrigatoriosConcluidos.length;
+    const obrigatorios = this.checklist.filter((item) => item.obrigatorio);
+    const obrigatoriosConcluidos = obrigatorios.filter(
+      (item) => item.status === 'Concluído',
+    );
+    this.todosDocumentosOk =
+      obrigatorios.length === obrigatoriosConcluidos.length;
+  }
+
+  onAprovar(): void {
+    this.aprovarAgendamento.emit();
+  }
+
+  onRejeitar(): void {
+    if (!this.motivoRejeicao.trim()) {
+      this.toast.warning('Informe o motivo da rejeição');
+      return;
+    }
+    this.rejeitarAgendamento.emit(this.motivoRejeicao);
+    this.motivoRejeicao = '';
+  }
+
+  get isAguardandoAprovacao(): boolean {
+    return this.pedido?.status === 'AGUARDANDO_APROVACAO_AGENDAMENTO';
   }
 
   /**
@@ -148,7 +166,7 @@ export class FaseMarcacaoCirurgia implements OnInit {
       dataCirurgia: this.dataCirurgia,
       horario: this.horario,
       local: this.local,
-      riscoCirurgico: this.riscoCirurgico
+      riscoCirurgico: this.riscoCirurgico,
     };
 
     this.salvarRascunho.emit(dados);
@@ -174,7 +192,7 @@ export class FaseMarcacaoCirurgia implements OnInit {
       fornecedor: this.fornecedor,
       dataAgendamento: dataHoraFormatada,
       local: this.local,
-      riscoCirurgico: this.riscoCirurgico
+      riscoCirurgico: this.riscoCirurgico,
     };
 
     this.agendar.emit(agendamento);
@@ -214,7 +232,7 @@ export class FaseMarcacaoCirurgia implements OnInit {
         }
       }, 100);
 
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       clearInterval(interval);
       this.progressoUpload = 100;
