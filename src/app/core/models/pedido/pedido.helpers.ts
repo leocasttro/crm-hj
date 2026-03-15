@@ -83,6 +83,25 @@ export function getStatusClass(status: string): string {
   return classes[status] || 'bg-secondary';
 }
 
+export function getLabelStatus(status: string): string {
+  const labels: Record<string, string> = {
+    RASCUNHO: 'Rascunho',
+    PENDENTE: 'Pendente',
+    EM_ANALISE: 'Em Análise',
+    REJEITADO: 'Rejeitado',
+    APROVADO: 'Aprovado',
+    AGENDAR: 'Agendar',
+    AGENDADO: 'Agendado',
+    AGUARDANDO_APROVACAO_AGENDAMENTO: 'Aguardando Aprovar',
+    AGENDAMENTO_REPROVADO: 'Agendamento Reprovado',
+    CONFIRMADO: 'Confirmado',
+    EM_PROGRESSO: 'Em Progresso',
+    REALIZADO: 'Realizado',
+    CANCELADO: 'Cancelado',
+  };
+  return labels[status] ?? status;
+}
+
 export function getPrioridadeClasse(prioridade: string): string {
   const classes: Record<string, string> = {
     ELETIVA: 'bg-success',
@@ -115,7 +134,7 @@ export function mapPedidoToCardData(
     descricao: pedido.indicacaoClinica || '',
     prioridade: pedido.prioridade,
     prioridadeClasse: getPrioridadeClasse(pedido.prioridade),
-    badgeTexto: pedido.status,
+    badgeTexto: getLabelStatus(pedido.status),
     badgeClasseCor: getStatusClass(pedido.status),
     urlImagem: '/assets/default-pedido.png',
     dataCriacao: pedido.criadoEm,
@@ -291,9 +310,14 @@ export function avatarFromName(nome: string): string {
 
 // ==================== VALIDAÇÕES DE STATUS ====================
 export function isEmAndamento(status: string): boolean {
-  return ['EM_ANALISE', 'APROVADO', 'REJEITADO', 'AGENDAR', 'EM_ANDAMENTO'].includes(
-    status,
-  );
+  return [
+    'EM_ANALISE',
+    'APROVADO',
+    'REJEITADO',
+    'AGENDAR',
+    'EM_ANDAMENTO',
+    'AGUARDANDO_APROVACAO_AGENDAMENTO',
+  ].includes(status);
 }
 
 export function isConcluido(status: string): boolean {

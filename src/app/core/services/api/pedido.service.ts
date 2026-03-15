@@ -121,7 +121,6 @@ export class PedidoService {
     pedidoId: string,
     dadosAgendamento: AgendamentoRequest,
   ): Observable<PedidoDto> {
-    console.log('📅 Agendando pedido:', pedidoId, dadosAgendamento);
     return this.http.post<PedidoDto>(
       `${this.baseUrl}/${pedidoId}/agendar`,
       dadosAgendamento,

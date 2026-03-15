@@ -146,10 +146,10 @@ export interface PedidoDto {
   comprovanteDataUpload?: string; // Data de upload (ISO string)
   temComprovante?: boolean; // Flag indicando se existe comprovante
 
-  hospital?: string;
-  fornecedor?: string;
+  agendamentoHospital?: string;
+  agendamentoFornecedor?: string;
   agendamentoLocal?: string;
-  riscoCirurgico?: string;
+  agendamentoRiscoCirurgico?: string;
   termoConsentimentoUrl?: string;
   termoConsentimentoNome?: string;
   consultaPreLocal?: string;

@@ -22,10 +22,10 @@
           {{ formatarDataHora(pedido.agendadoPara) }}
         </span>
       </div>
-      <div class="d-flex align-items-center gap-2 mt-1" *ngIf="pedido.hospital">
+      <div class="d-flex align-items-center gap-2 mt-1" *ngIf="pedido.agendamentoHospital">
         <i class="bi bi-building text-primary"></i>
         <span class="small text-muted">Hospital:</span>
-        <span class="small fw-semibold">{{ pedido.hospital }}</span>
+        <span class="small fw-semibold">{{ pedido.agendamentoHospital }}</span>
       </div>
     </div>
 

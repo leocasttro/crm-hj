@@ -332,7 +332,6 @@ export class CardDetalheComponent implements OnInit {
         .map((a) => a?.checklistItemId)
         .filter((id) => id !== undefined);
 
-      // 🔥 Usa setTimeout para atualizar no próximo ciclo
       setTimeout(() => {
         this.atualizarChecklistComArquivos(arquivos);
       }, 0);
@@ -644,7 +643,8 @@ export class CardDetalheComponent implements OnInit {
       EM_ANALISE: 'EM_ANALISE',
       APROVADO: 'RETORNO_PEDIDO',
       REJEITADO: 'EM_ANALISE',
-      AGENDAR: 'MARCACAO_CIRURGIA', // ✅ Aguardando agendamento
+      AGUARDANDO_APROVACAO_AGENDAMENTO: 'MARCACAO_CIRURGIA',
+      AGENDAR: 'MARCACAO_CIRURGIA',
       AGENDADO: 'CONSULTA_PRE_OPERATORIA', // ✅ ✅ NOVO: Agendado vai para Consulta Pré
       CONFIRMADO: 'CONSULTA_PRE_OPERATORIA', // ✅ Confirmado também na Consulta Pré
       EM_PROGRESSO: 'POS_OPERATORIO',
