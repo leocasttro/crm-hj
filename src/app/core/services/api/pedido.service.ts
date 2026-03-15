@@ -117,12 +117,12 @@ export class PedidoService {
     );
   }
 
-  agendarPedido(
+  salvarAgendamentoPedido(
     pedidoId: string,
     dadosAgendamento: AgendamentoRequest,
   ): Observable<PedidoDto> {
     return this.http.post<PedidoDto>(
-      `${this.baseUrl}/${pedidoId}/agendar`,
+      `${this.baseUrl}/${pedidoId}/agendamento/solicitar`,
       dadosAgendamento,
     );
   }

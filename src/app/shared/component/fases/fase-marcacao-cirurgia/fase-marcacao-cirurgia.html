@@ -220,6 +220,21 @@
       </p>
     </div>
 
+    <!-- Botão salvar (apenas quando NÃO está aguardando aprovação) -->
+    <div *ngIf="!isAguardandoAprovacao" class="action-footer mt-4">
+      <div class="d-flex justify-content-end gap-2">
+        <button
+          class="btn btn-primary"
+          (click)="onAvancar()"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!loading" class="bi bi-arrow-right-circle me-2"></i>
+          Solicitar Agendamento
+        </button>
+      </div>
+    </div>
+
     <!-- Bloco de aprovação/rejeição -->
     <div *ngIf="isAguardandoAprovacao" class="alert alert-light mt-3">
       <div class="d-flex align-items-center gap-2 mb-2">

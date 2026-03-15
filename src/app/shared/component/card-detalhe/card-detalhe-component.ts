@@ -747,7 +747,7 @@ export class CardDetalheComponent implements OnInit {
 
       const resultado = await executarAcaoPedido(
         () =>
-          this.pedidoService.agendarPedido(this.pedido.id, dadosAgendamento),
+          this.pedidoService.salvarAgendamentoPedido(this.pedido.id, dadosAgendamento),
         (loading) => {
           this.loading = loading;
           this.cdRef.detectChanges();
