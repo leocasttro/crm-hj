@@ -35,7 +35,7 @@ import {
 
 import { PedidosResumo } from '../pedidos-resumo/pedidos-resumo';
 import { PedidoDto, PedidoStatus } from '@models/pedido';
-import { PedidoService } from '@services/api';
+import { AgendamentoConsultaPreRequest, PedidoService } from '@services/api';
 import { ToastService } from '@services/utils';
 import { ChecklistItem } from '@models/checklist';
 import { FasePedido, CodigoFase } from '@models/pedido';
@@ -747,7 +747,10 @@ export class CardDetalheComponent implements OnInit {
 
       const resultado = await executarAcaoPedido(
         () =>
-          this.pedidoService.salvarAgendamentoPedido(this.pedido.id, dadosAgendamento),
+          this.pedidoService.salvarAgendamentoPedido(
+            this.pedido.id,
+            dadosAgendamento,
+          ),
         (loading) => {
           this.loading = loading;
           this.cdRef.detectChanges();
@@ -1007,7 +1010,6 @@ export class CardDetalheComponent implements OnInit {
     this.loading = true;
 
     try {
-      // Monta data e hora completa
       let dataHoraFormatada = dados.dataConsulta;
       if (dados.horaConsulta) {
         dataHoraFormatada = `${dados.dataConsulta}T${dados.horaConsulta}:00`;
@@ -1015,37 +1017,30 @@ export class CardDetalheComponent implements OnInit {
         dataHoraFormatada = `${dados.dataConsulta}T00:00:00`;
       }
 
-      const dadosConsulta = {
+      const request: AgendamentoConsultaPreRequest = {
         dataHora: dataHoraFormatada,
-        local: dados.localConsulta,
-        medico: dados.medicoResponsavel,
+        local: dados.localConsulta || '',
         cuidados: dados.cuidados,
         observacoesEspeciais: dados.observacoesEspeciais,
       };
 
-      // TODO: Chamar o serviço quando estiver implementado
-      // const resultado = await this.pedidoService.agendarConsultaPre(this.pedido.id, dadosConsulta);
+      const resultado = await executarAcaoPedido(
+        () => this.pedidoService.agendarConusltaPre(this.pedido.id, request),
+        (loading) => {
+          this.loading = loading;
+          this.cdRef.detectChanges();
+        },
+        this.toast,
+        'Consulta pré-operatória agendada com sucesso!',
+        'Erro ao agendar consulta',
+      );
 
-      // Simula agendamento
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Atualiza o pedido com os dados da consulta
-      this.pedido.consultaPreDataHora = dataHoraFormatada;
-      this.pedido.consultaPreLocal = dados.localConsulta;
-      this.pedido.consultaPreMedico = dados.medicoResponsavel;
-      this.pedido.consultaPreCuidados = dados.cuidados;
-      this.pedido.consultaPreObservacoesEspeciais = dados.observacoesEspeciais;
-      this.pedido.temConsultaPreAgendada = true;
-
-      this.toast.success('Consulta agendada com sucesso!');
-
-      // Atualiza as variáveis locais
-      this.consultaPreData = dados.dataConsulta;
-      this.consultaPreHora = dados.horaConsulta || '';
-      this.consultaPreLocal = dados.localConsulta || '';
-      this.consultaPreMedico = dados.medicoResponsavel || '';
-      this.consultaPreCuidados = dados.cuidados || '';
-      this.consultaPreObservacoes = dados.observacoesEspeciais || '';
+      if (resultado.sucesso && resultado.pedido) {
+        this.pedido = resultado.pedido;
+        this.atualizarFasesPorStatus(this.pedido.status);
+        this.faseAvancada.emit(this.pedido);
+        this.cdRef.detectChanges();
+      }
     } catch (error) {
       console.error('Erro ao agendar consulta:', error);
       this.toast.error('Erro ao agendar consulta');
