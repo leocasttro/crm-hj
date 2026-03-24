@@ -80,6 +80,7 @@ import { FaseEmAnalise } from '../fases/fase-em-analise/fase-em-analise';
 import { FaseRetorno } from '../fases/fase-retorno/fase-retorno';
 import { FaseMarcacaoCirurgia } from '../fases/fase-marcacao-cirurgia/fase-marcacao-cirurgia';
 import { FaseConsultaPreOperatoria } from '../fases/fase-consulta-pre-operatoria/fase-consulta-pre-operatoria';
+import { FaseFaturamento } from '../fases/fase-faturamento/fase-faturamento';
 
 @Component({
   selector: 'app-card-detalhe',
@@ -97,6 +98,7 @@ import { FaseConsultaPreOperatoria } from '../fases/fase-consulta-pre-operatoria
     FaseRetorno,
     FaseMarcacaoCirurgia,
     FaseConsultaPreOperatoria,
+    FaseFaturamento,
   ],
   templateUrl: './card-detalhe-component.html',
   styleUrls: ['./card-detalhe-component.scss'],
@@ -645,8 +647,10 @@ export class CardDetalheComponent implements OnInit {
       REJEITADO: 'EM_ANALISE',
       AGUARDANDO_APROVACAO_AGENDAMENTO: 'MARCACAO_CIRURGIA',
       AGENDAR: 'MARCACAO_CIRURGIA',
-      AGENDADO: 'CONSULTA_PRE_OPERATORIA', // ✅ ✅ NOVO: Agendado vai para Consulta Pré
-      CONFIRMADO: 'CONSULTA_PRE_OPERATORIA', // ✅ Confirmado também na Consulta Pré
+      AGENDADO: 'CONSULTA_PRE_OPERATORIA',
+      FATURAMENTO: 'FATURAMENTO',
+      AGUARDANDO_POS_OPERATORIO: 'POS_OPERATORIO',
+      CONFIRMADO: 'POS_OPERATORIO',
       EM_PROGRESSO: 'POS_OPERATORIO',
       REALIZADO: 'FINALIZADO',
       CANCELADO: 'FINALIZADO',
@@ -778,6 +782,38 @@ export class CardDetalheComponent implements OnInit {
       this.toast.error('Erro ao agendar cirurgia');
     } finally {
       this.loading = false;
+    }
+  }
+
+  async avancarFaturamento() {
+    const resultado = await executarAcaoPedido(
+      () =>
+        this.pedidoService.atualizarStatus(
+          this.pedido.id,
+          'AGUARDANDO_POS_OPERATORIO',
+          'Faturamento concluído',
+        ),
+      (loading) => {
+        this.loading = loading;
+        this.cdRef.detectChanges();
+      },
+      this.toast,
+      'Faturamento concluído! Aguardando pós-operatório.',
+      'Erro ao avançar faturamento',
+    );
+
+    if (resultado.sucesso && resultado.pedido) {
+      this.pedido = resultado.pedido;
+      this.atualizarFasesPorStatus(this.pedido.status);
+      this.faseAvancada.emit(this.pedido);
+
+      setTimeout(() => {
+        this.activeModal.close({
+          sucesso: true,
+          mensagem: 'Faturamento avançado',
+          pedido: this.pedido,
+        });
+      }, 100);
     }
   }
 

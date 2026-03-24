@@ -76,7 +76,13 @@ export function getStatusClass(status: string): string {
     REJEITADO: 'bg-danger',
     APROVADO: 'bg-success',
     AGENDAR: 'bg-primary',
+    AGUARDANDO_APROVACAO_AGENDAMENTO: 'bg-warning',
+    AGENDAMENTO_REPROVADO: 'bg-danger',
+    AGENDADO: 'bg-primary',
+    FATURAMENTO: 'bg-info',
+    AGUARDANDO_POS_OPERATORIO: 'bg-warning',
     CONFIRMADO: 'bg-success',
+    EM_PROGRESSO: 'bg-info',
     REALIZADO: 'bg-success',
     CANCELADO: 'bg-danger',
   };
@@ -94,6 +100,8 @@ export function getLabelStatus(status: string): string {
     AGENDADO: 'Agendado',
     AGUARDANDO_APROVACAO_AGENDAMENTO: 'Aguardando Aprovar',
     AGENDAMENTO_REPROVADO: 'Agendamento Reprovado',
+    FATURAMENTO: 'Faturamento',
+    AGUARDANDO_POS_OPERATORIO: 'Aguardando Pós-Op',
     CONFIRMADO: 'Confirmado',
     EM_PROGRESSO: 'Em Progresso',
     REALIZADO: 'Realizado',
@@ -313,11 +321,15 @@ export function isEmAndamento(status: string): boolean {
   return [
     'EM_ANALISE',
     'APROVADO',
-    'REJEITADO',
     'AGENDAR',
     'EM_ANDAMENTO',
     'AGUARDANDO_APROVACAO_AGENDAMENTO',
-    'AGENDADO'
+    'AGENDAMENTO_REPROVADO',
+    'AGENDADO',
+    'FATURAMENTO',
+    'AGUARDANDO_POS_OPERATORIO',
+    'CONFIRMADO',
+    'EM_PROGRESSO',
   ].includes(status);
 }
 

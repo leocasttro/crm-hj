@@ -98,6 +98,13 @@
     >
     </app-fase-consulta-pre-operatoria>
 
+    <app-fase-faturamento
+      *ngIf="faseAtual === 'FATURAMENTO'"
+      [pedido]="pedido"
+      [loading]="loading"
+      (avancar)="avancarFaturamento()"
+    >
+    </app-fase-faturamento>
     <!-- 🔹 FASE: FINALIZADO -->
     <div *ngIf="faseAtual === 'FINALIZADO'">
       <h5 class="fw-bold text-success">Pedido finalizado</h5>

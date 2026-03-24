@@ -1,1 +1,456 @@
-<p>fase-faturamento works!</p>
+<div class="fase-faturamento">
+  <!-- Header com informações do convênio -->
+  <div class="header-faturamento mb-4">
+    <div class="row g-3">
+      <div class="col-md-2">
+        <div class="info-box">
+          <label class="text-muted small">Número da Guia</label>
+          <input type="text" class="form-control" [(ngModel)]="dadosFaturamento.numeroGuia" placeholder="Nº Guia" />
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="info-box">
+          <label class="text-muted small">Data</label>
+          <input type="date" class="form-control" [(ngModel)]="dadosFaturamento.data" />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box">
+          <label class="text-muted small">Convênio</label>
+          <input type="text" class="form-control" [(ngModel)]="dadosFaturamento.convenio" readonly />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box">
+          <label class="text-muted small">Hospital</label>
+          <input type="text" class="form-control" [(ngModel)]="dadosFaturamento.hospital" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equipe Cirúrgica -->
+  <div class="card mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+      <h6 class="mb-0 fw-bold">Equipe Cirúrgica</h6>
+      <button
+        class="btn btn-sm btn-outline-primary"
+        (click)="adicionarAuxiliar()"
+        [disabled]="auxiliares.length >= 4"
+      >
+        <i class="bi bi-plus-lg me-1"></i> Adicionar Auxiliar
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Cirurgião -->
+        <div class="col-md-3">
+          <div class="info-box">
+            <label class="text-muted small">Cirurgião</label>
+            <input type="text" class="form-control" [(ngModel)]="dadosFaturamento.cirurgiao" readonly />
+          </div>
+        </div>
+
+        <!-- Auxiliares Dinâmicos -->
+        <div class="col-md-3" *ngFor="let aux of auxiliares; let i = index">
+          <div class="info-box">
+            <label class="text-muted small">Auxiliar {{ i + 1 }}</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="aux.nome"
+                placeholder="Nome do auxiliar"
+              />
+              <button
+                class="btn btn-outline-danger"
+                type="button"
+                (click)="removerAuxiliar(aux.id)"
+              >
+                <fa-icon [icon]="faTrash"/>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financeiro -->
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h6 class="mb-0 fw-bold">Financeiro</h6>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Paciente</label>
+          <input type="text" class="form-control" [(ngModel)]="dadosFaturamento.paciente" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Banco</label>
+          <select class="form-select" [(ngModel)]="dadosFaturamento.banco">
+            <option value="">Selecione</option>
+            <option value="BB">Banco do Brasil</option>
+            <option value="ITAU">Itaú</option>
+            <option value="BRADESCO">Bradesco</option>
+            <option value="CAIXA">Caixa Econômica</option>
+            <option value="NUBANK">Nubank</option>
+            <option value="SICOOB">Sicoob</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Imposto (%)</label>
+          <div class="input-group">
+            <span class="input-group-text">%</span>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="dadosFaturamento.imposto"
+              (ngModelChange)="atualizarTotais()"
+              step="0.01"
+              min="0"
+              max="100"
+              placeholder="0,00"
+            />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Número da NF</label>
+          <input type="text" class="form-control" [(ngModel)]="dadosFaturamento.numeroNF" placeholder="NF" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Data do Repasse</label>
+          <input type="date" class="form-control" [(ngModel)]="dadosFaturamento.dataRepasse" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Status</label>
+          <select class="form-select" [(ngModel)]="dadosFaturamento.status">
+            <option value="">Selecione</option>
+            <option value="PENDENTE">Pendente</option>
+            <option value="PAGO">Pago</option>
+            <option value="CANCELADO">Cancelado</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Forma de Pagamento</label>
+          <select class="form-select" [(ngModel)]="dadosFaturamento.formaPagamento">
+            <option value="">Selecione</option>
+            <option value="DINHEIRO">Dinheiro</option>
+            <option value="CHEQUE">Cheque</option>
+            <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+            <option value="CARTAO_DEBITO">Cartão de Débito</option>
+            <option value="PIX">PIX</option>
+            <option value="TRANSFERENCIA">Transferência</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Número (Cheque/Cartão)</label>
+          <input type="text" class="form-control" [(ngModel)]="dadosFaturamento.numeroPagamento" placeholder="Número" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela de Procedimentos -->
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h6 class="mb-0 fw-bold">Procedimentos</h6>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm mb-0">
+          <thead class="table-light">
+            <!-- Linha de Divisão Total do Procedimento -->
+            <tr class="table-secondary">
+              <th colspan="3" class="text-end align-middle fw-semibold text-nowrap pe-3">
+                Divisão Total do procedimento:
+              </th>
+
+              <!-- Divisão Cirurgião -->
+              <th class="text-center align-middle" style="min-width: 130px;">
+                <div class="input-group input-group-sm">
+                  <select
+                    class="form-select form-select-sm"
+                    [(ngModel)]="divisao.tipoCirurgiao"
+                    (ngModelChange)="onTipoDivisaoChange('cirurgiao')"
+                    style="max-width: 55px; flex: 0 0 auto;"
+                  >
+                    <option value="PERCENTUAL">%</option>
+                    <option value="VALOR">R$</option>
+                  </select>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-end"
+                    [(ngModel)]="divisao.cirurgiao"
+                    (ngModelChange)="onDivisaoChange()"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                  />
+                </div>
+              </th>
+
+              <!-- Divisão Auxiliares Dinâmicos -->
+              <th
+                *ngFor="let aux of auxiliares"
+                class="text-center align-middle"
+                style="min-width: 130px;"
+              >
+                <div class="input-group input-group-sm">
+                  <select
+                    class="form-select form-select-sm"
+                    [(ngModel)]="divisao['tipo_aux_' + aux.id]"
+                    (ngModelChange)="onTipoDivisaoChange('aux_' + aux.id)"
+                    style="max-width: 55px; flex: 0 0 auto;"
+                  >
+                    <option value="PERCENTUAL">%</option>
+                    <option value="VALOR">R$</option>
+                  </select>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-end"
+                    [(ngModel)]="divisao['aux_' + aux.id]"
+                    (ngModelChange)="onDivisaoChange()"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                  />
+                </div>
+              </th>
+
+              <!-- Coluna Instrutor (se houver) -->
+              <th class="text-center align-middle" style="min-width: 130px;">
+                <div class="input-group input-group-sm">
+                  <select
+                    class="form-select form-select-sm"
+                    [(ngModel)]="divisao.tipoInstrutor"
+                    (ngModelChange)="onTipoDivisaoChange('instrutor')"
+                    style="max-width: 55px; flex: 0 0 auto;"
+                  >
+                    <option value="PERCENTUAL">%</option>
+                    <option value="VALOR">R$</option>
+                  </select>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-end"
+                    [(ngModel)]="divisao.instrutor"
+                    (ngModelChange)="onDivisaoChange()"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                  />
+                </div>
+              </th>
+
+              <th></th>
+            </tr>
+
+            <!-- Cabeçalho das colunas -->
+            <tr>
+              <th class="text-center" style="width: 45px;">Parc.</th>
+              <th style="min-width: 80px;">Qtd - Código - Procedimento</th>
+              <th style="min-width: 260px;"></th>
+              <th class="text-end" style="min-width: 120px;">Cirurgião</th>
+              <th
+                *ngFor="let aux of auxiliares; let i = index"
+                class="text-end"
+                style="min-width: 110px;"
+              >
+                {{ aux.nome || ('Aux ' + (i + 1)) }}
+              </th>
+              <th class="text-end" style="min-width: 110px;">
+                <select class="form-select form-select-sm" [(ngModel)]="dadosFaturamento.tipoInstrutor">
+                  <option value="INSTRU">Instru</option>
+                  <option value="CO_OP">Co-Op</option>
+                </select>
+              </th>
+              <th class="text-end" style="min-width: 100px;">Total</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of procedimentos">
+              <td class="text-center align-middle">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="item.parcial" />
+              </td>
+              <td colspan="2" class="align-middle">
+                <span class="fw-semibold">{{ item.quantidade }}</span> - <code>{{ item.codigo }}</code> - {{ item.descricao }}
+              </td>
+              <td class="text-end align-middle">
+                <input
+                  type="number"
+                  class="form-control form-control-sm text-end"
+                  [(ngModel)]="item.valorCirurgiao"
+                  (ngModelChange)="onValorChange(item)"
+                  step="0.01"
+                  style="min-width: 100px;"
+                />
+              </td>
+              <!-- Valores auxiliares dinâmicos -->
+              <td *ngFor="let aux of auxiliares" class="text-end align-middle">
+                <input
+                  type="number"
+                  class="form-control form-control-sm text-end"
+                  [(ngModel)]="item.auxiliares['aux_' + aux.id]"
+                  (ngModelChange)="onValorChange(item)"
+                  step="0.01"
+                  style="min-width: 90px;"
+                />
+              </td>
+              <!-- Instrutor -->
+              <td class="text-end align-middle">
+                <input
+                  type="number"
+                  class="form-control form-control-sm text-end"
+                  [(ngModel)]="item.valorInstrutor"
+                  (ngModelChange)="onValorChange(item)"
+                  step="0.01"
+                  style="min-width: 90px;"
+                />
+              </td>
+              <td class="text-end align-middle fw-semibold text-nowrap">
+                {{ formatarMoeda(item.total) }}
+              </td>
+            </tr>
+          </tbody>
+
+          <tfoot class="table-light fw-bold">
+            <tr>
+              <td colspan="3" class="text-end">TOTAIS:</td>
+              <td class="text-end">{{ formatarMoeda(totais.totalCirurgiao) }}</td>
+              <td *ngFor="let aux of auxiliares" class="text-end">
+                {{ formatarMoeda(totais.totalAuxiliares['aux_' + aux.id] || 0) }}
+              </td>
+              <td class="text-end">{{ formatarMoeda(totais.totalInstrutor) }}</td>
+              <td class="text-end text-primary">{{ formatarMoeda(totais.totalGeral) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parcelas -->
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h6 class="mb-0 fw-bold">Parcelas</h6>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Nº de Parcelas</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="dadosFaturamento.parcelas"
+            (ngModelChange)="atualizarTotais()"
+            min="1"
+            max="12"
+          />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Data da 1ª Parcela</label>
+          <input type="date" class="form-control" [(ngModel)]="dadosFaturamento.dataPrimeiraParcela" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Sinal</label>
+          <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="dadosFaturamento.sinal"
+              (ngModelChange)="atualizarTotais()"
+              step="0.01"
+            />
+          </div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Imposto do Sinal</label>
+          <div class="input-group">
+            <span class="input-group-text">%</span>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="dadosFaturamento.impostoSinal"
+              step="0.01"
+            />
+          </div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Forma Pgt Sinal</label>
+          <select class="form-select" [(ngModel)]="dadosFaturamento.formaPagamentoSinal">
+            <option value="">Selecione</option>
+            <option value="DINHEIRO">Dinheiro</option>
+            <option value="CHEQUE">Cheque</option>
+            <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+            <option value="CARTAO_DEBITO">Cartão de Débito</option>
+            <option value="PIX">PIX</option>
+            <option value="TRANSFERENCIA">Transferência</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Cheque/Recibo Cartão</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="dadosFaturamento.numeroCheque"
+              placeholder="Número"
+            />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Valor por Parcela</label>
+          <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input
+              type="text"
+              class="form-control bg-light"
+              [value]="formatarMoeda(calcularValorParcela())"
+              readonly
+            />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Total com Imposto</label>
+          <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input
+              type="text"
+              class="form-control bg-light text-danger"
+              [value]="formatarMoeda(calcularTotalComImposto())"
+              readonly
+            />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Valor Líquido (após imposto)</label>
+          <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input
+              type="text"
+              class="form-control bg-light text-success fw-bold"
+              [value]="formatarMoeda(calcularValorLiquido())"
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão Avançar -->
+  <div class="d-flex justify-content-end">
+    <button
+      class="btn btn-success btn-md px-4"
+      (click)="onAvancar()"
+      [disabled]="loading || !dadosFaturamento.numeroGuia"
+    >
+      <i class="bi bi-check-circle-fill me-2"></i>
+      Avançar para Próxima Etapa
+    </button>
+  </div>
+</div>

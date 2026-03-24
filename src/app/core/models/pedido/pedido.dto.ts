@@ -15,6 +15,7 @@ export interface PedidoDto {
   agendadoPara?: string; // ISO string
 
   // ==================== PROCEDIMENTO ====================
+  procedimentos: [];
   procedimento: string;
   procedimentoDescricao?: string;
   procedimentoCodigoTUSS?: string;
