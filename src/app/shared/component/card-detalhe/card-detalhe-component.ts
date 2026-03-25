@@ -81,6 +81,7 @@ import { FaseRetorno } from '../fases/fase-retorno/fase-retorno';
 import { FaseMarcacaoCirurgia } from '../fases/fase-marcacao-cirurgia/fase-marcacao-cirurgia';
 import { FaseConsultaPreOperatoria } from '../fases/fase-consulta-pre-operatoria/fase-consulta-pre-operatoria';
 import { FaseFaturamento } from '../fases/fase-faturamento/fase-faturamento';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-card-detalhe',
@@ -179,10 +180,6 @@ export class CardDetalheComponent implements OnInit {
 
   ngOnInit(): void {
     this.inicializarComponente();
-    if (this.pedidoStatus === this.pedido.status) {
-      console.log('Status não mudou, apenas inicializando fases');
-    }
-    console.log('📦 Dados completos do pedido:', this.pedido);
     this.carregarDadosConsultaPre();
   }
 
@@ -658,10 +655,6 @@ export class CardDetalheComponent implements OnInit {
 
     const faseCodigo = mapaStatusParaFase[status] || 'CRIADO';
 
-    console.log(
-      `🔄 Atualizando fases - Status: ${status} -> Fase: ${faseCodigo}`,
-    );
-
     // Reseta todas as fases
     this.fases.forEach((f) => (f.concluido = false));
 
@@ -673,7 +666,6 @@ export class CardDetalheComponent implements OnInit {
         if (!fase.data) {
           fase.data = this.pedido.atualizadoEm || new Date().toISOString();
         }
-        console.log(`📍 Fase atual: ${fase.nome} (${fase.codigo})`);
       }
 
       if (!encontrou) {
@@ -1037,15 +1029,10 @@ export class CardDetalheComponent implements OnInit {
   }
 
   async confirmarAgendamentoConsulta(dados: any) {
-    // Este método pode ser igual ao agendarConsultaPre ou ter lógica diferente
-    await this.agendarConsultaPre(dados);
-  }
-
-  // Agendar consulta pré-operatória
-  async agendarConsultaPre(dados: any) {
     this.loading = true;
 
     try {
+      // 1. Formata os dados
       let dataHoraFormatada = dados.dataConsulta;
       if (dados.horaConsulta) {
         dataHoraFormatada = `${dados.dataConsulta}T${dados.horaConsulta}:00`;
@@ -1060,6 +1047,7 @@ export class CardDetalheComponent implements OnInit {
         observacoesEspeciais: dados.observacoesEspeciais,
       };
 
+      // 2. Usa o executarAcaoPedido que já retorna o pedido atualizado
       const resultado = await executarAcaoPedido(
         () => this.pedidoService.agendarConusltaPre(this.pedido.id, request),
         (loading) => {
@@ -1067,15 +1055,137 @@ export class CardDetalheComponent implements OnInit {
           this.cdRef.detectChanges();
         },
         this.toast,
-        'Consulta pré-operatória agendada com sucesso!',
-        'Erro ao agendar consulta',
+        'Consulta confirmada! Avançando para faturamento.',
+        'Erro ao confirmar agendamento',
       );
 
+      // 3. O resultado já contém o pedido com o status atualizado
       if (resultado.sucesso && resultado.pedido) {
         this.pedido = resultado.pedido;
         this.atualizarFasesPorStatus(this.pedido.status);
         this.faseAvancada.emit(this.pedido);
         this.cdRef.detectChanges();
+
+        setTimeout(() => {
+          this.activeModal.close({
+            sucesso: true,
+            mensagem: 'Avançado para faturamento',
+            pedido: this.pedido,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Erro ao confirmar agendamento:', error);
+      this.toast.error('Erro ao confirmar agendamento');
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  // Agendar/Confirmar consulta pré-operatória (método unificado)
+  async agendarConfirmarConsultaPre(dados: any) {
+    this.loading = true;
+
+    try {
+      // 1. Formata os dados
+      let dataHoraFormatada = dados.dataConsulta;
+      if (dados.horaConsulta) {
+        dataHoraFormatada = `${dados.dataConsulta}T${dados.horaConsulta}:00`;
+      } else {
+        dataHoraFormatada = `${dados.dataConsulta}T00:00:00`;
+      }
+
+      const request: AgendamentoConsultaPreRequest = {
+        dataHora: dataHoraFormatada,
+        local: dados.localConsulta || '',
+        cuidados: dados.cuidados,
+        observacoesEspeciais: dados.observacoesEspeciais,
+      };
+
+      // 2. Chama o serviço (backend já avança para FATURAMENTO)
+      await firstValueFrom(
+        this.pedidoService.agendarConusltaPre(this.pedido.id, request),
+      );
+
+      // 3. Recarrega o pedido para obter o novo status
+      const pedidoAtualizado = await firstValueFrom(
+        this.pedidoService.buscarPorId(this.pedido.id),
+      );
+
+      if (pedidoAtualizado) {
+        this.pedido = pedidoAtualizado;
+        this.atualizarFasesPorStatus(this.pedido.status);
+        this.faseAvancada.emit(this.pedido);
+        this.cdRef.detectChanges();
+
+        this.toast.success(
+          'Consulta pré-operatória agendada com sucesso! Avançando para faturamento.',
+        );
+
+        setTimeout(() => {
+          this.activeModal.close({
+            sucesso: true,
+            mensagem: 'Avançado para faturamento',
+            pedido: this.pedido,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Erro ao agendar consulta:', error);
+      this.toast.error('Erro ao agendar consulta');
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  // Agendar consulta pré-operatória
+  // Substitua o método antigo por este
+  async agendarConsultaPre(dados: any) {
+    this.loading = true;
+
+    try {
+      // 1. Formata os dados
+      let dataHoraFormatada = dados.dataConsulta;
+      if (dados.horaConsulta) {
+        dataHoraFormatada = `${dados.dataConsulta}T${dados.horaConsulta}:00`;
+      } else {
+        dataHoraFormatada = `${dados.dataConsulta}T00:00:00`;
+      }
+
+      const request: AgendamentoConsultaPreRequest = {
+        dataHora: dataHoraFormatada,
+        local: dados.localConsulta || '',
+        cuidados: dados.cuidados,
+        observacoesEspeciais: dados.observacoesEspeciais,
+      };
+
+      // 2. Chama o serviço diretamente (backend já avança para FATURAMENTO)
+      await firstValueFrom(
+        this.pedidoService.agendarConusltaPre(this.pedido.id, request),
+      );
+
+      // 3. Recarrega o pedido para obter o novo status
+      const pedidoAtualizado = await firstValueFrom(
+        this.pedidoService.buscarPorId(this.pedido.id),
+      );
+
+      if (pedidoAtualizado) {
+        this.pedido = pedidoAtualizado;
+        this.atualizarFasesPorStatus(this.pedido.status);
+        this.faseAvancada.emit(this.pedido);
+        this.cdRef.detectChanges();
+
+        this.toast.success(
+          'Consulta agendada com sucesso! Avançando para faturamento.',
+        );
+
+        setTimeout(() => {
+          this.activeModal.close({
+            sucesso: true,
+            mensagem: 'Avançado para faturamento',
+            pedido: this.pedido,
+          });
+        }, 100);
       }
     } catch (error) {
       console.error('Erro ao agendar consulta:', error);
