@@ -112,6 +112,7 @@ export class PedidosForm implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
+    console.log(this.pacienteForm);
     this.inicializarFormulario();
 
     // Se for modo edição, carrega os dados do pedido existente
@@ -277,7 +278,7 @@ export class PedidosForm implements OnInit {
     // TÍTULO: Usar procedimentos
     let titulo = '';
     if (dados.procedimentos && dados.procedimentos.length > 0) {
-      titulo = dados.procedimentos.map((p: any) => p.descricao).join(' | ');
+      titulo = dados.procedimentos[0].descricao || '';
     }
 
     // DESCRIÇÃO: Usar indicação clínica ou relatório pré-operatório
@@ -359,7 +360,6 @@ export class PedidosForm implements OnInit {
   }
 
   private atualizarPedido(): void {
-
     if (!this.pedidoId) {
       console.log('📋 Estado do componente:', {
         modoEdicao: this.modoEdicao,
@@ -428,7 +428,7 @@ export class PedidosForm implements OnInit {
       request.telefonesPaciente = [
         {
           numero: telefone.replace(/\D/g, ''),
-          tipo: 'CELULAR'
+          tipo: 'CELULAR',
         },
       ];
     }

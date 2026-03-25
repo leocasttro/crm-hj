@@ -1,0 +1,94 @@
+.fase-faturamento {
+  animation: fadeIn 0.3s ease;
+
+  .info-box {
+    label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    input, textarea, select {
+      font-size: 0.875rem;
+
+      &:focus {
+        box-shadow: none;
+        border-color: #86b7fe;
+      }
+    }
+  }
+
+  .table {
+    th, td {
+      vertical-align: middle;
+      font-size: 0.8125rem;
+    }
+
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+
+    input.form-control-sm {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+    }
+
+    tfoot td {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+  }
+
+  .card {
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      padding: 0.75rem 1rem;
+    }
+  }
+
+  .form-check {
+    padding-top: 0.5rem;
+
+    .form-check-input {
+      cursor: pointer;
+
+      &:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+      }
+    }
+
+    .form-check-label {
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+  }
+
+  button {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

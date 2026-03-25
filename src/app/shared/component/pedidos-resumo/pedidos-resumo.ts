@@ -18,6 +18,10 @@ export class PedidosResumo {
 
   constructor(private router: Router) {}
 
+  ngOnInit() {
+    console.log(this.pedido.procedimento)
+  }
+
   getStatusClass(status: string): string {
     const classes: Record<string, string> = {
       RASCUNHO: 'bg-secondary',

@@ -1,4 +1,4 @@
-import { PedidoDto } from "./pedido.dto";
+import { PedidoDto } from './pedido.dto';
 
 // Enums para valores fixos (mais seguro que strings soltas)
 export type PedidoStatus =
@@ -8,7 +8,13 @@ export type PedidoStatus =
   | 'REJEITADO'
   | 'APROVADO'
   | 'AGENDAR'
+  | 'AGUARDANDO_APROVACAO_AGENDAMENTO'
+  | 'AGENDAMENTO_REPROVADO'
+  | 'AGENDADO'
+  | 'FATURAMENTO'
+  | 'AGUARDANDO_POS_OPERATORIO'
   | 'CONFIRMADO'
+  | 'EM_PROGRESSO'
   | 'REALIZADO'
   | 'CANCELADO';
 

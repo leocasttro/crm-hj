@@ -21,6 +21,13 @@ export interface AgendamentoRequest {
   observacao?: string;
 }
 
+export interface AgendamentoConsultaPreRequest {
+  dataHora: string;
+  cuidados?: string;
+  observacoesEspeciais?: string;
+  local: string;
+}
+
 // Interfaces para o checklist
 export interface UploadArquivoResponse {
   sucesso: boolean;
@@ -123,6 +130,13 @@ export class PedidoService {
   ): Observable<PedidoDto> {
     return this.http.post<PedidoDto>(
       `${this.baseUrl}/${pedidoId}/agendamento/solicitar`,
+      dadosAgendamento,
+    );
+  }
+
+  agendarConusltaPre(pedidoId: string, dadosAgendamento: AgendamentoConsultaPreRequest): Observable<PedidoDto> {
+    return this.http.post<PedidoDto>(
+      `${this.baseUrl}/${pedidoId}/consulta-pre/agendar`,
       dadosAgendamento,
     );
   }
